@@ -1,0 +1,94 @@
+.table {
+  border-collapse: collapse;
+  border-radius: $border-radius-input;
+  width: 100%;
+
+  th {
+    font-weight: bold;
+    font-family: $font-face-header;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  thead,
+  tr:nth-child(2n) {
+    background-color: var(--color-border-shadow);
+    transition: background-color 0.1s;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+
+  td, th {
+    padding: .5em .7em;
+    border: 1px solid var(--color-contrast-border);
+
+    &.collapsing {
+      width: 1px;
+    }
+  }
+
+  &.active tbody > tr:hover {
+    cursor: pointer;
+    background-color: var(--color-alt-bg);
+  }
+
+  &.compact {
+    td, th {
+      padding: .4em .5em;
+    }
+  }
+
+  &.clear {
+    tr {
+      background-color: transparent;
+    }
+
+    td, th {
+      padding: .1em .2em;
+      border: none;
+    }
+  }
+
+
+  @media (max-width: $responsive-mobile-browser-width) {
+    display: block;
+    margin: auto $container-padding*-1;
+    width: calc(100% + #{2*$container-padding});
+
+    thead, tbody, td, th {
+      display: block;
+      width: 100% !important;
+      box-sizing: border-box;
+    }
+
+    tr {
+      display: block;
+      border: 1px solid var(--color-contrast-border);
+      border-bottom: none;
+      padding: 0.5em 0;
+    }
+
+    tr:last-child {
+      border-bottom: 1px solid var(--color-contrast-border);
+    }
+
+    td, th {
+      text-align: left !important;
+      border: none;
+      padding: 0.1em $space-standard!important;
+    }
+
+    td::before {
+      content: attr(data-header);
+      color: var(--color-dimmed);
+    }
+
+    &.clear {
+      td, th {
+        padding: .1em $space-standard!important;
+      }
+    }
+  }
+}

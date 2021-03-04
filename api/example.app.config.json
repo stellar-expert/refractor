@@ -1,0 +1,30 @@
+{
+  "port": 3000,
+  "storage": "mongodb",
+  "db": "mongodb://127.0.0.1:27017/coordinator",
+  "trustProxy": 0,
+  "networks": {
+    "public": {
+      "horizon": "https://horizon.stellar.org",
+      "network": "PUBLIC",
+      "passphrase": "Public Global Stellar Network ; September 2015",
+      "coredb": {
+        "user": "stellar",
+        "host": "127.0.0.1",
+        "database": "stellar-core",
+        "password": ""
+      }
+    },
+    "testnet": {
+      "horizon": "https://horizon-testnet.stellar.org",
+      "network": "TESTNET",
+      "passphrase": "Test SDF Network ; September 2015",
+      "coredb": {
+        "user": "stellar",
+        "host": "127.0.0.1",
+        "database": "stellar-testnet",
+        "password": ""
+      }
+    }
+  }
+}

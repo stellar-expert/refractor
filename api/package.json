@@ -1,0 +1,37 @@
+{
+  "name": "api-refractor-stellar-expert",
+  "private": true,
+  "version": "0.1.2",
+  "author": "orbitlens<orbit@stellar.expert>",
+  "description": "Pending transactions storage and multisig aggregator for Stellar Network",
+  "main": "api.js",
+  "scripts": {
+    "start": "node ./api.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/stellar-expert/coordinator-stellar-expert.git"
+  },
+  "dependencies": {
+    "@google-cloud/firestore": "^4.9.4",
+    "@stellar-expert/tx-signers-inspector": "^1.1.0",
+    "axios": "^0.21.1",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "dayjs": "^1.9.6",
+    "express": "^4.17.1",
+    "express-rate-limit": "^5.2.3",
+    "fastq": "^1.10.1",
+    "lru-cache": "^6.0.0",
+    "mongodb": "^3.6.3",
+    "morgan": "^1.10.0",
+    "pg": "^8.5.1",
+    "pg-connection-string": "^2.4.0",
+    "pg-cursor": "^2.5.1",
+    "stellar-sdk": "^7.0.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
+  }
+}

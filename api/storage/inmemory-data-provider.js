@@ -1,0 +1,54 @@
+const DataProvider = require('./data-provider')
+
+class InMemoryDataProvider extends DataProvider {
+    storage
+
+    async init() {
+        this.storage = {}
+    }
+
+    async saveTransaction(txModel) {
+        this.storage[txModel.hash] = txModel
+        await this.save()
+    }
+
+    async findTransaction(txId) {
+        return this.storage[txId]
+    }
+
+    async updateTransaction(hash, update, expectedCurrentStatus) {
+        const tx = await this.findTransaction(hash)
+        if (!tx) return false
+        if (expectedCurrentStatus !== undefined && tx.status !== expectedCurrentStatus) return false
+        Object.assign(tx, update)
+        await this.save()
+        return true
+    }
+
+    listTransactions(filter) {
+        const filters = Object.entries(filter),
+            matchResult = Object.values(this.storage)
+                .filter(tx => filters.every(([key, value]) => tx[key] == value))
+        return {
+            [Symbol.asyncIterator]() {
+                return {
+                    matchResult,
+                    cursor: 0,
+                    next() {
+                        if (this.cursor >= this.matchResult.length) return Promise.resolve({done: true})
+                        return Promise.resolve({value: this.matchResult[this.cursor++], done: false})
+                    }
+                }
+            },
+            async toArray() {
+                return matchResult.slice()
+            }
+        }
+    }
+
+    async save() {
+        //no op
+    }
+}
+
+module.exports = InMemoryDataProvider

@@ -1,0 +1,17 @@
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--color-highlight);
+  }
+
+  &.disabled {
+    cursor: default;
+
+    &:hover {
+      color: var(--color-primary);
+    }
+  }
+}

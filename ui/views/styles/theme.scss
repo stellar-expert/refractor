@@ -1,0 +1,26 @@
+$color-alert: #dc3545;
+$color-success: #28a745;
+$color-warning: #ffc107;
+
+:root {
+  //colors
+  --color-primary: #0691B7;
+  --color-highlight: #08B5E5;
+  --color-dimmed: #999;
+  --color-alert: #{$color-alert};
+  --color-alert-bg: #{transparentize($color-alert, 0.8)};
+  --color-success: #{$color-success};
+  --color-success-bg: #{transparentize($color-success, 0.8)};
+  --color-warning: #{$color-warning};
+  --color-warning-bg: #{transparentize($color-warning, 0.8)};
+  --color-bg: #fff;
+  --color-dashboard-bg: #f5f5f5;
+  --color-alt-bg: #D4EEF7;
+  --color-text: #333;
+  --color-contrast-border: #d8dadb;
+  --color-border-shadow: rgba(189, 191, 192, .1);
+  --color-backdrop: rgba(0, 0, 0, .35);
+  //for trading
+  --color-price-up: #00ba00;
+  --color-price-down: #df0000;
+}

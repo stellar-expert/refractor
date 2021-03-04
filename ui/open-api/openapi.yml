@@ -1,0 +1,207 @@
+openapi: 3.0.2
+info:
+  title: Refractor
+  version: 0.1.0
+  description: |
+    [Refractor](/) is a pending transactions storage and multisig aggregator for Stellar Network.
+
+    ## How it works
+
+    This service allows anyone to store transactions and gather signatures required to match the signing threshold.
+
+    Any eligible signer can sign the transaction. As soon as it reaches the required threshold (calculated
+    automatically), the service either submits the transaction to Stellar network or executes a callback.
+
+    Once uploaded to the server, the transaction cannot be deleted or modified. Other services and wallets can access
+    and sign it by a standard URL like `https://api.refractor.stellar.expert/tx/4b50...3dad` where its hash serves as
+    a unique identifier.
+
+    Refractor automatically discovers potential signers and computes the thresholds. The signing process is
+    fully coordinated, signatures aggregation occurs on the server side which in turn allows us to deal with
+    potentially problematic cases like applying signatures from two different signers concurrently or preventing
+    handling `TX_BAD_AUTH_EXTRA` errors in case of too many signatures applied to a transaction.
+    Refractor ensures that signatures are valid and consistent.
+
+  termsOfService: 'https://refractor.stellar.expert/'
+  contact:
+    url: 'https://refractor.stellar.expert/'
+    email: info@stellar.expert
+  license:
+    name: MIT
+    url: 'https://tldrlegal.com/license/mit-license'
+  x-logo:
+    url: 'https://refractor.stellar.expert/img/refractor-small-logo.png'
+servers:
+  - url: 'https://api.refractor.stellar.expert'
+paths:
+  /tx:
+    post:
+      requestBody:
+        description: Transaction description
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TxRequest'
+        required: true
+      tags:
+        - '/tx endpoint'
+      responses:
+        '200':
+          description: Transaction stored/updated sucessfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxInfo'
+        '400':
+          description: |
+            Invalid paremters, possible errors:
+            - Unidentified network
+            - Invalid transaction XDR
+            - Invalid URL supplied in "callbackUrl" parameter
+            - Invalid "requestedSigners" parameter
+            - Invalid "expires" parameter
+            - Invalid transactions "timebounds.maxTime" value - the transaction already expired
+        '406':
+          description: |
+            Not supported, possible errors:
+            - FeeBump transactions not supported
+      summary: Store a transaction
+      description: >-
+        Sends a transaction (with or without signatures) to the server. If the
+        transaction with the same hash doesn't exist on the server yet, the
+        transaction and its signatures are stored on the server. Otherwise,
+        Refractor finds new signatures and applies them to the existing
+        transaction. Invalid or redundant signatures are discarded
+        automatically.
+      operationId: submitTx
+  '/tx/{txHash}':
+    get:
+      tags:
+        - '/tx endpoint'
+      parameters:
+        - name: txHash
+          description: Transaction hash
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/TxHash'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TxInfo'
+          description: Transaction info retrieved
+        '404':
+          description: Transaction not found
+      operationId: getTxByHash
+      summary: Retrieve transaction info
+      description: >-
+        Returns transaction information and signing status for a given
+        transaction hash.
+components:
+  schemas:
+    TxHash:
+      description: Transaction hash
+      type: string
+      example: a1ef625e2bda7e71493b8a6bb4b03fa6512a67593d99acacfe5fb59b79e28154
+      pattern: '/^[a-f0-9]{64}$/'
+    TxRequest:
+      description: Transaction descriptor
+      required:
+        - network
+        - xdr
+      type: object
+      properties:
+        network:
+          description: Stellar network name ("public" or "testnet")
+          enum:
+            - public
+            - testnet
+          type: string
+          example: testnet
+        xdr:
+          description: Base64-encoded Stellar transaction XDR with or without signatures
+          type: string
+          example: AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0h…
+        expires:
+          description: >-
+            Transaction expiration date (UNIX timestamp), by default equals the
+            transaction maxTime if not set
+          default: Current date + 30 days
+          type: integer
+          example: 1727178665
+        callbackUrl:
+          description: Callback URL where the transaction will be POSTed once ready
+          type: string
+          example: 'https://my.server/tx-signed'
+        submit:
+          description: >-
+            Whether the transaction should be automatically submitted to Horizon
+            once ready
+          default: false
+          type: boolean
+    TxSignature:
+      description: Applied transaction signature pairs
+      type: object
+      properties:
+        key:
+          description: Signature public key
+          type: string
+          example: GA4K90L1NP…
+        signature:
+          description: Raw transaction signature
+          type: string
+          example: d30a85c…
+    TxInfo:
+      description: Transaction descriptor
+      type: object
+      properties:
+        network:
+          description: Stellar network name ("public" or "testnet")
+          enum:
+            - public
+            - testnet
+          type: string
+          example: testnet
+        xdr:
+          description: Base64-encoded Stellar transaction XDR with or without signatures
+          type: string
+          example: AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0h…
+        minTime:
+          description: Point in time when a transaction becomes valid (populated from a tx timebounds)
+          type: integer
+          example: 1527178665
+        maxTime:
+          description: Transaction expiration date (UNIX timestamp)
+          type: integer
+          example: 1727178665
+        callbackUrl:
+          description: Callback URL where the transaction will be POSTed once ready
+          type: string
+          example: 'https://my.server/tx-signed'
+        submit:
+          description: Whether the transaction should be automatically submitted to Horizon once ready
+          default: false
+          type: boolean
+        signatures:
+          description: Applied transaction signatures
+          type: array
+          items:
+            $ref: '#/components/schemas/TxSignature'
+        status:
+          description: Current transaction status
+          type: string
+          enum:
+            - pending
+            - ready
+            - processing
+            - processed
+            - failed
+          example: testnet
+        submitted:
+          description: Submitted transaction timestamp (only if the transaction has been automatically submitted to the network)
+          type: integer
+          example: 1627178665
+tags:
+  - name: '/tx endpoint'
