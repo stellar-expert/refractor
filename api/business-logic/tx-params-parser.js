@@ -1,9 +1,8 @@
 const {StrKey} = require('stellar-sdk'),
     {standardError} = require('./std-error'),
     {resolveNetwork, resolveNetworkId} = require('./network-resolver'),
-    TxModel = require('../models/tx-model')
-
-const maxAgeDays = 30
+    TxModel = require('../models/tx-model'),
+    {getUnixTimestamp} = require('./timestamp-utils')
 
 /**
  *
@@ -16,7 +15,7 @@ const maxAgeDays = 30
  * @returns {TxModel}
  */
 function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expires = 0}) {
-    const now = Math.floor(new Date().getTime() / 1000)
+    const now = getUnixTimestamp()
     const txInfo = new TxModel()
     txInfo.network = resolveNetworkId(network)
     txInfo.xdr = tx.toXDR()
@@ -43,19 +42,20 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
             throw standardError(400, `Invalid "expires" parameter. ${expires} is not a valid UNIX date.`)
         if (expires < now)
             throw standardError(400, `Invalid "expires" parameter. ${expires} date has already passed.`)
-        if (expires > now + maxAgeDays * 24 * 60 * 60)
-            throw standardError(400, `Invalid "expires" parameter. Transactions can be stored for no more than ${maxAgeDays} days.`)
+        // if (expires > now + maxAgeDays * 24 * 60 * 60)
+        //     throw standardError(400, `Invalid "expires" parameter. Transactions can be stored for no more than ${maxAgeDays} days.`)
     }
 
     //retrieve expiration time from the transaction itself
     const txExpiration = parseInt(tx.timeBounds.maxTime)
     if (txExpiration && txExpiration < now)
         throw standardError(400, `Invalid transactions "timebounds.maxTime" value - the transaction already expired.`)
-    if (txExpiration > 0 && txExpiration < expires && txExpiration < now + maxAgeDays * 24 * 60 * 60) {
+    if (txExpiration > 0 && txExpiration < expires) {
         expires = txExpiration
     }
-
-    txInfo.maxTime = expires || (now + maxAgeDays * 24 * 60 * 60)
+    if (expires > 0) {
+        txInfo.maxTime = expires
+    }
 
     if (submit === true) {
         txInfo.submit = true

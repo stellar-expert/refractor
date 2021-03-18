@@ -1,4 +1,5 @@
-const DataProvider = require('./data-provider')
+const DataProvider = require('./data-provider'),
+    {matchPredicate} = require('./simple-predicate-matcher')
 
 class InMemoryDataProvider extends DataProvider {
     storage
@@ -26,9 +27,8 @@ class InMemoryDataProvider extends DataProvider {
     }
 
     listTransactions(filter) {
-        const filters = Object.entries(filter),
-            matchResult = Object.values(this.storage)
-                .filter(tx => filters.every(([key, value]) => tx[key] == value))
+        const matchResult = Object.values(this.storage)
+            .filter(tx => matchPredicate(tx, filter))
         return {
             [Symbol.asyncIterator]() {
                 return {

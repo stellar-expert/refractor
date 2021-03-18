@@ -1,9 +1,9 @@
 const createQueue = require('fastq'),
-    {inspectTransactionSigners} = require('@stellar-expert/tx-signers-inspector'),
     storageLayer = require('../../storage/storage-layer'),
     {rehydrateTx} = require('../tx-loader'),
     {processCallback} = require('./callback-handler'),
-    {submitTransaction} = require('./horizon-handler')
+    {submitTransaction} = require('./horizon-handler'),
+    {getUnixTimestamp} = require('../timestamp-utils')
 
 class Finalizer {
     constructor() {
@@ -20,11 +20,14 @@ class Finalizer {
 
     async scheduleTransactionsBatch() {
         try {
-            const cursor = await storageLayer.dataProvider.listTransactions({status: 'ready'})
+            const now = getUnixTimestamp()
+            //get transactions ready to be submitted
+            const cursor = await storageLayer.dataProvider.listTransactions({status: 'ready', minTime: {$lte: now}})
             for await (let txInfo of cursor) {
                 if (this.processorTimerHandler === 0) //pipeline stop executed
                     return
                 this.finalizerQueue.push(txInfo)
+                //the queue length should not exceed the max queue size
                 if (this.finalizerQueue.length() >= this.targetQueueSize)
                     break
             }
@@ -54,6 +57,8 @@ class Finalizer {
             return //invalid current state
         }
         try {
+            if (txInfo.maxTime < getUnixTimestamp())
+                throw new Error(`Transaction has already expired`)
             const txInfoFull = rehydrateTx(txInfo)
             const update = {status: 'processed'}
             if (txInfo.callbackUrl) {
@@ -61,12 +66,10 @@ class Finalizer {
             }
             if (txInfo.submit) {
                 await submitTransaction(txInfoFull)
-                update.submitted = Math.floor(new Date().getTime() / 1000)
+                update.submitted = getUnixTimestamp()
             }
-            if (!await storageLayer.dataProvider.updateTransaction(txInfo.hash, update, 'processing')) {
-                console.error(`State conflict after callback execution`)
-                return
-            }
+            if (!await storageLayer.dataProvider.updateTransaction(txInfo.hash, update, 'processing'))
+                throw new Error(`State conflict after callback execution`)
         } catch (e) {
             console.error(e)
             await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'failed', 'processing')

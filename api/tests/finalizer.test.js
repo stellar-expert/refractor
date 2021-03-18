@@ -1,10 +1,9 @@
 const finalizer = require('../business-logic/finalization/finalizer'),
     storageLayer = require('../storage/storage-layer'),
-    {setCallbackHandler} = require('../business-logic/finalization/callback-handler')
-const {setSubmitTransactionCallback} = require('../business-logic/finalization/horizon-handler')
+    {setCallbackHandler} = require('../business-logic/finalization/callback-handler'),
+    {setSubmitTransactionCallback} = require('../business-logic/finalization/horizon-handler')
 
-//high-level integration test for the finalizer logic
-test('', async () => {
+test('high-level finalizer logic', async () => {
     await storageLayer.initDataProvider('inmemory')
     await storageLayer.dataProvider.saveTransaction({
         'hash': '89d6c423a51e030b392f0e7505e9f3b66be11cb1477aecda79a34e5ae61060e4',
@@ -22,7 +21,6 @@ test('', async () => {
         ],
         'submit': true,
         'minTime': 0,
-        'maxTime': 1615845406,
         'status': 'ready'
     })
     await storageLayer.dataProvider.saveTransaction({
@@ -41,7 +39,6 @@ test('', async () => {
         ],
         'callbackUrl': 'https://postman-echo.com/',
         'minTime': 0,
-        'maxTime': 1608642042,
         'status': 'ready'
     })
     await storageLayer.dataProvider.saveTransaction({
@@ -50,7 +47,6 @@ test('', async () => {
         'xdr': 'AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAMgACCbgAAAAAgAAAAEAAAAAAAAAAAAAAABihthYAAAAAQAAAAUxMTExMQAAAAAAAAEAAAAAAAAAAQAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAAAAAAAAAJiWgAAAAAAAAAAA',
         'signatures': [],
         'minTime': 0,
-        'maxTime': 1615731631,
         'status': 'pending'
     })
     await storageLayer.dataProvider.saveTransaction({
@@ -59,7 +55,6 @@ test('', async () => {
         'xdr': 'A',
         'signatures': [],
         'minTime': 9999999999,
-        'maxTime': 1615731631,
         'status': 'pending'
     })
     await storageLayer.dataProvider.saveTransaction({
@@ -79,7 +74,6 @@ test('', async () => {
         'submit': true,
         'callbackUrl': 'https://postman-echo.com/',
         'minTime': 0,
-        'maxTime': 1615840546,
         'status': 'ready'
     })
 

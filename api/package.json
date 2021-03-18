@@ -1,7 +1,7 @@
 {
   "name": "api-refractor-stellar-expert",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.1.3",
   "author": "orbitlens<orbit@stellar.expert>",
   "description": "Pending transactions storage and multisig aggregator for Stellar Network",
   "main": "api.js",
