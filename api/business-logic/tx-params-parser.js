@@ -35,7 +35,7 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
         txInfo.desiredSigners = desiredSigners
     }
 
-    txInfo.minTime = parseInt(tx.timeBounds.minTime) || 0
+    txInfo.minTime = (tx.timeBounds && parseInt(tx.timeBounds.minTime)) || 0
 
     if (expires) {
         if (expires > 2147483647 || expires < 0)
@@ -47,7 +47,7 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
     }
 
     //retrieve expiration time from the transaction itself
-    const txExpiration = parseInt(tx.timeBounds.maxTime)
+    const txExpiration = (tx.timeBounds && parseInt(tx.timeBounds.maxTime)) || 0
     if (txExpiration && txExpiration < now)
         throw standardError(400, `Invalid transactions "timebounds.maxTime" value - the transaction already expired.`)
     if (txExpiration > 0 && txExpiration < expires) {
