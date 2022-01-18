@@ -198,7 +198,7 @@ components:
             - processing
             - processed
             - failed
-          example: testnet
+          example: pending
         submitted:
           description: Submitted transaction timestamp (only if the transaction has been automatically submitted to the network)
           type: integer
