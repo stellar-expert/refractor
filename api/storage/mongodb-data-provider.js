@@ -11,11 +11,13 @@ class MongodbDataProvider extends DataProvider {
             promoteValues: true,
             promoteLongs: false,
             keepAlive: true,
-            useNewUrlParser: true,
             useUnifiedTopology: true,
+            directConnection: true,
+            retryWrites: true,
             authSource: 'admin',
-            poolSize: 30
+            minPoolSize: 2
         }
+
         const connection = await MongoClient.connect(config.db, options)
         this.db = connection.db()
         console.log(`Connected to MongoDB data source ${this.db.databaseName}`)

@@ -10,7 +10,6 @@
         finalizer = require('./business-logic/finalization/finalizer')
 
     //setup connectors
-    require('./storage/core-db-data-source').initPgDbPools()
     console.log('StellarCore DB connection - initialized')
     await require('./storage/storage-layer').initDataProvider()
     console.log('Storage data provider - initialized')

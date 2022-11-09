@@ -1,16 +1,13 @@
 const {TransactionBuilder, FeeBumpTransaction, Keypair} = require('stellar-sdk'),
     {inspectTransactionSigners} = require('@stellar-expert/tx-signers-inspector'),
-    TxModel = require('../models/tx-model'),
     TxSignature = require('../models/tx-signature'),
-    {resolveNetwork, resolveNetworkParams, normalizeNetworkName} = require('./network-resolver'),
+    {resolveNetwork, resolveNetworkParams} = require('./network-resolver'),
     {standardError} = require('./std-error'),
-    {loadAccountsInfo} = require('../storage/core-db-data-source'),
     storageLayer = require('../storage/storage-layer'),
-    {hintMatchesKey, hintToMask} = require('./signature-hint-utils'),
-    {sliceTx} = require('./tx-params-parser'),
-    {parseTxParams} = require('./tx-params-parser'),
-    {getAllSourceAccounts} = require('./tx-helpers'),
-    {rehydrateTx} = require('./tx-loader')
+    {loadTxSourceAccountsInfo} = require('./account-info-provider'),
+    {sliceTx, parseTxParams} = require('./tx-params-parser'),
+    {rehydrateTx} = require('./tx-loader'),
+    {hintMatchesKey, hintToMask} = require('./signature-hint-utils')
 
 class Signer {
     /**
@@ -90,12 +87,9 @@ class Signer {
             this.status = 'created'
         }
         const {horizon} = resolveNetworkParams(this.txInfo.network)
-        //find all source accounts participating in the tx
-        const sourceAccounts = getAllSourceAccounts(this.tx)
-        //load information about every source account directly from StellarCore database
-        const sourceAccountsInfo = await loadAccountsInfo(normalizeNetworkName(this.txInfo.network), sourceAccounts)
+        const accountsInfo = await loadTxSourceAccountsInfo(this.tx, this.txInfo.network)
         //discover signers
-        this.schema = await inspectTransactionSigners(this.tx, {horizon, accountsInfo: sourceAccountsInfo})
+        this.schema = await inspectTransactionSigners(this.tx, {horizon, accountsInfo})
         //get all signers that can potentially sign the transaction
         this.potentialSigners = this.schema.getAllPotentialSigners()
         return this
