@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import {Switch, Router, Route, Redirect} from 'react-router'
 import Layout from './layout-view'
 import TxView from './tx/tx-view'
-import AddTxView from './tx/add-tx-view'
+import AddTxView from './tx/add/add-tx-view'
 import NotFoundView from './general/not-found-view'
 import WelcomeView from './general/welcome-view'
 

@@ -1,5 +1,5 @@
 import {stringifyQuery} from './url-utils'
-import {apiEndpoint} from '../app.config.json'
+import config from '../app.config.json'
 
 /**
  * Retrieve data from the server API endpoint.
@@ -12,7 +12,7 @@ import {apiEndpoint} from '../app.config.json'
 export function apiCall(relativeApiPath, data, params) {
     params = {method: 'GET', includeNetwork: true, ...params}
     let fetchParams = {}
-    let url = `${apiEndpoint}/${relativeApiPath}`
+    let url = `${config.apiEndpoint}/${relativeApiPath}`
     if (params.method && params.method !== 'GET') {
         fetchParams = {
             ...params,

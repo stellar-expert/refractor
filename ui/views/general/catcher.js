@@ -34,7 +34,7 @@ class Catcher extends React.Component {
                         {stack}
                         </pre>
                     </div>
-                    <div className="space dimmed small">
+                    <div className="space dimmed text-small">
                         If this error persists please{' '}
                         <a href="https://github.com/orbitlens/refractor/issues/"
                            target="_blank" rel="noreferrer noopener">contact our support</a>.

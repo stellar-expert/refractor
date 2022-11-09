@@ -1,7 +1,9 @@
 import {TransactionBuilder, StrKey, Server} from 'stellar-sdk'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
-import {networks} from '../app.config.json'
+import config from '../app.config.json'
 import {apiCall} from './api'
+
+const {networks} = config
 
 export async function validateNewTx(data) {
     const res = {

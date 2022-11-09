@@ -1,3 +1,4 @@
-# Packages
-public/distr/
+node_modules
+public/
+
 /app.config.json

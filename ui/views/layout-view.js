@@ -1,6 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Catcher from './general/catcher'
+import {Tooltip} from '@stellar-expert/ui-framework'
+import MenuView from './menu-view'
 
 export default function Layout({children}) {
     return <div className="page-wrapper">
@@ -8,10 +10,10 @@ export default function Layout({children}) {
         <div className="top-block">
             <div className="container">
                 <a href="/" className="logo"><img src="/img/refractor-small-logo.png" alt="refractor logo"/></a>
-                <div className="main-menu">
+                <MenuView>
                     <a href="/tx/add">Store transaction</a>
                     <a href="/openapi.html" target="_blank">Documentation & API</a>
-                </div>
+                </MenuView>
             </div>
         </div>
         <div className="page-container">

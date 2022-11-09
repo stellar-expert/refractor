@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-US" data-theme="day">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no"/>
+    <title>Refractor - transactions storage and multisig aggregator for Stellar Network</title>
+    <meta name="description"
+          content="Explore detailed stats, price history, and analytic reports for all assets on Stellar Network. View comprehensive account history, search transactions and payments, examine well-known accounts, analyze XLM and Stellar Network performance.">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="referrer" content="no-referrer">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#000000">
+    <style>
+        #pre-loader {
+            width: 100%;
+            height: 100%;
+            color: #07A2CC;
+            font-size: 2.5rem;
+            text-align: center;
+            display: flex;
+            align-items: center;
+        }
+
+        .loader {
+            display: block;
+            background: url(/img/refractor-logo-512.svg) no-repeat center center;
+            background-size: auto 2em;
+            width: 2em;
+            height: 2em;
+            font-size: 18px;
+            margin: 2em auto;
+            padding: 1em;
+            position: relative;
+            transform: translateZ(0);
+            animation: 0.5s loader-appear, 3s loader-animation 0.5s infinite;
+            box-sizing: border-box;
+        }
+
+        .loader.inline {
+            margin: 0 !important;
+        }
+
+        .loader.large {
+            font-size: 24px;
+        }
+
+        .loader.page-center {
+            margin-top: 45vh;
+        }
+
+        @keyframes loader-appear {
+            0%,
+            80% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        @keyframes loader-animation {
+            0%,
+            100% {
+            }
+            50% {
+                transform: rotateY(180deg);
+            }
+        }
+    </style>
+</head>
+<body>
+<noscript>Please enable JavaScript or use another browser.</noscript>
+<div id="pre-loader">
+    <div class="loader large page-center"></div>
+</div>
+</body>
+</html>

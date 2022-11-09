@@ -16,25 +16,6 @@ $top-menu-line-height: 2.2em;
   padding: 0.2em 0 0.2em 0.5em;
 }
 
-.main-menu {
-  font-size: 1.6rem;
-  line-height: $top-menu-line-height;
-  float: right;
-  font-family: $font-face-header;
-  text-transform: uppercase;
-}
-
-.main-menu > * {
-  & + * {
-    margin-left: 1.4em;
-  }
-
-  &.current {
-    color: #333;
-    cursor: default;
-  }
-}
-
 .page-container {
   background: var(--color-dashboard-bg);
   padding: 1rem 0 2rem;
@@ -54,7 +35,6 @@ $top-menu-line-height: 2.2em;
     }
   }
 }
-
 
 .logo, .logo:hover {
   display: block;

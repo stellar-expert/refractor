@@ -1,15 +1,2 @@
-@import "./variables";
-@import "fonts";
-@import "theme";
-@import "typography";
-@import "scrollbars";
-@import "spacing";
-@import "loader";
-@import "link";
-@import "form";
-@import "button";
-@import "table";
-@import "base";
-@import "grid";
+@import '~@stellar-expert/ui-framework/index.scss';
 @import "page-layout";
-@import "responsive";
