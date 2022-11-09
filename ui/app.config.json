@@ -1,5 +1,4 @@
 {
-  "apiEndpoint": "http://localhost:3000",
   "networks": {
     "public": {
       "title": "public",
