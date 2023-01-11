@@ -73,7 +73,7 @@ class Finalizer {
         } catch (e) {
             console.error('TX ' + txInfo.hash + ' processing failed')
             console.error(e)
-            await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'failed', 'processing')
+            await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'failed', 'processing', e)
             cb(e)
             return
         }
