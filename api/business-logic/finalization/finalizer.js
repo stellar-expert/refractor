@@ -57,7 +57,7 @@ class Finalizer {
             return //invalid current state
         }
         try {
-            if (txInfo.maxTime < getUnixTimestamp())
+            if (txInfo.maxTime && txInfo.maxTime < getUnixTimestamp())
                 throw new Error(`Transaction has already expired`)
             const txInfoFull = rehydrateTx(txInfo)
             const update = {status: 'processed'}
@@ -71,6 +71,7 @@ class Finalizer {
             if (!await storageLayer.dataProvider.updateTransaction(txInfo.hash, update, 'processing'))
                 throw new Error(`State conflict after callback execution`)
         } catch (e) {
+            console.error('TX ' + txInfo.hash + ' processing failed')
             console.error(e)
             await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'failed', 'processing')
             cb(e)

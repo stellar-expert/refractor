@@ -45,11 +45,16 @@ class DataProvider {
      *
      * @param {String} hash
      * @param {TxStatus} newStatus
-     * @param {TxStatus} [expectedCurrentStatus]
+     * @param {TxStatus} expectedCurrentStatus?
+     * @param {Error|String} error?
      * @return {Promise<Boolean>}
      */
-    async updateTxStatus(hash, newStatus, expectedCurrentStatus = undefined) {
-        return this.updateTransaction(hash, {status: newStatus}, expectedCurrentStatus)
+    async updateTxStatus(hash, newStatus, expectedCurrentStatus = undefined, error = null) {
+        const update = {status: newStatus}
+        if (error) {
+            update.error = (error.message || error).toString()
+        }
+        return this.updateTransaction(hash, update, expectedCurrentStatus)
     }
 }
 
