@@ -22,15 +22,15 @@ export default function Layout({children}) {
             </div>
         </div>
         <div className="footer">
-            <div className="container text-center">
+            <div className="dimmed container text-center">
                 <div>{new Date().getFullYear()}&nbsp;©&nbsp;Refractor Web <span className="dimmed">v{appVersion}</span>
                 </div>
                 <div>
                     <a href="https://github.com/stellar-expert/refractor" target="_blank" rel="noopener"
-                       className="nowrap">
+                       className="nowrap dimmed ">
                         Open Source
                     </a>&emsp;
-                    <a href="mailto:info@stellar.expert" target="_blank" rel="noopener" className="nowrap">
+                    <a href="mailto:info@stellar.expert" target="_blank" rel="noopener" className="nowrap dimmed">
                         info@stellar.expert
                     </a>
                 </div>

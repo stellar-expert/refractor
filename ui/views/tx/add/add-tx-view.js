@@ -20,7 +20,7 @@ function TxPropsBlock({title, description, optional = false, children}) {
                 {children}
             </div>
             <div className="column column-40">
-                <div className="segment text-small" style={{height: '100%'}}>
+                <div className="segment dimmed text-tiny" style={{height: '100%'}}>
                     {description}
                 </div>
             </div>
@@ -83,8 +83,8 @@ export default function AddTxView() {
                 <a href="views/tx/add/add-tx-view#sdks" target="_blank"> Stellar SDK</a>.
             </>}>
                 <textarea value={data.xdr} disabled={inProgress} onChange={e => setParam('xdr', e.target.value.trim())}
-                          className="text-small text-monospace condensed" placeholder="Base64-encoded transaction envelope"
-                          style={{width: '100%', height: '8em', resize: 'vertical', marginBottom: '-6px'}}/>
+                          className="text-small text-monospace condensed mb-space" placeholder="Base64-encoded transaction envelope"
+                          style={{width: '100%', 'minHeight': '8rem', height: '100%', display: 'block', resize: 'vertical', marginBottom: '-6px'}}/>
             </TxPropsBlock>
 
             <TxPropsBlock description={<>
