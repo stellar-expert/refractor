@@ -21,7 +21,7 @@ export default function TxView() {
     if (error) throw error
     if (!txInfo) return <div className="loader"/>
     return <>
-        <h2>Transaction
+        <h2>Transaction&nbsp;
             <BlockSelect inline wrap className="condensed">{txhash}</BlockSelect>
             <span className="text-small"><CopyToClipboard text={txhash}/></span>
         </h2>

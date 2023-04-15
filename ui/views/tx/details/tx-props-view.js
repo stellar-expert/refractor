@@ -76,14 +76,14 @@ export default function TxPropsView({txInfo}) {
         </div>}
         <div>
             <span className="label">Source account sequence: </span>
-            <BlockSelect inline wrap className="condensed word-break">{tx.sequence}</BlockSelect>
+            <BlockSelect inline wrap className="condensed">{tx.sequence}</BlockSelect>
             <InfoTooltip>
                 Sequence of the source account
             </InfoTooltip>
         </div>
         <div>
             <span className="dimmed">Transaction&nbsp;XDR:&nbsp;</span>
-            <BlockSelect wrap inline className="condensed word-break">{txInfo.xdr}</BlockSelect>
+            <BlockSelect wrap inline className="condensed">{txInfo.xdr}</BlockSelect>
             <CopyToClipboard text={txInfo.xdr}/>
             <InfoTooltip>
                 Base64-encoded Stellar transaction XDR with signatures
