@@ -79,8 +79,8 @@ export async function loadTx(txhash) {
         try {
             const {created_at, successful} = await new Server(networks[txInfo.network].horizon)
                 .transactions().transaction(txInfo.hash).call()
+            txInfo.submitted = new Date(created_at)
             if (successful) {
-                txInfo.submitted = new Date(created_at)
                 txInfo.status = 'processed'
             } else {
                 txInfo.status = 'failed'

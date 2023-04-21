@@ -11,7 +11,7 @@ import {stringifyQuery} from './url-utils'
 export function apiCall(relativeApiPath, data, params) {
     params = {method: 'GET', includeNetwork: true, ...params}
     let fetchParams = {}
-    let url = `${apiOrigin}/${relativeApiPath}`
+    let url = `https://api.refractor.stellar.expert/${relativeApiPath}`
     if (params.method && params.method !== 'GET') {
         fetchParams = {
             ...params,

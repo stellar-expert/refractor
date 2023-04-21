@@ -1,12 +1,26 @@
-import React, {useState} from 'react'
+import React, {useState,useEffect} from 'react'
 import {Server, TransactionBuilder} from 'stellar-sdk'
 import {Button, TxLink} from '@stellar-expert/ui-framework'
 import config from '../../../app.config.json'
+import {loadTx} from "../../../infrastructure/tx-dispatcher";
 
-export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network}) {
+export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network, onUpdate}) {
     const [inProgress, setInProgress] = useState(false),
         [result, setResult] = useState(null),
         [error, setError] = useState(null)
+
+    let checkStatus
+    useEffect(async () => {
+        if (status === 'ready') {
+            checkStatus = setInterval(async ()=>{
+                const txInfo = await loadTx(hash)
+                txInfo.status !== 'ready' && onUpdate(txInfo)
+            }, 1000)
+        }
+        return () => {
+            clearInterval(checkStatus)
+        };
+    }, []);
 
     function submitTx() {
         const {passphrase, horizon} = config.networks[network],
@@ -38,6 +52,9 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
         Transaction has been <a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank">submitted</a> to the network
     </div>
 
+    if (status === 'processed' && !submitted) return <div>
+        Transaction is fully signed and processed.
+    </div>
     return <div>
         {readyToSubmit && !submitted ? <>
             {!!error && <div className="error">{error}</div>}

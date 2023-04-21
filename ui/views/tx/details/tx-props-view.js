@@ -75,21 +75,13 @@ export default function TxPropsView({txInfo}) {
             </InfoTooltip>
         </div>}
         <div>
-            <span className="label">Source account sequence: </span>
-            <BlockSelect inline wrap className="condensed">{tx.sequence}</BlockSelect>
-            <InfoTooltip>
-                Sequence of the source account
-            </InfoTooltip>
-        </div>
-        <div>
-            <span className="dimmed">Transaction&nbsp;XDR:&nbsp;</span>
-            <BlockSelect wrap inline className="condensed">{txInfo.xdr}</BlockSelect>
-            <CopyToClipboard text={txInfo.xdr}/>
-            <InfoTooltip>
-                Base64-encoded Stellar transaction XDR with signatures
-            </InfoTooltip>
-            {/*&nbsp;
-            <a href={formatLabLink(txInfo)} target="_blank" className="small nowrap">View in Laboratory</a>*/}
+            <span className="label">Source sequence: </span>
+            <span className="d-line-block">
+                <BlockSelect inline wrap className="condensed">{tx.sequence}</BlockSelect>
+                <InfoTooltip>
+                    Sequence of the source account
+                </InfoTooltip>
+            </span>
         </div>
     </div>
 }
