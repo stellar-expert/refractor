@@ -1,8 +1,5 @@
 import React from 'react'
-import {BlockSelect, InfoTooltip} from '@stellar-expert/ui-framework'
-import {formatDateUTC} from '@stellar-expert/formatter'
-import {loadTx} from '../../../infrastructure/tx-dispatcher'
-
+import {BlockSelect, InfoTooltip, UtcTimestamp} from '@stellar-expert/ui-framework'
 
 function StatusRowView({tooltip, children, extraInfo}) {
     return <div>
@@ -15,11 +12,11 @@ function StatusRowView({tooltip, children, extraInfo}) {
     </div>
 }
 
-function DateRowView({tooltip, children, extraInfo}) {
+function DateRowView({tooltip, children}) {
     return <div>
         <span className="dimmed">Timestamp: </span>
         <span className="d-line-block">
-            <BlockSelect>{children}</BlockSelect>
+            <UtcTimestamp date={children}/>
         </span>
     </div>
 }
@@ -33,7 +30,7 @@ export default function TxStatusView({tx}) {
                           className="icon-open-new-window" title="View in explorer"></a>}>
             Executed
         </StatusRowView>
-        <DateRowView>{formatDateUTC(submitted)}</DateRowView>
+        <DateRowView>{submitted}</DateRowView>
     </>
     switch (status) {
         case 'pending':
@@ -59,7 +56,7 @@ export default function TxStatusView({tx}) {
                     tooltip="The transaction has been fully signed but failed during either callback execution or network submission process">
                     Automatic processing failed
                 </StatusRowView>
-                <DateRowView>{formatDateUTC(submitted)}</DateRowView>
+                <DateRowView>{submitted}</DateRowView>
             </>
     }
 }

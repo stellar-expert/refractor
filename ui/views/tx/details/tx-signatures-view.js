@@ -9,7 +9,6 @@ function SignerKey({address, weight, chars, result = null, selected}) {
     let isHighlight = ''
     if (result && result.changes.accepted?.length) {
         const signerInfo = result.changes.accepted.find(signer => signer.key === address) || {}
-        console.log(result.changes.accepted.find(signer => signer.key === address))
         isHighlight = Object.keys(signerInfo).length ? 'highlight-animation' : ''
     }
     if (chars && chars !== 'all') {

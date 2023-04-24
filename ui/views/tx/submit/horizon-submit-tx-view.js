@@ -4,7 +4,7 @@ import {Button, TxLink} from '@stellar-expert/ui-framework'
 import config from '../../../app.config.json'
 import {loadTx} from "../../../infrastructure/tx-dispatcher";
 
-export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network, onUpdate}) {
+export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network}) {
     const [inProgress, setInProgress] = useState(false),
         [result, setResult] = useState(null),
         [error, setError] = useState(null)
@@ -14,13 +14,13 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
         if (status === 'ready') {
             checkStatus = setInterval(async ()=>{
                 const txInfo = await loadTx(hash)
-                txInfo.status !== 'ready' && onUpdate(txInfo)
+                txInfo.status === 'processed' && window.location.reload() //onUpdate(txInfo)
             }, 1000)
         }
         return () => {
             clearInterval(checkStatus)
         };
-    }, []);
+    });
 
     function submitTx() {
         const {passphrase, horizon} = config.networks[network],
