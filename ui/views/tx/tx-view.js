@@ -63,7 +63,7 @@ export default function TxView() {
                     <h3>Action</h3>
                     <hr/>
                     <div className="space">
-                        <HorizonSubmitTxView {...txInfo} {/*onUpdate={txInfo => setTxInfo(txInfo)}*/}/>
+                        <HorizonSubmitTxView {...txInfo}/>
                     </div>
                     <TxAddSignatureView txInfo={txInfo} onUpdate={txInfo => setTxInfo(txInfo)} updateResult={txInfo => setResult(txInfo)}/>
                 </div>

@@ -11,16 +11,16 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
 
     let checkStatus
     useEffect(async () => {
-        if (status === 'ready') {
+        if (result && status === 'ready') {
             checkStatus = setInterval(async ()=>{
                 const txInfo = await loadTx(hash)
-                txInfo.status === 'processed' && window.location.reload() //onUpdate(txInfo)
+                if (txInfo.status === 'processed' || txInfo.status === 'failed') window.location.reload()
             }, 1000)
         }
         return () => {
             clearInterval(checkStatus)
-        };
-    });
+        }
+    })
 
     function submitTx() {
         const {passphrase, horizon} = config.networks[network],
