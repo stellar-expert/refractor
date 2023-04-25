@@ -34,15 +34,15 @@ export default function TxView() {
             <span className="text-small"><CopyToClipboard text={txhash}/></span>
         </h2>
         <div className="row">
-            <div className="column column-50 flex-column">
-                <div className="segment dashboard">
+            <div className="column column-50">
+                <div className="segment h-100">
                     <h3>Properties</h3>
                     <hr/>
                     <TxPropsView txInfo={txInfo}/>
                 </div>
             </div>
-            <div className="column column-50 flex-column">
-                <div className="segment dashboard mobile-space">
+            <div className="column column-50">
+                <div className="segment h-100 mobile-space">
                     <h3>Transaction</h3>
                     <hr/>
                     <div className="space">
@@ -51,15 +51,15 @@ export default function TxView() {
                     <TxDetailsOperationsView xdr={txInfo.xdr} network={txInfo.network}/>
                 </div>
             </div>
-            <div className="column column-50 flex-column">
-                <div className="segment dashboard space mobile-space">
+            <div className="column column-50">
+                <div className="segment h-100 space">
                     <h3>Signatures {signaturesAmount({...txInfo})}</h3>
                     <hr/>
                     <TxSignaturesView {...txInfo} resultAction={result}/>
                 </div>
             </div>
-            <div className="column column-50 flex-column">
-                <div className="segment dashboard space mobile-space">
+            <div className="column column-50">
+                <div className="segment h-100 space">
                     <h3>Action</h3>
                     <hr/>
                     <div className="space">

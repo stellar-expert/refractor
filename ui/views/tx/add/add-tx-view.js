@@ -20,7 +20,7 @@ function TxPropsBlock({title, description, optional = false, children}) {
                 {children}
             </div>
             <div className="column column-40">
-                <div className="segment dimmed text-tiny" style={{height: '100%'}}>
+                <div className="segment h-100 dimmed text-tiny">
                     {description}
                 </div>
             </div>

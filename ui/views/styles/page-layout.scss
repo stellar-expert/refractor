@@ -40,23 +40,8 @@ $top-menu-line-height: 2.2em;
   float: left;
 }
 
-.segment {
-  &.dashboard {
-    &:after, &:before {
-      background: var(--color-dashboard-bg);
-    }
-  }
-
-
-  flex-grow: 1;
-  @media (max-width: $responsive-mobile-browser-width) {
-    margin-left: -$space-micro;
-    margin-right: -$space-micro;
-    margin-bottom: $space-standard;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+.h-100 {
+  height: 100%;
 }
 
 .d-line-block {
