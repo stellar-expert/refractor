@@ -68,19 +68,6 @@ $top-menu-line-height: 2.2em;
   flex-direction: column;
 }
 
-.highlight-animation {
-  animation: highlight 2s;
-}
-
-@keyframes highlight {
-  0% {
-    background-color: transparentize($color-primary, 0.8);
-  }
-  50% {
-    background-color: initial;
-  }
-}
-
 @media (max-width: $responsive-mobile-browser-width) {
   code {
     word-break: break-word;

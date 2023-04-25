@@ -1,6 +1,6 @@
 import React from 'react'
 import cn from 'classnames'
-import {BlockSelect} from '@stellar-expert/ui-framework'
+import {BlockSelect, UpdateHighlighter} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 
 const signaturesWeight = {}
@@ -9,17 +9,19 @@ function SignerKey({address, weight, chars, result = null, selected}) {
     let isHighlight = ''
     if (result && result.changes.accepted?.length) {
         const signerInfo = result.changes.accepted.find(signer => signer.key === address) || {}
-        isHighlight = Object.keys(signerInfo).length ? 'highlight-animation' : ''
+        isHighlight = Object.keys(signerInfo).length ? 'highlighter' : ''
     }
     if (chars && chars !== 'all') {
         address = shortenString(address, chars)
     }
 
-    return <div className={`text-small ${isHighlight}`}>
-        {selected ? <span className="icon icon-feather"/> : '-'}&nbsp;
-        <BlockSelect>{address}</BlockSelect>&nbsp;
-        {weight && <span className="dimmed text-tiny">(w: {weight})</span>}
-    </div>
+    return <UpdateHighlighter>
+        <div className={`text-small ${isHighlight}`}>
+            {selected ? <span className="icon icon-feather"/> : '-'}&nbsp;
+            <BlockSelect>{address}</BlockSelect>&nbsp;
+            {weight && <span className="dimmed text-tiny">(w: {weight})</span>}
+        </div>
+    </UpdateHighlighter>
 }
 
 function SignatureResult({signer, chars, weight, accepted}) {
