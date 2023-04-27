@@ -34,3 +34,5 @@ jspm_packages/
 .idea
 
 assets
+
+pnpm-lock.yaml
