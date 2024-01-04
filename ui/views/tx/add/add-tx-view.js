@@ -20,7 +20,7 @@ function TxPropsBlock({title, description, optional = false, children}) {
                 {children}
             </div>
             <div className="column column-40">
-                <div className="segment text-small" style={{height: '100%'}}>
+                <div className="segment h-100 dimmed text-tiny">
                     {description}
                 </div>
             </div>
@@ -68,12 +68,12 @@ export default function AddTxView() {
             <div>
                 <h2>Store transaction</h2>
             </div>
-            <div style={{paddingTop: '1.4em'}}>
-                <Dropdown options={networkOptions} value={data.network} onChange={n => setParam('network', n)}/>
-            </div>
         </div>
 
         <div className="card card-blank" style={{paddingTop: '1px'}}>
+            <div className="flex-row space">
+                &nbsp; <Dropdown options={networkOptions} value={data.network} onChange={n => setParam('network', n)}/>
+            </div>
             <TxPropsBlock title="Transaction XDR" description={<>
                 Base64-encoded transaction envelope. If the same transaction has been already stored earlier,
                 all additional signatures will be added to this transaction.
@@ -83,8 +83,8 @@ export default function AddTxView() {
                 <a href="views/tx/add/add-tx-view#sdks" target="_blank"> Stellar SDK</a>.
             </>}>
                 <textarea value={data.xdr} disabled={inProgress} onChange={e => setParam('xdr', e.target.value.trim())}
-                          className="text-small text-monospace condensed" placeholder="Base64-encoded transaction envelope"
-                          style={{width: '100%', height: '8em', resize: 'vertical', marginBottom: '-6px'}}/>
+                          className="text-small text-monospace condensed mobile-micro-space-bottom" placeholder="Base64-encoded transaction envelope"
+                          style={{width: '100%', 'minHeight': '8rem', height: '100%', display: 'block', resize: 'vertical', marginBottom: '-6px'}}/>
             </TxPropsBlock>
 
             <TxPropsBlock description={<>
