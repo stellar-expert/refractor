@@ -1,5 +1,5 @@
 import React from 'react'
-import {Networks, TransactionBuilder} from 'stellar-sdk'
+import {Networks, TransactionBuilder} from '@stellar/stellar-sdk'
 import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip} from '@stellar-expert/ui-framework'
 import {formatDateUTC} from '@stellar-expert/formatter'
 import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
@@ -76,7 +76,7 @@ export default function TxPropsView({txInfo}) {
         </div>}
         <div>
             <span className="label">Source sequence: </span>
-            <span className="d-line-block">
+            <span className="inline-block">
                 <BlockSelect inline wrap className="condensed">{tx.sequence}</BlockSelect>
                 <InfoTooltip>
                     Sequence of the source account

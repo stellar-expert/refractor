@@ -1,4 +1,4 @@
-import {TransactionBuilder, StrKey, Server} from 'stellar-sdk'
+import {TransactionBuilder, StrKey, Horizon} from '@stellar/stellar-sdk'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
 import config from '../app.config.json'
 import {apiCall} from './api'
@@ -77,7 +77,7 @@ export async function loadTx(txhash) {
     const txInfo = await apiCall('tx/' + txhash)
     if (txInfo.status === 'ready') {
         try {
-            const {created_at, successful} = await new Server(networks[txInfo.network].horizon)
+            const {created_at, successful} = await new Horizon.Server(networks[txInfo.network].horizon)
                 .transactions().transaction(txInfo.hash).call()
             txInfo.submitted = new Date(created_at)
             if (successful) {

@@ -4,7 +4,7 @@ import {BlockSelect, InfoTooltip, UtcTimestamp} from '@stellar-expert/ui-framewo
 function StatusRowView({tooltip, children, extraInfo}) {
     return <div>
         <span className="dimmed">Status: </span>
-        <span className="d-line-block">
+        <span className="inline-block">
             <BlockSelect>{children}</BlockSelect>
             {!!extraInfo && <> {extraInfo}</>}
             <InfoTooltip>{tooltip}</InfoTooltip>
@@ -15,7 +15,7 @@ function StatusRowView({tooltip, children, extraInfo}) {
 function DateRowView({tooltip, children}) {
     return <div>
         <span className="dimmed">Timestamp: </span>
-        <span className="d-line-block">
+        <span className="inline-block">
             <UtcTimestamp date={children}/>
         </span>
     </div>

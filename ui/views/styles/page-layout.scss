@@ -40,19 +40,6 @@ $top-menu-line-height: 2.2em;
   float: left;
 }
 
-.h-100 {
-  height: 100%;
-}
-
-.d-line-block {
-  display: inline-block;
-}
-
-.flex-column {
-  display: flex!important;
-  flex-direction: column;
-}
-
 @media (max-width: $responsive-mobile-browser-width) {
   code {
     word-break: break-word;

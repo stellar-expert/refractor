@@ -1,6 +1,6 @@
 import React, {useState,useEffect} from 'react'
-import {Server, TransactionBuilder} from 'stellar-sdk'
-import {Button, TxLink} from '@stellar-expert/ui-framework'
+import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
+import {Button} from '@stellar-expert/ui-framework'
 import config from '../../../app.config.json'
 import {loadTx} from "../../../infrastructure/tx-dispatcher";
 
@@ -25,7 +25,7 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
     function submitTx() {
         const {passphrase, horizon} = config.networks[network],
             tx = TransactionBuilder.fromXDR(xdr, passphrase),
-            server = new Server(horizon)
+            server = new Horizon.Server(horizon)
 
         setInProgress(true)
         setError(null)

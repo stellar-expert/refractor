@@ -35,37 +35,45 @@ export default function TxView() {
         </h2>
         <div className="row">
             <div className="column column-50">
-                <div className="segment h-100">
-                    <h3>Properties</h3>
-                    <hr/>
-                    <TxPropsView txInfo={txInfo}/>
-                </div>
-            </div>
-            <div className="column column-50">
-                <div className="segment h-100 mobile-space">
-                    <h3>Transaction</h3>
-                    <hr/>
-                    <div className="space">
-                        <TxTransactionXDRView xdr={txInfo.xdr}/>
+                <div className="flex-column h-100">
+                    <div className="segment h-100">
+                        <h3>Properties</h3>
+                        <hr/>
+                        <TxPropsView txInfo={txInfo}/>
                     </div>
-                    <TxDetailsOperationsView xdr={txInfo.xdr} network={txInfo.network}/>
                 </div>
             </div>
             <div className="column column-50">
-                <div className="segment h-100 space">
-                    <h3>Signatures {signaturesAmount({...txInfo})}</h3>
-                    <hr/>
-                    <TxSignaturesView {...txInfo} resultAction={result}/>
-                </div>
-            </div>
-            <div className="column column-50">
-                <div className="segment h-100 space">
-                    <h3>Action</h3>
-                    <hr/>
-                    <div className="space">
-                        <HorizonSubmitTxView {...txInfo}/>
+                <div className="flex-column h-100">
+                    <div className="segment h-100 mobile-space">
+                        <h3>Transaction</h3>
+                        <hr/>
+                        <div className="space">
+                            <TxTransactionXDRView xdr={txInfo.xdr}/>
+                        </div>
+                        <TxDetailsOperationsView xdr={txInfo.xdr} network={txInfo.network}/>
                     </div>
-                    <TxAddSignatureView txInfo={txInfo} onUpdate={txInfo => setTxInfo(txInfo)} updateResult={txInfo => setResult(txInfo)}/>
+                </div>
+            </div>
+            <div className="column column-50">
+                <div className="flex-column h-100">
+                    <div className="segment h-100 space">
+                        <h3>Signatures {signaturesAmount({...txInfo})}</h3>
+                        <hr/>
+                        <TxSignaturesView {...txInfo} resultAction={result}/>
+                    </div>
+                </div>
+            </div>
+            <div className="column column-50">
+                <div className="flex-column h-100">
+                    <div className="segment h-100 space">
+                        <h3>Action</h3>
+                        <hr/>
+                        <div className="space">
+                            <HorizonSubmitTxView {...txInfo}/>
+                        </div>
+                        <TxAddSignatureView txInfo={txInfo} onUpdate={txInfo => setTxInfo(txInfo)} updateResult={txInfo => setResult(txInfo)}/>
+                    </div>
                 </div>
             </div>
         </div>

@@ -1,6 +1,6 @@
 const {Pool} = require('pg'),
     {parse: parseConnectionString} = require('pg-connection-string'),
-    {StrKey} = require('stellar-sdk'),
+    {StrKey} = require('@stellar/stellar-sdk'),
     {networks} = require('../app.config.json')
 
 const pools = {}
