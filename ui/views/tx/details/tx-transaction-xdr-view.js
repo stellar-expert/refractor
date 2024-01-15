@@ -14,7 +14,5 @@ export default function TxTransactionXDRView({xdr}) {
         <InfoTooltip>
             Base64-encoded Stellar transaction XDR with signatures
         </InfoTooltip>
-        {/*&nbsp;
-            <a href={formatLabLink(txInfo)} target="_blank" className="small nowrap">View in Laboratory</a>*/}
     </div>
 }

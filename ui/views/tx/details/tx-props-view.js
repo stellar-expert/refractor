@@ -6,11 +6,7 @@ import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxStatusView from './tx-status-view'
 
-/*function formatLabLink({network, xdr}) {
-    return `https://laboratory.stellar.org/#xdr-viewer?input=${encodeURIComponent(xdr)}&type=TransactionEnvelope&network=${network}`
-}*/
-
-export default function TxPropsView({txInfo}) {
+export default function TxPropsView({txInfo, statusWatcher}) {
     let tx = TransactionBuilder.fromXDR(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
@@ -18,11 +14,11 @@ export default function TxPropsView({txInfo}) {
         tx = tx.innerTransaction
     }
     return <div className="space">
-        <TxStatusView tx={txInfo}/>
+        <TxStatusView tx={txInfo} statusWatcher={statusWatcher}/>
         <div>
             <span className="dimmed">Network:</span> <BlockSelect>{txInfo.network}</BlockSelect>
             <InfoTooltip>
-                Stellar network name ("public" or "testnet")
+                Stellar network name (&quot;public&quot; or &quot;testnet&quot;)
             </InfoTooltip>
         </div>
         {!!txInfo.submit && <div>
@@ -67,7 +63,7 @@ export default function TxPropsView({txInfo}) {
                 Source account of this transaction
             </InfoTooltip>
         </div>
-        {isFeeBump && <div>
+        {!!isFeeBump && <div>
             <span className="label">Fee sponsor: </span>
             <AccountAddress account={feeSponsor}/>
             <InfoTooltip>

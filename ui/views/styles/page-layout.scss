@@ -40,6 +40,16 @@ $top-menu-line-height: 2.2em;
   float: left;
 }
 
+.loader.small {
+  display: inline-block;
+  font-size: inherit;
+  width: 1em;
+  height: 1em;
+  margin: 0 auto;
+  padding: 0;
+  background-size: auto 1em;
+}
+
 @media (max-width: $responsive-mobile-browser-width) {
   code {
     word-break: break-word;

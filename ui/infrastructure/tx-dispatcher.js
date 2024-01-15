@@ -35,7 +35,7 @@ export async function validateNewTx(data) {
     if (data.expires) {
         let expires
         if (data.expires.toString().match(/^\d+$/)) {
-            expires = parseInt(data.expires)
+            expires = parseInt(data.expires, 10)
             //check that input is a valid Unix timestamp
             if (expires < 0 || expires > 2147483648)
                 throw new Error('Invalid expiration date - UNIX timestamp expected')
@@ -52,7 +52,7 @@ export async function validateNewTx(data) {
     //validate proposed signers
     if (data.desiredSigners?.length) {
         const nonEmptySigners = data.desiredSigners.filter(s => !!s)
-        for (let signer of nonEmptySigners) {
+        for (const signer of nonEmptySigners) {
             if (!StrKey.isValidEd25519PublicKey(signer))
                 throw new Error('Invalid signer public key - ' + signer)
         }
@@ -75,7 +75,7 @@ export async function loadTx(txhash) {
         throw new Error(`Invalid transaction hash: ${txhash || '(empty)'}`)
     //load from the server
     const txInfo = await apiCall('tx/' + txhash)
-    if (txInfo.status === 'ready') {
+    if (txInfo.status === 'ready' || txInfo.status === 'processed') {
         try {
             const {created_at, successful} = await new Horizon.Server(networks[txInfo.network].horizon)
                 .transactions().transaction(txInfo.hash).call()
@@ -86,15 +86,26 @@ export async function loadTx(txhash) {
                 txInfo.status = 'failed'
             }
         } catch (e) {
+            console.error(e)
         }
     }
     return await prepareTxInfo(txInfo)
 }
 
+export async function existenceTx({hash, network}) {
+    const server = new Horizon.Server(networks[network].horizon)
+    try {
+        const tx = await server.transactions().transaction(hash).call()
+        return !!tx
+    } catch (e) {
+        return !e
+    }
+}
+
 async function prepareTxInfo(txInfo) {
     //create Transaction object
-    const {passphrase, horizon} = networks[txInfo.network],
-        tx = TransactionBuilder.fromXDR(txInfo.xdr, passphrase)
+    const {passphrase, horizon} = networks[txInfo.network]
+    const tx = TransactionBuilder.fromXDR(txInfo.xdr, passphrase)
     //discover signers and check whether it is fully signed
     const schema = await inspectTransactionSigners(tx, {horizon})
     txInfo.schema = schema

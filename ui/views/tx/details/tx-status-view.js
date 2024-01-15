@@ -1,18 +1,18 @@
 import React from 'react'
-import {BlockSelect, InfoTooltip, UtcTimestamp} from '@stellar-expert/ui-framework'
+import {BlockSelect, InfoTooltip, UpdateHighlighter, UtcTimestamp} from '@stellar-expert/ui-framework'
 
 function StatusRowView({tooltip, children, extraInfo}) {
     return <div>
         <span className="dimmed">Status: </span>
         <span className="inline-block">
-            <BlockSelect>{children}</BlockSelect>
+            <UpdateHighlighter><BlockSelect>{children}</BlockSelect></UpdateHighlighter>
             {!!extraInfo && <> {extraInfo}</>}
             <InfoTooltip>{tooltip}</InfoTooltip>
         </span>
     </div>
 }
 
-function DateRowView({tooltip, children}) {
+function DateRowView({children}) {
     return <div>
         <span className="dimmed">Timestamp: </span>
         <span className="inline-block">
@@ -21,13 +21,12 @@ function DateRowView({tooltip, children}) {
     </div>
 }
 
-export default function TxStatusView({tx}) {
+export default function TxStatusView({tx, statusWatcher}) {
     const {status, submitted, hash, network} = tx
     if (submitted) return <>
-        <StatusRowView
-            tooltip="The transaction has been signed, processed, and automatically submitted to Stellar network"
-            extraInfo={<a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank"
-                          className="icon-open-new-window" title="View in explorer"></a>}>
+        <StatusRowView tooltip="The transaction has been signed, processed, and automatically submitted to Stellar network"
+                       extraInfo={<a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank" rel="noreferrer"
+                                     className="icon-open-new-window" title="View in explorer"/>}>
             Executed
         </StatusRowView>
         <DateRowView>{submitted}</DateRowView>
@@ -38,12 +37,13 @@ export default function TxStatusView({tx}) {
                 Waiting for signatures
             </StatusRowView>
         case 'ready':
-            return <StatusRowView tooltip="The transaction has been fully signed and can be submitted to the network">
+            return <StatusRowView tooltip="The transaction has been fully signed and can be submitted to the network"
+                                  extraInfo={!!statusWatcher && <span className="loader small"/>}>
                 Ready
             </StatusRowView>
         case 'processing':
-            return <StatusRowView
-                tooltip="The transaction has been fully signed and currently waits in the processing pipeline">
+            return <StatusRowView tooltip="The transaction has been fully signed and currently waits in the processing pipeline"
+                                  extraInfo={!!statusWatcher && <span className="loader small"/>}>
                 Processing
             </StatusRowView>
         case 'processed':
@@ -51,12 +51,12 @@ export default function TxStatusView({tx}) {
                 Processed
             </StatusRowView>
         case 'failed':
-            if (submitted) return <>
-                <StatusRowView
-                    tooltip="The transaction has been fully signed but failed during either callback execution or network submission process">
+            return <>
+                <StatusRowView tooltip="The transaction has been fully signed but failed during either callback execution or network submission process">
                     Automatic processing failed
                 </StatusRowView>
-                <DateRowView>{submitted}</DateRowView>
+                {!!submitted && <DateRowView>{submitted}</DateRowView>}
             </>
+        default: return null
     }
 }

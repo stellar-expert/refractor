@@ -9,7 +9,7 @@ import OperationDescription from './operation-description-view'
  * @param {Boolean} compact? - Whether to show extended tx info
  */
 export default function TxDetailsOperationsView({xdr, network, compact = false}) {
-    let tx = TransactionBuilder.fromXDR(xdr, network)
+    const tx = TransactionBuilder.fromXDR(xdr, network)
 
     if (!tx) return <div>
         <span className="icon-warning color-danger"/> Transaction is invalid

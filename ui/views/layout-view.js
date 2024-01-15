@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import Catcher from './general/catcher'
 import {ThemeSelector} from '@stellar-expert/ui-framework'
+import Catcher from './general/catcher'
 import MenuView from './menu-view'
 
 export default function Layout({children}) {
@@ -25,10 +25,10 @@ export default function Layout({children}) {
             <div className="dimmed container text-center">
                 <div>{new Date().getFullYear()}&nbsp;©&nbsp;Refractor Web <span className="dimmed">v{appVersion}</span></div>
                 <div>
-                    <a href="mailto:info@stellar.expert" target="_blank" className="dimmed">
+                    <a href="mailto:info@stellar.expert" target="_blank" rel="noreferrer" className="dimmed">
                         <i className="icon-email"/> Contact us
                     </a>&emsp;
-                    <a href="https://github.com/stellar-expert/refractor" target="_blank" className="dimmed">
+                    <a href="https://github.com/stellar-expert/refractor" target="_blank" rel="noreferrer" className="dimmed">
                         <i className="icon-github"/> Source code
                     </a>&emsp;
                     <ThemeSelector/>
