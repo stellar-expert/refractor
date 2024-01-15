@@ -28,10 +28,10 @@ class Catcher extends React.Component {
                     <hr/>
                     <div className="error space">
                         <div className="micro-space">
-                            "{message}" at {window.location.href}
+                            &quot;{message}&quot; at {window.location.href}
                         </div>
                         <pre className="small">
-                        {stack}
+                            {stack}
                         </pre>
                     </div>
                     <div className="space dimmed text-small">

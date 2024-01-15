@@ -3,6 +3,7 @@ import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
 import {Button} from '@stellar-expert/ui-framework'
 import {existenceTx} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
+import {horizonErrorHandler} from './horizon-error-handler'
 
 export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network, error}) {
     const [inProgress, setInProgress] = useState(false)
@@ -10,6 +11,7 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
 
     useEffect(() => {
         if (!submit && !submitted) {
+            //check existence of transaction in Horizon
             existenceTx({hash, network})
                 .then(existence => setIsExist(existence))
         }
@@ -26,13 +28,12 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
                 window.location.reload()
             })
             .catch(e => {
-                let err = 'Transaction failed'
-                if (e.response.data?.extras) {
-                    console.log(e.response.data)
-                    err += ' ' + JSON.stringify(e.response.data.extras.result_codes)
-                    notify({type: 'error', err})
+                if (e.response.data) {
+                    const errors = horizonErrorHandler(e.response.data, 'Transaction failed')
+                    errors.forEach(err => {
+                        notify({type: 'error', message: err.description})
+                    })
                 }
-                console.log(err)
             })
             .finally(() => {
                 setInProgress(false)
