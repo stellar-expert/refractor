@@ -6,7 +6,7 @@ import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxStatusView from './tx-status-view'
 
-export default function TxPropsView({txInfo, statusWatcher}) {
+export default function TxPropsView({txInfo}) {
     let tx = TransactionBuilder.fromXDR(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
@@ -14,7 +14,7 @@ export default function TxPropsView({txInfo, statusWatcher}) {
         tx = tx.innerTransaction
     }
     return <div className="space">
-        <TxStatusView tx={txInfo} statusWatcher={statusWatcher}/>
+        <TxStatusView tx={txInfo}/>
         <div>
             <span className="dimmed">Network:</span> <BlockSelect>{txInfo.network}</BlockSelect>
             <InfoTooltip>

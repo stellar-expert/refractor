@@ -1,5 +1,4 @@
 import React from 'react'
-import cn from 'classnames'
 import {BlockSelect, UpdateHighlighter} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 
@@ -24,45 +23,31 @@ function SignerKey({address, weight, chars, changes, selected}) {
     </UpdateHighlighter>
 }
 
-function SignatureResult({signer, chars, weight, accepted}) {
-    if (chars && chars !== 'all') {
-        signer = shortenString(signer, chars)
-    }
-    return <div>
-        <i className={cn('icon', accepted ? 'icon-ok' : 'icon-block')}/>&nbsp;
-        <BlockSelect>{signer}</BlockSelect>&nbsp;
-        {!!weight && <span className="dimmed text-tiny">(w: {weight})</span>}
-    </div>
-}
-
 function TxStoreResult({changes}) {
     if (!changes) return null
     const {accepted, rejected} = changes
 
-    return <>
-        <h3 className="space">Changes</h3>
-        <hr/>
-        <div className="small">
-            {accepted?.length > 0 && <div>
-                <h4 className="dimmed">
-                    Accepted signatures:
-                </h4>
-                <div className="text-small">
-                    {accepted.map(s =>
-                        <SignatureResult key={s.signature} signer={s.key} weight={signaturesWeight[s.key]}  chars={12} accepted/>)}
-                </div>
-            </div>}
-            {rejected?.length > 0 && <div>
-                <h4 className="dimmed">
-                    Rejected signatures:
-                </h4>
-                <div className="text-small">
-                    {rejected.map(s =>
-                        <SignatureResult key={s.signature} signer={s.key.replace(/_+/g,'**')}/>)}
-                </div>
-            </div>}
-        </div>
-    </>
+    accepted?.forEach(s => {
+        const signer = shortenString(s.key, 12)
+        notify({
+            type: 'success',
+            message: <span key={s.signature}>
+                Accepted signature {signer}
+            </span>
+        })
+    })
+
+    rejected?.forEach(s => {
+        const signer = s.key.replace(/_+/g,'**')
+        notify({
+            type: 'error',
+            message: <span key={s.signature}>
+                Rejected signature {signer}
+            </span>
+        })
+    })
+
+    return null
 }
 
 export default function TxSignaturesView({signatures, schema, readyToSubmit, changes}) {

@@ -13,6 +13,7 @@ const resultCodesDescription = {
     tx_bad_minseq_age_or_gap: "Bad minimum sequence age or gap",
     tx_bad_sponsorship: "The sponsorship is not confirmed",
 
+    op_success: "The payment was successfully completed.",
     op_malformed: "The operation was malformed in some way.",
     op_underfunded: "The operation failed due to a lack of funds.",
     op_low_reserve: "The account does not have enough balance to satisfy what new minimum balance would be.",

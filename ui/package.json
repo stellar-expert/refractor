@@ -1,7 +1,7 @@
 {
   "name": "ui-refractor-stellar-expert",
   "private": true,
-  "version": "0.3.1",
+  "version": "0.4.0",
   "author": "orbitlens<orbit@stellar.expert>",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {

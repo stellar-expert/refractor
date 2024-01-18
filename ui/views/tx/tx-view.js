@@ -1,6 +1,6 @@
-import React, {useCallback, useState} from 'react'
+import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useParams} from 'react-router'
-import {BlockSelect, CopyToClipboard, useDependantState} from '@stellar-expert/ui-framework'
+import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState} from '@stellar-expert/ui-framework'
 import {loadTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'
@@ -8,6 +8,8 @@ import TxSignaturesView from './details/tx-signatures-view'
 import TxAddSignatureView from './details/tx-add-signature-view'
 import HorizonSubmitTxView from './submit/horizon-submit-tx-view'
 import TxPropsView from './details/tx-props-view'
+
+const statusRefreshInterval = 4//4 sec.
 
 function signaturesAmount({signatures, schema}) {
     let amount = 0
@@ -18,7 +20,6 @@ function signaturesAmount({signatures, schema}) {
 export default function TxView() {
     const {txhash} = useParams()
     const [error, setError] = useState(null)
-    const [statusWatcher, setStatusWatcher] = useState(false)
     const [txInfo, setTxInfo] = useDependantState(() => {
         setError('')
         loadTx(txhash)
@@ -26,30 +27,52 @@ export default function TxView() {
             .catch(e => setError(e))
         return null
     }, [txhash])
+    const statusWatcher = useRef()
 
-    const loadPeriodicallyTx = useCallback((ping = 1) => {
-        setTimeout(() => {
-            setError('')
-            setStatusWatcher(true)
-            loadTx(txhash)
-                .then(txInfo => {
-                    setTxInfo(txInfo)
-                    if (txInfo.status === 'processed' || txInfo.status === 'failed')
-                        return setStatusWatcher(false)
-                    ping = ping < 16 ? ping * 2 : 16 //maximum interval limit (16 sec.)
-                    loadPeriodicallyTx(ping)
-                })
-                .catch(e => setError(e))
-        }, ping * 1000)
+    const loadPeriodicallyTx = useCallback(() => {
+        setError('')
+        loadTx(txhash)
+            .then(txInfo => {
+                setTxInfo(txInfo)
+                clearTimeout(statusWatcher.current)
+                if (txInfo.submitted || txInfo.status === 'failed')
+                    return null
+                statusWatcher.current = setTimeout(() => {
+                    loadPeriodicallyTx()
+                }, statusRefreshInterval * 1000)
+            })
+            .catch(e => setError(e))
     }, [txhash, setTxInfo])
+
+    const checkStatus = useCallback(isWatch => {
+        if (!isWatch || txInfo?.submitted || txInfo?.status === 'failed') {
+            return clearTimeout(statusWatcher.current)
+        }
+        loadPeriodicallyTx()
+    }, [txInfo, loadPeriodicallyTx])
+
+    useEffect(() => {
+        if (txInfo && !txInfo.submitted) {
+            statusWatcher.current = setTimeout(() => {
+                checkStatus(isDocumentVisible())
+            }, statusRefreshInterval * 1000)
+
+            //check active tab
+            document.addEventListener('visibilitychange', () => checkStatus(isDocumentVisible()))
+            return () => {
+                document.removeEventListener('visibilitychange', () => checkStatus(isDocumentVisible()))
+            }
+        }
+    }, [txhash, txInfo, checkStatus])
+
+    //stop statusWatcher if component was unmount
+    useEffect(() => () => {
+        clearTimeout(statusWatcher.current)
+    }, [checkStatus])
 
     const updateTx = useCallback(txInfo => {
         setTxInfo(txInfo)
-        //checking status transaction after signed
-        const now = Date.now() / 1000 >> 0
-        if (txInfo.status === 'ready' && (txInfo.minTime === 0 || txInfo.minTime > now))
-            loadPeriodicallyTx()
-    }, [setTxInfo, loadPeriodicallyTx])
+    }, [setTxInfo])
 
     if (error) throw error
     if (!txInfo) return <div className="loader"/>
@@ -64,7 +87,7 @@ export default function TxView() {
                     <div className="segment h-100">
                         <h3>Properties</h3>
                         <hr/>
-                        <TxPropsView txInfo={txInfo} statusWatcher={statusWatcher}/>
+                        <TxPropsView txInfo={txInfo}/>
                     </div>
                 </div>
             </div>
@@ -95,7 +118,7 @@ export default function TxView() {
                         <h3>Action</h3>
                         <hr/>
                         <div className="space">
-                            <HorizonSubmitTxView {...txInfo}/>
+                            <HorizonSubmitTxView txInfo={txInfo}/>
                         </div>
                         <TxAddSignatureView txInfo={txInfo} onUpdate={updateTx}/>
                     </div>

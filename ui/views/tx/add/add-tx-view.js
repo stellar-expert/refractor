@@ -54,6 +54,8 @@ export default function AddTxView() {
             .then(res => {
                 console.log(res)
                 navigation.navigate(`/tx/${res.hash}`)
+                //reset previous transaction history
+                window.location.reload()
             })
             .catch(e => {
                 console.error(e)

@@ -74,32 +74,22 @@ export async function loadTx(txhash) {
     if (typeof txhash !== 'string' || !/^[a-f0-9]{64}$/i.test(txhash))
         throw new Error(`Invalid transaction hash: ${txhash || '(empty)'}`)
     //load from the server
-    const txInfo = await apiCall('tx/' + txhash)
+    let txInfo = await apiCall('tx/' + txhash)
     if (txInfo.status === 'ready' || txInfo.status === 'processed') {
-        try {
-            const {created_at, successful} = await new Horizon.Server(networks[txInfo.network].horizon)
-                .transactions().transaction(txInfo.hash).call()
-            txInfo.submitted = new Date(created_at)
-            if (successful) {
-                txInfo.status = 'processed'
-            } else {
-                txInfo.status = 'failed'
-            }
-        } catch (e) {
-            console.error(e)
-        }
+        txInfo = await existenceTx(txInfo)
     }
     return await prepareTxInfo(txInfo)
 }
 
-export async function existenceTx({hash, network}) {
-    const server = new Horizon.Server(networks[network].horizon)
+export async function existenceTx(txInfo) {
     try {
-        const tx = await server.transactions().transaction(hash).call()
-        return !!tx
+        const server = new Horizon.Server(networks[txInfo.network].horizon)
+        const {created_at, successful} = await server.transactions().transaction(txInfo.hash).call()
+        txInfo.submitted = new Date(created_at)
+        txInfo.status = (successful) ? 'processed' : 'failed'
     } catch (e) {
-        return !e
     }
+    return txInfo
 }
 
 async function prepareTxInfo(txInfo) {

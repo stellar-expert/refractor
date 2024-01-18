@@ -5,17 +5,20 @@ import {existenceTx} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
 import {horizonErrorHandler} from './horizon-error-handler'
 
-export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network, error}) {
+export default function HorizonSubmitTxView({txInfo}) {
+    const {readyToSubmit, hash, submit, submitted, xdr, status, network, error} = txInfo
     const [inProgress, setInProgress] = useState(false)
     const [isExist, setIsExist] = useState(true)
 
     useEffect(() => {
-        if (!submit && !submitted) {
+        if (!txInfo.submit && !txInfo.submitted) {
             //check existence of transaction in Horizon
-            existenceTx({hash, network})
-                .then(existence => setIsExist(existence))
+            existenceTx(txInfo)
+                .then(tx => {
+                    setIsExist(!!tx.submitted)
+                })
         }
-    }, [submit, submitted, hash, network])
+    }, [txInfo])
 
     const submitTx = useCallback(() => {
         const {passphrase, horizon} = config.networks[network]

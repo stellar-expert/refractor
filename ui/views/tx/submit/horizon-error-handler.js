@@ -6,7 +6,8 @@ function handleOperationError(operations, defaultErrorText) {
         return [{'description': defaultErrorText}]
     const errors = operations.reduce((acc, op) => {
         const moreDetail = (resultCodesDescription[op]) ? `${defaultErrorText}. ${resultCodesDescription[op]}` : defaultErrorText
-        acc.push({'description': moreDetail})
+        if (op !== 'op_success')
+            acc.push({'description': moreDetail})
         return acc
     }, [])
     return errors

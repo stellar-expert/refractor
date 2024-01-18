@@ -21,7 +21,7 @@ function DateRowView({children}) {
     </div>
 }
 
-export default function TxStatusView({tx, statusWatcher}) {
+export default function TxStatusView({tx}) {
     const {status, submitted, hash, network} = tx
     if (submitted) return <>
         <StatusRowView tooltip="The transaction has been signed, processed, and automatically submitted to Stellar network"
@@ -33,21 +33,23 @@ export default function TxStatusView({tx, statusWatcher}) {
     </>
     switch (status) {
         case 'pending':
-            return <StatusRowView tooltip="The transaction has not reached the required signatures threshold yet">
+            return <StatusRowView tooltip="The transaction has not reached the required signatures threshold yet"
+                                  extraInfo={<span className="loader small"/>}>
                 Waiting for signatures
             </StatusRowView>
         case 'ready':
             return <StatusRowView tooltip="The transaction has been fully signed and can be submitted to the network"
-                                  extraInfo={!!statusWatcher && <span className="loader small"/>}>
+                                  extraInfo={<span className="loader small"/>}>
                 Ready
             </StatusRowView>
         case 'processing':
             return <StatusRowView tooltip="The transaction has been fully signed and currently waits in the processing pipeline"
-                                  extraInfo={!!statusWatcher && <span className="loader small"/>}>
+                                  extraInfo={<span className="loader small"/>}>
                 Processing
             </StatusRowView>
         case 'processed':
-            return <StatusRowView tooltip="The transaction has been fully signed and processed">
+            return <StatusRowView tooltip="The transaction has been fully signed and processed"
+                                  extraInfo={<span className="loader small"/>}>
                 Processed
             </StatusRowView>
         case 'failed':
