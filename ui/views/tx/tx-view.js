@@ -19,6 +19,7 @@ function signaturesAmount({signatures, schema}) {
 
 export default function TxView() {
     const {txhash} = useParams()
+    const statusWatcher = useRef()
     const [error, setError] = useState(null)
     const [txInfo, setTxInfo] = useDependantState(() => {
         setError('')
@@ -26,8 +27,7 @@ export default function TxView() {
             .then(txInfo => setTxInfo(txInfo))
             .catch(e => setError(e))
         return null
-    }, [txhash])
-    const statusWatcher = useRef()
+    }, [txhash], () => clearTimeout(statusWatcher.current))
 
     const loadPeriodicallyTx = useCallback(() => {
         setError('')
@@ -44,8 +44,9 @@ export default function TxView() {
             .catch(e => setError(e))
     }, [txhash, setTxInfo])
 
-    const checkStatus = useCallback(isWatch => {
-        if (!isWatch || txInfo?.submitted || txInfo?.status === 'failed') {
+    //periodically check the transaction status when the transaction tab is active
+    const checkStatus = useCallback(() => {
+        if (!isDocumentVisible() || txInfo?.submitted || txInfo?.status === 'failed') {
             return clearTimeout(statusWatcher.current)
         }
         loadPeriodicallyTx()
@@ -54,21 +55,16 @@ export default function TxView() {
     useEffect(() => {
         if (txInfo && !txInfo.submitted) {
             statusWatcher.current = setTimeout(() => {
-                checkStatus(isDocumentVisible())
+                checkStatus()
             }, statusRefreshInterval * 1000)
 
             //check active tab
-            document.addEventListener('visibilitychange', () => checkStatus(isDocumentVisible()))
+            document.addEventListener('visibilitychange', checkStatus)
             return () => {
-                document.removeEventListener('visibilitychange', () => checkStatus(isDocumentVisible()))
+                document.removeEventListener('visibilitychange', checkStatus)
             }
         }
-    }, [txhash, txInfo, checkStatus])
-
-    //stop statusWatcher if component was unmount
-    useEffect(() => () => {
-        clearTimeout(statusWatcher.current)
-    }, [checkStatus])
+    }, [txInfo, checkStatus])
 
     const updateTx = useCallback(txInfo => {
         setTxInfo(txInfo)
