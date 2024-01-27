@@ -1,11 +1,11 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
-import {Button} from '@stellar-expert/ui-framework'
+import {Button, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {checkTxSubmitted} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
 import {horizonErrorHandler} from './horizon-error-handler'
 
-export default function HorizonSubmitTxView({txInfo}) {
+export default withErrorBoundary(function HorizonSubmitTxView({txInfo}) {
     const {readyToSubmit, hash, submit, submitted, xdr, status, network, error} = txInfo
     const [inProgress, setInProgress] = useState(false)
     const [isExist, setIsExist] = useState(true)
@@ -74,4 +74,4 @@ export default function HorizonSubmitTxView({txInfo}) {
             Transaction is not fully signed yet. More signatures required to match the threshold.
         </>}
     </div>
-}
+})

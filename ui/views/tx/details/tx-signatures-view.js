@@ -1,5 +1,5 @@
 import React from 'react'
-import {BlockSelect, UpdateHighlighter} from '@stellar-expert/ui-framework'
+import {BlockSelect, UpdateHighlighter, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 
 const signaturesWeight = {}
@@ -50,7 +50,7 @@ function TxStoreResult({changes}) {
     return null
 }
 
-export default function TxSignaturesView({signatures, schema, readyToSubmit, changes}) {
+export default withErrorBoundary(function TxSignaturesView({signatures, schema, readyToSubmit, changes}) {
     const appliedSigners = signatures.map(sig => sig.key)
     const potentialSigners = schema.discoverSigners()
     const otherAvailableSigners = potentialSigners.filter(signer => !appliedSigners.includes(signer))
@@ -73,4 +73,4 @@ export default function TxSignaturesView({signatures, schema, readyToSubmit, cha
         }
         <TxStoreResult changes={changes}/>
     </div>
-}
+})

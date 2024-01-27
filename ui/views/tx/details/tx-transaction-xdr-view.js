@@ -1,11 +1,11 @@
 import React from 'react'
-import {BlockSelect, CopyToClipboard, InfoTooltip} from '@stellar-expert/ui-framework'
+import {BlockSelect, CopyToClipboard, InfoTooltip, withErrorBoundary} from '@stellar-expert/ui-framework'
 
 /**
  * Transaction details
  * @param {String} xdr - Transaction XDR
  */
-export default function TxTransactionXDRView({xdr}) {
+export default withErrorBoundary(function TxTransactionXDRView({xdr}) {
 
     return <div style={{'display': 'inline-flex', 'maxWidth': '100%'}}>
         <span className="dimmed">Raw&nbsp;XDR:&nbsp;</span>
@@ -15,4 +15,4 @@ export default function TxTransactionXDRView({xdr}) {
             Base64-encoded Stellar transaction XDR with signatures
         </InfoTooltip>
     </div>
-}
+})

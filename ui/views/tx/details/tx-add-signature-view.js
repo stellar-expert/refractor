@@ -1,9 +1,9 @@
 import React, {useCallback, useState} from 'react'
-import {Button} from '@stellar-expert/ui-framework'
+import {Button, withErrorBoundary} from '@stellar-expert/ui-framework'
 import albedo from '@albedo-link/intent'
 import {submitTx} from '../../../infrastructure/tx-dispatcher'
 
-export default function TxAddSignatureView({txInfo, onUpdate}) {
+export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate}) {
     const [error, setError] = useState('')
     const [inProgress, setInProgress] = useState(false)
 
@@ -31,4 +31,4 @@ export default function TxAddSignatureView({txInfo, onUpdate}) {
         {!!error && <div className="error">{error}</div>}
         {!!inProgress && <div className="loader"/>}
     </div>
-}
+})

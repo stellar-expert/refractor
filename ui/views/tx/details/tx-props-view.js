@@ -1,12 +1,12 @@
 import React from 'react'
 import {Networks, TransactionBuilder} from '@stellar/stellar-sdk'
-import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip} from '@stellar-expert/ui-framework'
+import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {formatDateUTC} from '@stellar-expert/formatter'
 import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxStatusView from './tx-status-view'
 
-export default function TxPropsView({txInfo}) {
+export default withErrorBoundary(function TxPropsView({txInfo}) {
     let tx = TransactionBuilder.fromXDR(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
@@ -80,4 +80,4 @@ export default function TxPropsView({txInfo}) {
             </span>
         </div>
     </div>
-}
+})
