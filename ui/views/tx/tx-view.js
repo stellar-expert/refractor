@@ -13,7 +13,7 @@ const statusRefreshInterval = 4//4 sec.
 
 function signaturesAmount({signatures, schema}) {
     let amount = 0
-    schema.requirements?.map(requirement => amount += requirement.signers?.length)
+    schema.requirements?.forEach(requirement => amount += requirement.signers?.length)
     return signatures ? <span className="text-small dimmed">{`${signatures.length}/${amount}`}</span> : ''
 }
 
@@ -66,9 +66,7 @@ export default function TxView() {
         }
     }, [txInfo, checkStatus])
 
-    const updateTx = useCallback(txInfo => {
-        setTxInfo(txInfo)
-    }, [setTxInfo])
+    const updateTx = useCallback(txInfo => setTxInfo(txInfo), [setTxInfo])
 
     if (error) throw error
     if (!txInfo) return <div className="loader"/>

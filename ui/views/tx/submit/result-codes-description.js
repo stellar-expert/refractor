@@ -58,12 +58,12 @@ const resultCodesDescription = {
     op_too_many_signers: "Signers max count (20) is exceeded.",
     op_invalid_home_domain: "The home domain is invalid.",
     op_invalid_limit: "Can not to remove a trustline with a non-zero asset balance.",
-    op_not_aut_maintain_liabilities: "The trustline has buying/selling liabilities. The asset trustline is deauthorized.",
-    op_not_required: "The account doesn't require trust.",
+    op_not_auth_maintain_liabilities: "The asset trust line is not authorized to maintain buying/selling liabilities.",
+    op_not_required: "The asset trust line for the account is not required.",
     op_has_sub_entries: "The account has subentries and cannot be merged.",
-    op_cant_revoke: "The account is trying to revoke the trustline of the trustor, but it cannot do so.",
-    op_bad_seq: "Desired value for the operation's source account sequence number is invalid.",
-    op_self_not_allowed: "The source account attempted to create a trustline for itself, which is not allowed.",
+    op_cant_revoke: "Failed to revoke the asset trust line authorization.",
+    op_bad_seq: "Invalid account sequence number.",
+    op_self_not_allowed: "Failed to create a self-referencing asset trust line.",
     op_seq_num_too_far: "The account cannot be created and merged in the same transaction."
 }
 

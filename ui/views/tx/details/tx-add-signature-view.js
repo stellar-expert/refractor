@@ -19,7 +19,8 @@ export default function TxAddSignatureView({txInfo, onUpdate}) {
             .finally(() => setInProgress(false))
     }, [txInfo, onUpdate])
 
-    if (txInfo.readyToSubmit || txInfo.submitted) return null
+    if (txInfo.readyToSubmit || txInfo.submitted)
+        return null
 
     return <div className="space">
         <div className="row">

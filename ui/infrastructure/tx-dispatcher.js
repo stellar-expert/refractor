@@ -76,12 +76,12 @@ export async function loadTx(txhash) {
     //load from the server
     let txInfo = await apiCall('tx/' + txhash)
     if (txInfo.status === 'ready' || txInfo.status === 'processed') {
-        txInfo = await existenceTx(txInfo)
+        txInfo = await checkTxSubmitted(txInfo)
     }
     return await prepareTxInfo(txInfo)
 }
 
-export async function existenceTx(txInfo) {
+export async function checkTxSubmitted(txInfo) {
     try {
         const server = new Horizon.Server(networks[txInfo.network].horizon)
         const {created_at, successful} = await server.transactions().transaction(txInfo.hash).call()

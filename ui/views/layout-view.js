@@ -1,10 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ThemeSelector} from '@stellar-expert/ui-framework'
+import {withRouter} from 'react-router'
 import Catcher from './general/catcher'
 import MenuView from './menu-view'
 
-export default function Layout({children}) {
+function Layout({children}) {
     return <div className="page-wrapper">
         <div className="blue-ribbon"/>
         <div className="top-block">
@@ -41,3 +42,5 @@ export default function Layout({children}) {
 Layout.propTypes = {
     children: PropTypes.node
 }
+
+export default withRouter(Layout)

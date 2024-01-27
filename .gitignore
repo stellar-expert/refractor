@@ -24,6 +24,8 @@ build/Release
 node_modules/
 jspm_packages/
 
+public/
+
 # Optional npm cache directory
 .npm
 
@@ -36,3 +38,6 @@ jspm_packages/
 assets
 
 pnpm-lock.yaml
+
+# config API files
+app.config.json

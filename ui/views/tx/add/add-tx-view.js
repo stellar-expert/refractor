@@ -59,25 +59,15 @@ export default function AddTxView() {
             })
     }, [data])
 
-    const changeNetwork = useCallback(n => {
-        setParam('network', n)
-    }, [setParam])
+    const changeNetwork = useCallback(n => setParam('network', n), [setParam])
 
-    const changeXdr = useCallback(e => {
-        setParam('xdr', e.target.value.trim())
-    }, [setParam])
+    const changeXdr = useCallback(e => setParam('xdr', e.target.value.trim()), [setParam])
 
-    const changeAutoSubmit = useCallback(e => {
-        setParam('submit', e.target.checked)
-    }, [setParam])
+    const changeAutoSubmit = useCallback(e => setParam('submit', e.target.checked), [setParam])
 
-    const changeCallback = useCallback(e => {
-        setParam('callback', e.target.value.trim())
-    }, [setParam])
+    const changeCallback = useCallback(e => setParam('callback', e.target.value.trim()), [setParam])
 
-    const changeExpires = useCallback(e => {
-        setParam('expires', e.target.value)
-    }, [setParam])
+    const changeExpires = useCallback(e => setParam('expires', e.target.value), [setParam])
 
     return <>
         <div className="dual-layout">

@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
 import {Button} from '@stellar-expert/ui-framework'
-import {existenceTx} from '../../../infrastructure/tx-dispatcher'
+import {checkTxSubmitted} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
 import {horizonErrorHandler} from './horizon-error-handler'
 
@@ -13,7 +13,7 @@ export default function HorizonSubmitTxView({txInfo}) {
     useEffect(() => {
         if (!txInfo.submit && !txInfo.submitted) {
             //check existence of transaction in Horizon
-            existenceTx(txInfo)
+            checkTxSubmitted(txInfo)
                 .then(tx => {
                     setIsExist(!!tx.submitted)
                 })
