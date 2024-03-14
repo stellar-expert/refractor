@@ -1,4 +1,4 @@
-import {TransactionBuilder, StrKey, Server} from 'stellar-sdk'
+import {TransactionBuilder, StrKey, Server} from '@stellar/stellar-sdk'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
 import config from '../app.config.json'
 import {apiCall} from './api'

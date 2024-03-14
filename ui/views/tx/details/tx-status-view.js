@@ -1,37 +1,18 @@
 import React from 'react'
 import {BlockSelect, InfoTooltip, UtcTimestamp} from '@stellar-expert/ui-framework'
 
-function StatusRowView({tooltip, children, extraInfo}) {
-    return <div>
-        <span className="dimmed">Status: </span>
-        <span className="d-line-block">
-            <BlockSelect>{children}</BlockSelect>
-            {!!extraInfo && <> {extraInfo}</>}
-            <InfoTooltip>{tooltip}</InfoTooltip>
-        </span>
-    </div>
-}
-
-function DateRowView({tooltip, children}) {
-    return <div>
-        <span className="dimmed">Timestamp: </span>
-        <span className="d-line-block">
-            <UtcTimestamp date={children}/>
-        </span>
-    </div>
-}
-
 export default function TxStatusView({tx}) {
     const {status, submitted, hash, network} = tx
-    if (submitted) return <>
-        <StatusRowView
-            tooltip="The transaction has been signed, processed, and automatically submitted to Stellar network"
-            extraInfo={<a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank"
-                          className="icon-open-new-window" title="View in explorer"></a>}>
-            Executed
-        </StatusRowView>
-        <DateRowView>{submitted}</DateRowView>
-    </>
+    if (submitted)
+        return <>
+            <StatusRowView
+                tooltip="The transaction has been signed, processed, and automatically submitted to Stellar network"
+                extraInfo={<a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank"
+                              className="icon-open-new-window" title="View in explorer"></a>}>
+                Executed
+            </StatusRowView>
+            <DateRowView submitted={submitted}/>
+        </>
     switch (status) {
         case 'pending':
             return <StatusRowView tooltip="The transaction has not reached the required signatures threshold yet">
@@ -51,12 +32,34 @@ export default function TxStatusView({tx}) {
                 Processed
             </StatusRowView>
         case 'failed':
-            if (submitted) return <>
+            return <>
                 <StatusRowView
                     tooltip="The transaction has been fully signed but failed during either callback execution or network submission process">
                     Automatic processing failed
                 </StatusRowView>
-                <DateRowView>{submitted}</DateRowView>
+                <DateRowView submitted={submitted}/>
             </>
     }
+}
+
+function StatusRowView({tooltip, children, extraInfo}) {
+    return <div>
+        <span className="dimmed">Status: </span>
+        <span className="d-line-block">
+            <BlockSelect>{children}</BlockSelect>
+            {!!extraInfo && <> {extraInfo}</>}
+            <InfoTooltip>{tooltip}</InfoTooltip>
+        </span>
+    </div>
+}
+
+function DateRowView({submitted, tooltip}) {
+    if (!submitted)
+        return null
+    return <div>
+        <span className="dimmed">Timestamp: </span>
+        <span className="d-line-block">
+            <UtcTimestamp date={children}/>
+        </span>
+    </div>
 }

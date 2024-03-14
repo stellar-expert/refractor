@@ -1,4 +1,4 @@
-const {StrKey} = require('stellar-sdk'),
+const {StrKey} = require('@stellar/stellar-sdk'),
     {standardError} = require('./std-error'),
     {resolveNetwork, resolveNetworkId} = require('./network-resolver'),
     TxModel = require('../models/tx-model'),

@@ -1,8 +1,8 @@
-import React, {useState,useEffect} from 'react'
-import {Server, TransactionBuilder} from 'stellar-sdk'
+import React, {useState, useEffect} from 'react'
+import {Server, TransactionBuilder} from '@stellar/stellar-sdk'
 import {Button, TxLink} from '@stellar-expert/ui-framework'
 import config from '../../../app.config.json'
-import {loadTx} from "../../../infrastructure/tx-dispatcher";
+import {loadTx} from '../../../infrastructure/tx-dispatcher'
 
 export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network}) {
     const [inProgress, setInProgress] = useState(false),
@@ -12,7 +12,7 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
     let checkStatus
     useEffect(async () => {
         if (result && status === 'ready') {
-            checkStatus = setInterval(async ()=>{
+            checkStatus = setInterval(async () => {
                 const txInfo = await loadTx(hash)
                 if (txInfo.status === 'processed' || txInfo.status === 'failed') window.location.reload()
             }, 1000)
@@ -47,16 +47,19 @@ export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submit
             })
     }
 
-    if (inProgress) return <div className="loader inline"/>
-    if (submitted) return <div>
-        Transaction has been <a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank">submitted</a> to the network
-    </div>
-
-    if (status === 'processed' && !submitted) return <div>
-        Transaction is fully signed and processed.
-    </div>
+    if (inProgress)
+        return <div className="loader inline"/>
+    if (submitted)
+        return <div>
+            Transaction has been <a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank">submitted</a> to the
+            network
+        </div>
+    if (status === 'processed' && !submitted)
+        return <div>
+            Transaction is fully signed but not submitted to the network.
+        </div>
     return <div>
-        {readyToSubmit && !submitted ? <>
+        {readyToSubmit? <>
             {!!error && <div className="error">{error}</div>}
             {submit ? <p>✓ The transaction is fully signed and will be submitted automatically.</p> :
                 <div className="row micro-space">

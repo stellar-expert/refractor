@@ -1,5 +1,5 @@
 import React from 'react'
-import {TransactionBuilder} from 'stellar-sdk'
+import {TransactionBuilder} from '@stellar/stellar-sdk'
 import OperationDescription from './operation-description-view'
 
 /**

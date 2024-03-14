@@ -1,5 +1,5 @@
 import React from 'react'
-import {Networks, TransactionBuilder} from 'stellar-sdk'
+import {Networks, TransactionBuilder} from '@stellar/stellar-sdk'
 import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip} from '@stellar-expert/ui-framework'
 import {formatDateUTC} from '@stellar-expert/formatter'
 import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'

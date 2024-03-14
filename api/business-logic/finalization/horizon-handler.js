@@ -1,4 +1,4 @@
-const {Server, TransactionBuilder} = require('stellar-sdk'),
+const {Server, TransactionBuilder} = require('@stellar/stellar-sdk'),
     createQueue = require('fastq'),
     {resolveNetwork} = require('../network-resolver')
 
