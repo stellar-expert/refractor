@@ -24,7 +24,7 @@ const horizonQueue = createQueue((txInfo, cb) => {
             if (e.response && e.response.status) {
                 const horizonError = new Error('Transaction submission failed')
                 horizonError.status = e.response.status
-                if (e.response.data) {
+                if (e.response?.data?.extras) {
                     horizonError.result_codes = e.response.data.extras.result_codes
                 }
                 e = horizonError
