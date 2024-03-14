@@ -1,5 +1,5 @@
 import React from 'react'
-import {BlockSelect, InfoTooltip, UtcTimestamp} from '@stellar-expert/ui-framework'
+import {BlockSelect, InfoTooltip, UpdateHighlighter, UtcTimestamp} from '@stellar-expert/ui-framework'
 
 export default function TxStatusView({tx}) {
     const {status, submitted, hash, network} = tx
@@ -15,20 +15,23 @@ export default function TxStatusView({tx}) {
         </>
     switch (status) {
         case 'pending':
-            return <StatusRowView tooltip="The transaction has not reached the required signatures threshold yet">
+            return <StatusRowView tooltip="The transaction has not reached the required signatures threshold yet"
+                                  extraInfo={<span className="loader small"/>}>
                 Waiting for signatures
             </StatusRowView>
         case 'ready':
-            return <StatusRowView tooltip="The transaction has been fully signed and can be submitted to the network">
+            return <StatusRowView tooltip="The transaction has been fully signed and can be submitted to the network"
+                                  extraInfo={<span className="loader small"/>}>
                 Ready
             </StatusRowView>
         case 'processing':
-            return <StatusRowView
-                tooltip="The transaction has been fully signed and currently waits in the processing pipeline">
+            return <StatusRowView tooltip="The transaction has been fully signed and currently waits in the processing pipeline"
+                                  extraInfo={<span className="loader small"/>}>
                 Processing
             </StatusRowView>
         case 'processed':
-            return <StatusRowView tooltip="The transaction has been fully signed and processed">
+            return <StatusRowView tooltip="The transaction has been fully signed and processed"
+                                  extraInfo={<span className="loader small"/>}>
                 Processed
             </StatusRowView>
         case 'failed':
@@ -39,14 +42,15 @@ export default function TxStatusView({tx}) {
                 </StatusRowView>
                 <DateRowView submitted={submitted}/>
             </>
+        default: return null
     }
 }
 
 function StatusRowView({tooltip, children, extraInfo}) {
     return <div>
         <span className="dimmed">Status: </span>
-        <span className="d-line-block">
-            <BlockSelect>{children}</BlockSelect>
+        <span className="inline-block">
+            <UpdateHighlighter><BlockSelect>{children}</BlockSelect></UpdateHighlighter>
             {!!extraInfo && <> {extraInfo}</>}
             <InfoTooltip>{tooltip}</InfoTooltip>
         </span>

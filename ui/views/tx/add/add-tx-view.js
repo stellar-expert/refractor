@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useCallback, useState} from 'react'
 import isEqual from 'react-fast-compare'
 import {Button, Dropdown} from '@stellar-expert/ui-framework'
 import {navigation} from '@stellar-expert/navigation'
@@ -30,38 +30,44 @@ function TxPropsBlock({title, description, optional = false, children}) {
 
 export default function AddTxView() {
     const [data, setData] = useState({
-            xdr: '',
-            network: 'public',
-            submit: false,
-            callback: '',
-            expires: '',
-            desiredSigners: []
-        }),
-        [error, setError] = useState(''),
-        [inProgress, setInProgress] = useState(false)
+        xdr: '',
+        network: 'public',
+        submit: false,
+        callback: '',
+        expires: '',
+        desiredSigners: []
+    })
+    const [inProgress, setInProgress] = useState(false)
 
-    function setParam(param, value) {
+    const setParam = useCallback((param, value) => {
         setData(prev => {
             const newData = {...prev, [param]: value}
             if (!isEqual(prev, newData)) return newData
             return prev
         })
-    }
+    }, [])
 
-    function storeTx() {
+    const storeTx = useCallback(() => {
         setInProgress(true)
         return submitTx(data)
             .then(res => {
-                console.log(res)
                 navigation.navigate(`/tx/${res.hash}`)
             })
             .catch(e => {
-                console.error(e)
-                setError(e.message)
+                setInProgress(false)
+                notify({type: 'error', message: e.message})
             })
-            .finally(() => setInProgress(false))
-    }
+    }, [data])
 
+    const changeNetwork = useCallback(n => setParam('network', n), [setParam])
+
+    const changeXdr = useCallback(e => setParam('xdr', e.target.value.trim()), [setParam])
+
+    const changeAutoSubmit = useCallback(e => setParam('submit', e.target.checked), [setParam])
+
+    const changeCallback = useCallback(e => setParam('callback', e.target.value.trim()), [setParam])
+
+    const changeExpires = useCallback(e => setParam('expires', e.target.value), [setParam])
 
     return <>
         <div className="dual-layout">
@@ -72,7 +78,7 @@ export default function AddTxView() {
 
         <div className="card card-blank" style={{paddingTop: '1px'}}>
             <div className="flex-row space">
-                &nbsp; <Dropdown options={networkOptions} value={data.network} onChange={n => setParam('network', n)}/>
+                &nbsp; <Dropdown options={networkOptions} value={data.network} onChange={changeNetwork}/>
             </div>
             <TxPropsBlock title="Transaction XDR" description={<>
                 Base64-encoded transaction envelope. If the same transaction has been already stored earlier,
@@ -82,7 +88,7 @@ export default function AddTxView() {
                 <a href="views/tx/add/add-tx-view#txbuilder" target="_blank">Stellar Laboratory</a> or any{' '}
                 <a href="views/tx/add/add-tx-view#sdks" target="_blank"> Stellar SDK</a>.
             </>}>
-                <textarea value={data.xdr} disabled={inProgress} onChange={e => setParam('xdr', e.target.value.trim())}
+                <textarea value={data.xdr} disabled={inProgress} onChange={changeXdr}
                           className="text-small text-monospace condensed mobile-micro-space-bottom" placeholder="Base64-encoded transaction envelope"
                           style={{width: '100%', 'minHeight': '8rem', height: '100%', display: 'block', resize: 'vertical', marginBottom: '-6px'}}/>
             </TxPropsBlock>
@@ -92,7 +98,7 @@ export default function AddTxView() {
             </>}>
                 <label>
                     <input type="checkbox" checked={data.submit}
-                           onChange={e => setParam('submit', e.target.checked)}/>{' '}
+                           onChange={changeAutoSubmit}/>{' '}
                     Autosubmit to the network<Optional/>
                 </label>
             </TxPropsBlock>
@@ -101,7 +107,7 @@ export default function AddTxView() {
                 Callback URL where this transaction will be automatically sent as a HTTP POST request gathered enough signatures to match
                 the threshold.
             </>}>
-                <input type="text" value={data.callback} onChange={e => setParam('callback', e.target.value.trim())}
+                <input type="text" value={data.callback} onChange={changeCallback}
                        placeholder="for example, https://my.service/success.php"/>
             </TxPropsBlock>
 
@@ -109,7 +115,7 @@ export default function AddTxView() {
                 Transaction retention period. If not specified explicitly, the <code>validBefore</code> value from transaction is used.
                 Maximum retention period is capped to 1 year.
             </>}>
-                <input value={data.expires} onChange={e => setParam('expires', e.target.value)}
+                <input value={data.expires} onChange={changeExpires}
                        placeholder="UNIX timestamp or ISO date, like 2020-11-29T09:29:13Z"/>
             </TxPropsBlock>
             {/*<div>
@@ -118,7 +124,6 @@ export default function AddTxView() {
                                       onChange={newSigners => setParam('desiredSigners', newSigners)}/>
             </div>*/}
             <hr className="space"/>
-            {!!error && <div className="error space">{error}</div>}
             <div className="space row">
                 <div className="column column-50">
                     {!!inProgress && <>

@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {AccountAddress, Amount, AssetLink, ClaimableBalanceClaimants} from '@stellar-expert/ui-framework'
+import {AccountAddress, Amount, AssetLink, ClaimableBalanceClaimants, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {AssetDescriptor} from '@stellar-expert/asset-descriptor'
 import {formatPrice, formatWithAutoPrecision} from '@stellar-expert/formatter'
 
@@ -14,7 +14,7 @@ function SetOptionsTrait({children}) {
     </div>
 }
 
-export default function OperationDescriptionView({op, source}) {
+function OperationDescriptionView({op, source}) {
     function SourceAccount() {
         if (!op.source || op.source === source) return null
         return <> on behalf of account <AccountAddress account={op.source || source}/></>
@@ -250,3 +250,5 @@ OperationDescriptionView.propTypes = {
     op: PropTypes.object.isRequired,
     source: PropTypes.string.isRequired
 }
+
+export default withErrorBoundary(OperationDescriptionView)

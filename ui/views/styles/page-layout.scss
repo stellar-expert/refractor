@@ -40,17 +40,14 @@ $top-menu-line-height: 2.2em;
   float: left;
 }
 
-.h-100 {
-  height: 100%;
-}
-
-.d-line-block {
+.loader.small {
   display: inline-block;
-}
-
-.flex-column {
-  display: flex!important;
-  flex-direction: column;
+  font-size: inherit;
+  width: 1em;
+  height: 1em;
+  margin: 0 auto;
+  padding: 0;
+  background-size: auto 1em;
 }
 
 @media (max-width: $responsive-mobile-browser-width) {

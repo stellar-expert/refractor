@@ -1,5 +1,6 @@
 import React from 'react'
 import {TransactionBuilder} from '@stellar/stellar-sdk'
+import {withErrorBoundary} from '@stellar-expert/ui-framework'
 import OperationDescription from './operation-description-view'
 
 /**
@@ -8,8 +9,8 @@ import OperationDescription from './operation-description-view'
  * @param {String} network - Network identifier or passphrase
  * @param {Boolean} compact? - Whether to show extended tx info
  */
-export default function TxDetailsOperationsView({xdr, network, compact = false}) {
-    let tx = TransactionBuilder.fromXDR(xdr, network)
+export default withErrorBoundary(function TxDetailsOperationsView({xdr, network, compact = false}) {
+    const tx = TransactionBuilder.fromXDR(xdr, network)
 
     if (!tx) return <div>
         <span className="icon-warning color-danger"/> Transaction is invalid
@@ -22,4 +23,4 @@ export default function TxDetailsOperationsView({xdr, network, compact = false})
                 <i className="icon icon-angle-right"/><OperationDescription key={i} op={op} source={tx.source}/>
             </div>)}</>}
     </div>
-}
+})
