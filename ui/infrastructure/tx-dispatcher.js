@@ -1,4 +1,4 @@
-import {TransactionBuilder, StrKey, Server} from 'stellar-sdk'
+import {TransactionBuilder, StrKey, Horizon} from '@stellar/stellar-sdk'
 import {inspectTransactionSigners} from '@stellar-expert/tx-signers-inspector'
 import config from '../app.config.json'
 import {apiCall} from './api'
@@ -35,7 +35,7 @@ export async function validateNewTx(data) {
     if (data.expires) {
         let expires
         if (data.expires.toString().match(/^\d+$/)) {
-            expires = parseInt(data.expires)
+            expires = parseInt(data.expires, 10)
             //check that input is a valid Unix timestamp
             if (expires < 0 || expires > 2147483648)
                 throw new Error('Invalid expiration date - UNIX timestamp expected')
@@ -52,7 +52,7 @@ export async function validateNewTx(data) {
     //validate proposed signers
     if (data.desiredSigners?.length) {
         const nonEmptySigners = data.desiredSigners.filter(s => !!s)
-        for (let signer of nonEmptySigners) {
+        for (const signer of nonEmptySigners) {
             if (!StrKey.isValidEd25519PublicKey(signer))
                 throw new Error('Invalid signer public key - ' + signer)
         }
@@ -74,27 +74,28 @@ export async function loadTx(txhash) {
     if (typeof txhash !== 'string' || !/^[a-f0-9]{64}$/i.test(txhash))
         throw new Error(`Invalid transaction hash: ${txhash || '(empty)'}`)
     //load from the server
-    const txInfo = await apiCall('tx/' + txhash)
-    if (txInfo.status === 'ready') {
-        try {
-            const {created_at, successful} = await new Server(networks[txInfo.network].horizon)
-                .transactions().transaction(txInfo.hash).call()
-            txInfo.submitted = new Date(created_at)
-            if (successful) {
-                txInfo.status = 'processed'
-            } else {
-                txInfo.status = 'failed'
-            }
-        } catch (e) {
-        }
+    let txInfo = await apiCall('tx/' + txhash)
+    if (txInfo.status === 'ready' || txInfo.status === 'processed') {
+        txInfo = await checkTxSubmitted(txInfo)
     }
     return await prepareTxInfo(txInfo)
 }
 
+export async function checkTxSubmitted(txInfo) {
+    try {
+        const server = new Horizon.Server(networks[txInfo.network].horizon)
+        const {created_at, successful} = await server.transactions().transaction(txInfo.hash).call()
+        txInfo.submitted = new Date(created_at)
+        txInfo.status = (successful) ? 'processed' : 'failed'
+    } catch (e) {
+    }
+    return txInfo
+}
+
 async function prepareTxInfo(txInfo) {
     //create Transaction object
-    const {passphrase, horizon} = networks[txInfo.network],
-        tx = TransactionBuilder.fromXDR(txInfo.xdr, passphrase)
+    const {passphrase, horizon} = networks[txInfo.network]
+    const tx = TransactionBuilder.fromXDR(txInfo.xdr, passphrase)
     //discover signers and check whether it is fully signed
     const schema = await inspectTransactionSigners(tx, {horizon})
     txInfo.schema = schema

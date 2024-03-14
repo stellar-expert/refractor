@@ -1,4 +1,4 @@
-const {TransactionBuilder, FeeBumpTransaction, Keypair} = require('stellar-sdk'),
+const {TransactionBuilder, FeeBumpTransaction, Keypair} = require('@stellar/stellar-sdk'),
     {inspectTransactionSigners} = require('@stellar-expert/tx-signers-inspector'),
     TxSignature = require('../models/tx-signature'),
     {resolveNetwork, resolveNetworkParams} = require('./network-resolver'),

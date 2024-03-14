@@ -1,76 +1,77 @@
-import React, {useState,useEffect} from 'react'
-import {Server, TransactionBuilder} from 'stellar-sdk'
-import {Button, TxLink} from '@stellar-expert/ui-framework'
+import React, {useState, useCallback, useEffect} from 'react'
+import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
+import {Button, withErrorBoundary} from '@stellar-expert/ui-framework'
+import {checkTxSubmitted} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
-import {loadTx} from "../../../infrastructure/tx-dispatcher";
+import {horizonErrorHandler} from './horizon-error-handler'
 
-export default function HorizonSubmitTxView({readyToSubmit, hash, submit, submitted, xdr, status, network}) {
-    const [inProgress, setInProgress] = useState(false),
-        [result, setResult] = useState(null),
-        [error, setError] = useState(null)
+export default withErrorBoundary(function HorizonSubmitTxView({txInfo}) {
+    const {readyToSubmit, hash, submit, submitted, xdr, status, network, error} = txInfo
+    const [inProgress, setInProgress] = useState(false)
+    const [isExist, setIsExist] = useState(true)
 
-    let checkStatus
-    useEffect(async () => {
-        if (result && status === 'ready') {
-            checkStatus = setInterval(async ()=>{
-                const txInfo = await loadTx(hash)
-                if (txInfo.status === 'processed' || txInfo.status === 'failed') window.location.reload()
-            }, 1000)
+    useEffect(() => {
+        if (!txInfo.submit && !txInfo.submitted) {
+            //check existence of transaction in Horizon
+            checkTxSubmitted(txInfo)
+                .then(tx => {
+                    setIsExist(!!tx.submitted)
+                })
         }
-        return () => {
-            clearInterval(checkStatus)
-        }
-    })
+    }, [txInfo])
 
-    function submitTx() {
-        const {passphrase, horizon} = config.networks[network],
-            tx = TransactionBuilder.fromXDR(xdr, passphrase),
-            server = new Server(horizon)
+    const submitTx = useCallback(() => {
+        const {passphrase, horizon} = config.networks[network]
+        const tx = TransactionBuilder.fromXDR(xdr, passphrase)
+        const server = new Horizon.Server(horizon)
 
         setInProgress(true)
-        setError(null)
         server.submitTransaction(tx)
             .then(() => {
-                setResult(true)
                 window.location.reload()
             })
             .catch(e => {
-                console.error(e)
-                let err = 'Transaction failed'
                 if (e.response.data) {
-                    err += ' ' + JSON.stringify(e.response.data.extras.result_codes)
+                    const errors = horizonErrorHandler(e.response.data, 'Transaction failed')
+                    errors.forEach(err => {
+                        notify({type: 'error', message: err.description})
+                    })
                 }
-                setError(err)
             })
             .finally(() => {
                 setInProgress(false)
             })
-    }
+    }, [network, xdr])
 
     if (inProgress) return <div className="loader inline"/>
-    if (submitted) return <div>
-        Transaction has been <a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank">submitted</a> to the network
+
+    if (error) return <div>
+        <div>{error}</div>
     </div>
 
-    if (status === 'processed' && !submitted) return <div>
+    if (submitted) return <div>
+        Transaction has been <a href={`https://stellar.expert/explorer/${network}/tx/${hash}`} target="_blank" rel="noreferrer">submitted</a> to the network
+    </div>
+
+    if (status === 'processed' && !submitted && isExist) return <div>
         Transaction is fully signed and processed.
     </div>
+
     return <div>
         {readyToSubmit && !submitted ? <>
-            {!!error && <div className="error">{error}</div>}
-            {submit ? <p>✓ The transaction is fully signed and will be submitted automatically.</p> :
-                <div className="row micro-space">
-                    <div className="column column-25">
-                        <Button block onClick={submitTx}>Submit</Button>
+            {!!submit && <p>✓ The transaction is fully signed and will be submitted automatically.</p>}
+            {(!submit && !isExist) && <div className="row micro-space">
+                <div className="column column-25">
+                    <Button block onClick={submitTx}>Submit</Button>
+                </div>
+                <div className="column column-75">
+                    <div className="micro-space text-small dimmed">
+                        Transaction is fully signed and ready to be submitted to the network.
                     </div>
-                    <div className="column column-75">
-                        <div className="micro-space text-small dimmed">
-                            Transaction is fully signed and ready to be submitted to the network.
-                        </div>
-                    </div>
-                </div>}
+                </div>
+            </div>}
         </> : <>
             Transaction is not fully signed yet. More signatures required to match the threshold.
         </>}
     </div>
-}
+})

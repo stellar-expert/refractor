@@ -1,16 +1,12 @@
 import React from 'react'
-import {Networks, TransactionBuilder} from 'stellar-sdk'
-import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip} from '@stellar-expert/ui-framework'
+import {Networks, TransactionBuilder} from '@stellar/stellar-sdk'
+import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {formatDateUTC} from '@stellar-expert/formatter'
 import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxStatusView from './tx-status-view'
 
-/*function formatLabLink({network, xdr}) {
-    return `https://laboratory.stellar.org/#xdr-viewer?input=${encodeURIComponent(xdr)}&type=TransactionEnvelope&network=${network}`
-}*/
-
-export default function TxPropsView({txInfo}) {
+export default withErrorBoundary(function TxPropsView({txInfo}) {
     let tx = TransactionBuilder.fromXDR(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
@@ -22,7 +18,7 @@ export default function TxPropsView({txInfo}) {
         <div>
             <span className="dimmed">Network:</span> <BlockSelect>{txInfo.network}</BlockSelect>
             <InfoTooltip>
-                Stellar network name ("public" or "testnet")
+                Stellar network name (&quot;public&quot; or &quot;testnet&quot;)
             </InfoTooltip>
         </div>
         {!!txInfo.submit && <div>
@@ -67,7 +63,7 @@ export default function TxPropsView({txInfo}) {
                 Source account of this transaction
             </InfoTooltip>
         </div>
-        {isFeeBump && <div>
+        {!!isFeeBump && <div>
             <span className="label">Fee sponsor: </span>
             <AccountAddress account={feeSponsor}/>
             <InfoTooltip>
@@ -76,7 +72,7 @@ export default function TxPropsView({txInfo}) {
         </div>}
         <div>
             <span className="label">Source sequence: </span>
-            <span className="d-line-block">
+            <span className="inline-block">
                 <BlockSelect inline wrap className="condensed">{tx.sequence}</BlockSelect>
                 <InfoTooltip>
                     Sequence of the source account
@@ -84,4 +80,4 @@ export default function TxPropsView({txInfo}) {
             </span>
         </div>
     </div>
-}
+})

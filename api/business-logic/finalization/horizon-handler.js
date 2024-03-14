@@ -1,4 +1,4 @@
-const {Server, TransactionBuilder} = require('stellar-sdk'),
+const {Horizon, TransactionBuilder} = require('@stellar/stellar-sdk'),
     createQueue = require('fastq'),
     {resolveNetwork} = require('../network-resolver')
 
@@ -12,7 +12,7 @@ let submitTransactionWorker = function (txInfo) {
     let horizon = servers[txInfo.network]
     const network = resolveNetwork(txInfo.network)
     if (!horizon) {
-        servers[txInfo.network] = horizon = new Server(network.horizon)
+        servers[txInfo.network] = horizon = new Horizon.Server(network.horizon)
     }
     return horizon.submitTransaction(TransactionBuilder.fromXDR(txInfo.xdr, network.passphrase), {skipMemoRequiredCheck: true})
 }

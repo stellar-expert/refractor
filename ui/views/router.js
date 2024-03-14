@@ -1,6 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Switch, Router, Route, Redirect} from 'react-router'
+import {Switch, Router, Route} from 'react-router'
 import Layout from './layout-view'
 import TxView from './tx/tx-view'
 import AddTxView from './tx/add/add-tx-view'

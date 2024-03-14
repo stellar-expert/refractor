@@ -8,7 +8,7 @@ export function hasTimeBounds(tx) {
 
 export default function TxTimeBoundsView({tx}) {
     const {minTime, maxTime} = tx.timeBounds
-    if (minTime > 0 && maxTime > 0) return <span className="d-line-block"><BlockSelect>{formatDateUTC(minTime)} - {formatDateUTC(maxTime)}</BlockSelect></span>
-    if (minTime > 0) return <span className="d-line-block">from <BlockSelect>{formatDateUTC(minTime)}</BlockSelect></span>
-    if (maxTime > 0) return <span className="d-line-block">to <BlockSelect>{formatDateUTC(maxTime)}</BlockSelect></span>
+    if (minTime > 0 && maxTime > 0) return <span className="inline-block"><BlockSelect>{formatDateUTC(minTime)} - {formatDateUTC(maxTime)}</BlockSelect></span>
+    if (minTime > 0) return <span className="inline-block">from <BlockSelect>{formatDateUTC(minTime)}</BlockSelect></span>
+    if (maxTime > 0) return <span className="inline-block">to <BlockSelect>{formatDateUTC(maxTime)}</BlockSelect></span>
 }

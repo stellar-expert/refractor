@@ -1,6 +1,7 @@
 import React from 'react'
 import {render} from 'react-dom'
 import {bindClickNavHandler, navigation} from '@stellar-expert/navigation'
+import {createToastNotificationsContainer} from '@stellar-expert/ui-framework'
 import Router from './router'
 import './styles/styles.scss'
 
@@ -16,3 +17,5 @@ const preLoader = document.getElementById('pre-loader')
 preLoader.parentNode.removeChild(preLoader)
 
 document.body.appendChild(appContainer)
+
+createToastNotificationsContainer()

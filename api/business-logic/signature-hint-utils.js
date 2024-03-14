@@ -1,4 +1,4 @@
-const {Keypair} = require('stellar-sdk')
+const {Keypair} = require('@stellar/stellar-sdk')
 
 /**
  * Convert the signature hint to the StrKey mask.

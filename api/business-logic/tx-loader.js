@@ -1,6 +1,6 @@
 const {normalizeNetworkName, resolveNetwork} = require('./network-resolver'),
     storageLayer = require('../storage/storage-layer'),
-    {TransactionBuilder} = require('stellar-sdk')
+    {TransactionBuilder} = require('@stellar/stellar-sdk')
 
 async function loadRehydrateTx(hash) {
     const txInfo = await storageLayer.dataProvider.findTransaction(hash)
