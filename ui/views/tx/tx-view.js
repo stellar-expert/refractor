@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useParams} from 'react-router'
-import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState} from '@stellar-expert/ui-framework'
+import {BlockSelect, CopyToClipboard, ErrorBoundary, isDocumentVisible, useDependantState} from '@stellar-expert/ui-framework'
 import {loadTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'
@@ -30,18 +30,15 @@ export default function TxView() {
     }, [txhash], () => clearTimeout(statusWatcher.current))
 
     const loadPeriodicallyTx = useCallback(() => {
-        setError('')
         loadTx(txhash)
             .then(txInfo => {
                 setTxInfo(txInfo)
                 clearTimeout(statusWatcher.current)
                 if (txInfo.submitted || txInfo.status === 'failed')
                     return null
-                statusWatcher.current = setTimeout(() => {
-                    loadPeriodicallyTx()
-                }, statusRefreshInterval * 1000)
+                statusWatcher.current = setTimeout(loadPeriodicallyTx, statusRefreshInterval * 1000)
             })
-            .catch(e => setError(e))
+            .catch(e => console.error(e))
     }, [txhash, setTxInfo])
 
     //periodically check the transaction status when the transaction tab is active
@@ -68,9 +65,11 @@ export default function TxView() {
 
     const updateTx = useCallback(txInfo => setTxInfo(txInfo), [setTxInfo])
 
-    if (error) throw error
-    if (!txInfo) return <div className="loader"/>
-    return <>
+    if (error)
+        throw error
+    if (!txInfo)
+        return <div className="loader"/>
+    return <ErrorBoundary>
         <h2 style={{'display': 'inline-flex', 'maxWidth': '100%'}}>Transaction&nbsp;
             <BlockSelect className="condensed" style={{'overflow': 'hidden'}}>{txhash}</BlockSelect>
             <span className="text-small"><CopyToClipboard text={txhash}/></span>
@@ -119,6 +118,5 @@ export default function TxView() {
                 </div>
             </div>
         </div>
-
-    </>
+    </ErrorBoundary>
 }
