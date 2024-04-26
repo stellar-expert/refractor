@@ -1,26 +1,21 @@
 import React from 'react'
-import {TransactionBuilder} from '@stellar/stellar-sdk'
-import {withErrorBoundary} from '@stellar-expert/ui-framework'
-import OperationDescription from './operation-description-view'
+import {
+    TxOperationsList,
+    parseTxDetails, withErrorBoundary
+} from '@stellar-expert/ui-framework'
 
 /**
- * Transaction details
- * @param {String} xdr - Transaction XDR
- * @param {String} network - Network identifier or passphrase
- * @param {Boolean} compact? - Whether to show extended tx info
+ * @param {{}} tx
+ * @param {Boolean} embedded
+ * @return {JSX.Element}
  */
-export default withErrorBoundary(function TxDetailsOperationsView({xdr, network, compact = false}) {
-    const tx = TransactionBuilder.fromXDR(xdr, network)
-
-    if (!tx) return <div>
-        <span className="icon-warning color-danger"/> Transaction is invalid
-    </div>
-
+export default withErrorBoundary(function TxDetailsView({xdr, network}) {
+    const parsedTx = parseTxDetails({
+        network: network,
+        txEnvelope: xdr,
+        context: {}
+    })
     return <div className="space">
-        {tx.operations.length === 1 ?
-            <OperationDescription op={tx.operations[0]} source={tx.source}/> :
-            <>{tx.operations.map((op, i) => <div key={i}>
-                <i className="icon icon-angle-right"/><OperationDescription key={i} op={op} source={tx.source}/>
-            </div>)}</>}
+        <TxOperationsList parsedTx={parsedTx} showEffects={false}/>
     </div>
 })

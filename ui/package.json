@@ -1,7 +1,7 @@
 {
   "name": "@stellar-expert/refractor-ui",
   "private": true,
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": "team@stellar.expert",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {
@@ -20,8 +20,8 @@
     "@stellar-expert/formatter": "^2.3.0",
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
     "@stellar-expert/tx-signers-inspector": "^1.8.1",
-    "@stellar-expert/ui-framework": "1.10.3",
-    "@stellar/stellar-sdk": "11.2.2",
+    "@stellar-expert/ui-framework": "1.10.5",
+    "@stellar/stellar-sdk": "11.3.0",
     "classnames": "^2.3.2",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",

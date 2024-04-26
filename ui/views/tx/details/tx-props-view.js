@@ -2,9 +2,9 @@ import React from 'react'
 import {Networks, TransactionBuilder} from '@stellar/stellar-sdk'
 import {AccountAddress, BlockSelect, CopyToClipboard, InfoTooltip, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {formatDateUTC} from '@stellar-expert/formatter'
-import TxTimeBoundsView, {hasTimeBounds} from './tx-timebounds-view'
 import TxFormattedMemo, {hasMemo} from './tx-formatted-memo-view'
 import TxStatusView from './tx-status-view'
+import TxPreconditionsView from './tx-preconditions-view'
 
 export default withErrorBoundary(function TxPropsView({txInfo}) {
     let tx = TransactionBuilder.fromXDR(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
@@ -41,13 +41,6 @@ export default withErrorBoundary(function TxPropsView({txInfo}) {
                 When transaction expires, it will be deleted from the database
             </InfoTooltip>
         </div>}
-        {hasTimeBounds(tx) && <div>
-            <span className="label">Time restrictions: </span>
-            <TxTimeBoundsView tx={tx}/>
-            <InfoTooltip>
-                Time restrictions (minimum/maximum) set in this transactions
-            </InfoTooltip>
-        </div>}
         {hasMemo(tx) && <div>
             <span className="label">Memo: </span>
             <TxFormattedMemo rawMemo={tx.memo}/>
@@ -79,5 +72,6 @@ export default withErrorBoundary(function TxPropsView({txInfo}) {
                 </InfoTooltip>
             </span>
         </div>
+        <TxPreconditionsView tx={tx}/>
     </div>
 })
