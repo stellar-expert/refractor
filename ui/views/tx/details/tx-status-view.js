@@ -11,7 +11,7 @@ export default function TxStatusView({tx}) {
                               className="icon-open-new-window" title="View in explorer"></a>}>
                 Executed
             </StatusRowView>
-            <DateRowView submitted={submitted}/>
+            <DateRowView submitted={submitted} tooltip="Date and time when the transaction has been saved on the ledger"/>
         </>
     switch (status) {
         case 'pending':
@@ -40,7 +40,7 @@ export default function TxStatusView({tx}) {
                     tooltip="The transaction has been fully signed but failed during either callback execution or network submission process">
                     Automatic processing failed
                 </StatusRowView>
-                <DateRowView submitted={submitted}/>
+                <DateRowView submitted={submitted} tooltip="Date and time when the transaction has been processed"/>
             </>
         default: return null
     }
@@ -63,7 +63,8 @@ function DateRowView({submitted, tooltip}) {
     return <div>
         <span className="dimmed">Timestamp: </span>
         <span className="d-line-block">
-            <UtcTimestamp date={children}/>
+            <UtcTimestamp date={submitted}/>
+            <InfoTooltip>{tooltip}</InfoTooltip>
         </span>
     </div>
 }
