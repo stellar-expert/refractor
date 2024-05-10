@@ -51,7 +51,7 @@ function TxStoreResult({changes}) {  //TODO: refactor
 
 export default withErrorBoundary(function TxSignaturesView({signatures, schema, readyToSubmit, changes}) {
     const appliedSigners = signatures.map(sig => sig.key)
-    const potentialSigners = schema.discoverSigners()
+    const potentialSigners = schema.getAllPotentialSigners()
     const otherAvailableSigners = potentialSigners.filter(signer => !appliedSigners.includes(signer))
     const weights = useMemo(() => {
         const res = {}
