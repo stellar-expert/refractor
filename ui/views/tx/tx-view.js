@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useParams} from 'react-router'
-import {BlockSelect, CopyToClipboard, ErrorBoundary, isDocumentVisible, useDependantState} from '@stellar-expert/ui-framework'
+import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {loadTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'
@@ -11,13 +11,8 @@ import TxPropsView from './details/tx-props-view'
 
 const statusRefreshInterval = 4//4 sec.
 
-function signaturesAmount({signatures, schema}) {
-    let amount = 0
-    schema.requirements?.forEach(requirement => amount += requirement.signers?.length)
-    return signatures ? <span className="text-small dimmed">{`${signatures.length}/${amount}`}</span> : ''
-}
 
-export default function TxView() {
+export default withErrorBoundary(function TxView() {
     const {txhash} = useParams()
     const statusWatcher = useRef()
     const [error, setError] = useState(null)
@@ -69,7 +64,7 @@ export default function TxView() {
         throw error
     if (!txInfo)
         return <div className="loader"/>
-    return <ErrorBoundary>
+    return <>
         <h2 style={{'display': 'inline-flex', 'maxWidth': '100%'}}>Transaction&nbsp;
             <BlockSelect className="condensed" style={{'overflow': 'hidden'}}>{txhash}</BlockSelect>
             <span className="text-small"><CopyToClipboard text={txhash}/></span>
@@ -78,15 +73,6 @@ export default function TxView() {
             <div className="column column-50">
                 <div className="flex-column h-100">
                     <div className="segment h-100">
-                        <h3>Properties</h3>
-                        <hr/>
-                        <TxPropsView txInfo={txInfo}/>
-                    </div>
-                </div>
-            </div>
-            <div className="column column-50">
-                <div className="flex-column h-100">
-                    <div className="segment h-100 mobile-space">
                         <h3>Transaction</h3>
                         <hr/>
                         <div className="space">
@@ -98,8 +84,18 @@ export default function TxView() {
             </div>
             <div className="column column-50">
                 <div className="flex-column h-100">
+                    <div className="segment h-100 mobile-space">
+                        <h3>Properties</h3>
+                        <hr/>
+                        <TxPropsView txInfo={txInfo}/>
+                    </div>
+                </div>
+            </div>
+            <div className="column column-50">
+                <div className="flex-column h-100">
                     <div className="segment h-100 space">
-                        <h3>Signatures {signaturesAmount({...txInfo})}</h3>
+                        <h3>Signatures<span className="text-small dimmed">&emsp;{getSignaturesStatus(txInfo)}</span>
+                        </h3>
                         <hr/>
                         <TxSignaturesView {...txInfo}/>
                     </div>
@@ -108,7 +104,7 @@ export default function TxView() {
             <div className="column column-50">
                 <div className="flex-column h-100">
                     <div className="segment h-100 space">
-                        <h3>Action</h3>
+                        <h3>Status</h3>
                         <hr/>
                         <div className="space">
                             <HorizonSubmitTxView txInfo={txInfo}/>
@@ -118,5 +114,24 @@ export default function TxView() {
                 </div>
             </div>
         </div>
-    </ErrorBoundary>
+    </>
+})
+
+function getSignaturesStatus({readyToSubmit, signatures, schema}) {
+    if (!signatures?.length || !schema?.requirements)
+        return ''
+    if (schema.requirements.length > 1) //complex case
+        return readyToSubmit ? '✓ fully signed' : 'more signatures required'
+    let totalWeight = 0
+    let signedWeight = 0
+    const requirements = schema.requirements[0]
+    for (const signer of requirements.signers) {
+        totalWeight += signer.weight
+        const matchingSignature = signatures.find(signature => signature.key === signer.key)
+        if (matchingSignature) {
+            matchingSignature.weight = signer.weight
+            signedWeight += signer.weight
+        }
+    }
+    return `${readyToSubmit ? '✓ ' : ''}${signatures.length}/${requirements.minThreshold} of ${totalWeight} possible`
 }

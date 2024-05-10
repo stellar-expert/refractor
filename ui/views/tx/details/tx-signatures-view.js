@@ -1,8 +1,6 @@
-import React from 'react'
+import React, {useMemo} from 'react'
 import {BlockSelect, UpdateHighlighter, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
-
-const signaturesWeight = {}
 
 function SignerKey({address, weight, chars, changes, selected}) {
     let isHighlight = ''
@@ -23,8 +21,9 @@ function SignerKey({address, weight, chars, changes, selected}) {
     </UpdateHighlighter>
 }
 
-function TxStoreResult({changes}) {
-    if (!changes) return null
+function TxStoreResult({changes}) {  //TODO: refactor
+    if (!changes)
+        return null
     const {accepted, rejected} = changes
 
     accepted?.forEach(s => {
@@ -32,17 +31,17 @@ function TxStoreResult({changes}) {
         notify({
             type: 'success',
             message: <span key={s.signature}>
-                Accepted signature {signer}
+                Signature from {signer} accepted
             </span>
         })
     })
 
     rejected?.forEach(s => {
-        const signer = s.key.replace(/_+/g,'**')
+        const signer = s.key.replace(/_+/g, '**')
         notify({
             type: 'error',
             message: <span key={s.signature}>
-                Rejected signature {signer}
+                Signature from {signer} rejected
             </span>
         })
     })
@@ -54,23 +53,27 @@ export default withErrorBoundary(function TxSignaturesView({signatures, schema, 
     const appliedSigners = signatures.map(sig => sig.key)
     const potentialSigners = schema.discoverSigners()
     const otherAvailableSigners = potentialSigners.filter(signer => !appliedSigners.includes(signer))
+    const weights = useMemo(() => {
+        const res = {}
+        for (const requirement of schema.requirements) {
+            for (const signer of requirement.signers) {
+                res[signer.key] = signer.weight
+            }
+        }
+        return res
+    }, [schema.requirements])
 
-    schema.requirements.map(requirement =>
-        requirement.signers.map(signer => signaturesWeight[signer.key] = signer.weight))
 
     return <div className="space">
-        {signatures.map(({key}) =>
-            <SignerKey key={key} weight={signaturesWeight[key]} address={key} chars={12} changes={changes} selected/>)}
+        {signatures.map(({key}) => <SignerKey key={key} weight={weights[key]} address={key} chars={12} changes={changes} selected/>)}
         {!signatures?.length && <div className="dimmed text-small">
             (no signatures so far)
         </div>}
         {!readyToSubmit && otherAvailableSigners.length > 0 &&
             <div className="micro-space">
                 <h4 className="dimmed">{signatures.length ? 'Other available' : 'Available'} signers:</h4>
-                {otherAvailableSigners.map(signer =>
-                    <SignerKey key={signer} weight={signaturesWeight[signer]} address={signer} chars={12}/>)}
-            </div>
-        }
+                {otherAvailableSigners.map(signer => <SignerKey key={signer} weight={weights[signer]} address={signer} chars={12}/>)}
+            </div>}
         <TxStoreResult changes={changes}/>
     </div>
 })

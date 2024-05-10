@@ -48,7 +48,7 @@ export default function TxStatusView({tx}) {
 
 function StatusRowView({tooltip, children, extraInfo}) {
     return <div>
-        <span className="dimmed">Status: </span>
+        <span className="dimmed">State: </span>
         <span className="inline-block">
             <UpdateHighlighter><BlockSelect>{children}</BlockSelect></UpdateHighlighter>
             {!!extraInfo && <> {extraInfo}</>}

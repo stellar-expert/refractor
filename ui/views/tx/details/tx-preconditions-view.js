@@ -106,7 +106,6 @@ function parseExtraSigners(preconditions) {
 }
 
 export default function TxPreconditionsView({tx}) {
-    debugger
     const parsed = [
         parseTimeBounds(tx),
         parseLedgerBounds(tx),
