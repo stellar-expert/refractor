@@ -11,6 +11,7 @@ export default class AlbedoProvider {
     }
 
     async signTx({xdr, network}) {
+        await this.init()
         const res = await this.provider.tx({xdr, network})
         return res.signed_envelope_xdr
     }

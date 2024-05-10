@@ -37,7 +37,7 @@ function TxStoreResult({changes}) {  //TODO: refactor
     })
 
     rejected?.forEach(s => {
-        const signer = s.key.replace(/_+/g, '**')
+        const signer = s.key.replace(/_+/g, '...')
         notify({
             type: 'error',
             message: <span key={s.signature}>

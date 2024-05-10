@@ -9,6 +9,7 @@ export default class XBullProvider {
     }
 
     async signTx({xdr, network}) {
+        await this.init()
         const bridge = new this.provider()
         const res = await bridge.sign({xdr, network})
         bridge.closeConnections()
