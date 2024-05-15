@@ -5,8 +5,9 @@
   "author": "team@stellar.expert",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {
-    "build": "webpack --mode=production --config ./webpack-config.js",
+    "build": "pnpm run build-ui && pnpm run build-api-docs",
     "dev-server": "webpack serve --mode=development --config ./webpack-config.js",
+    "build-ui": "webpack --mode=production --config ./webpack-config.js",
     "build-api-docs": "pnpm dlx redoc-cli@0.13.20 build open-api/openapi.yml -t open-api/openapi-template.hbs -o public/openapi.html --options.disableSearch --options.hideDownloadButton --options.hideLoading --options.expandSingleSchemaField --options.onlyRequiredInSamples --options.theme.colors.primary.main=#0691B7 --options.theme.typography.fontFamily=ClearSans --options.theme.typography.headings.fontFamily=RobotoCondensed --options.theme.typography.code.fontFamily=\"Consolas, 'Liberation Mono', Menlo, Courier, monospace\" --options.theme.typography.headings.fontWeight=300 --options.theme.typography.fontWeightRegular=300 --options.theme.typography.fontSize=16px --options.theme.logo.maxHeight=100px --options.theme.logo.gutter=8px --options.theme.spacing.sectionVertical=24px --options.theme.typography.headings.lineHeight=1.3em --options.theme.typography.menu.level1Items.textTransform=uppercase"
   },
   "repository": {
