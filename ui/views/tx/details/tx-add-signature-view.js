@@ -26,14 +26,14 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
             <div className="desktop-only">
                 <ButtonGroup>
                     {providers.map(provider =>
-                        <Button key={provider.title} disabled={inProgress} onClick={requestSignature} data-provider={provider.title}>
+                        <Button key={provider.title} outline disabled={inProgress} onClick={requestSignature} data-provider={provider.title}>
                             <img src={`/img/wallets/${provider.title.toLowerCase()}.svg`}/> {provider.title}
                         </Button>)}
                 </ButtonGroup>
             </div>
             <div className="mobile-only">
                 {providers.filter(p => !!p.mobileSupported).map(provider =>
-                    <Button key={provider.title} block disabled={inProgress} onClick={requestSignature} data-provider={provider.title}>
+                    <Button key={provider.title} outline block disabled={inProgress} onClick={requestSignature} data-provider={provider.title}>
                         <img src={`/img/wallets/${provider.title.toLowerCase()}.svg`}/> {provider.title}
                     </Button>)}
             </div>
