@@ -12,6 +12,7 @@ export default class LobstrProvider {
         await this.init()
         if (!(await this.provider.isConnected()))
             throw new Error(`Lobstr wallet not connected`)
+        await this.provider.getPublicKey()
         return await this.provider.signTransaction(xdr)
     }
 }
