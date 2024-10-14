@@ -47,7 +47,7 @@ async function processSignature(provider, txInfo) {
     try {
         signedTx = await delegateTxSigning(provider, txInfo.xdr, txInfo.network)
     } catch (e) {
-        notify({type: 'warning', message: 'Failed to obtain a transaction signature'})
+        notify({type: 'warning', message: e?.msg || 'Failed to obtain a transaction signature'})
         throw e
     }
     try {
