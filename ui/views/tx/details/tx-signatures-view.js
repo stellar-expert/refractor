@@ -1,4 +1,4 @@
-import React, {useMemo} from 'react'
+import React, {useEffect, useMemo} from 'react'
 import {BlockSelect, UpdateHighlighter, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {shortenString} from '@stellar-expert/formatter'
 
@@ -26,25 +26,27 @@ function TxStoreResult({changes}) {  //TODO: refactor
         return null
     const {accepted, rejected} = changes
 
-    accepted?.forEach(s => {
-        const signer = shortenString(s.key, 12)
-        notify({
-            type: 'success',
-            message: <span key={s.signature}>
+    useEffect(() => {
+        accepted?.forEach(s => {
+            const signer = shortenString(s.key, 12)
+            notify({
+                type: 'success',
+                message: <span key={s.signature}>
                 Signature from {signer} accepted
             </span>
+            })
         })
-    })
 
-    rejected?.forEach(s => {
-        const signer = s.key.replace(/_+/g, '...')
-        notify({
-            type: 'error',
-            message: <span key={s.signature}>
+        rejected?.forEach(s => {
+            const signer = s.key.replace(/_+/g, '...')
+            notify({
+                type: 'error',
+                message: <span key={s.signature}>
                 Signature from {signer} rejected
             </span>
+            })
         })
-    })
+    }, [accepted, rejected])
 
     return null
 }

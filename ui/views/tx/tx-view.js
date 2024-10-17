@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useParams} from 'react-router'
 import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, withErrorBoundary} from '@stellar-expert/ui-framework'
-import {loadTx} from '../../infrastructure/tx-dispatcher'
+import {checkTxSubmitted, loadTx, submitTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'
 import TxSignaturesView from './details/tx-signatures-view'
@@ -19,7 +19,20 @@ export default withErrorBoundary(function TxView() {
     const [txInfo, setTxInfo] = useDependantState(() => {
         setError('')
         loadTx(txhash)
-            .then(txInfo => setTxInfo(txInfo))
+            .then(async txInfo => {
+                const horizonTx = await checkTxSubmitted(txInfo)
+                if (!horizonTx.submitted)
+                    return setTxInfo(txInfo)
+                //Send transaction to the server
+                await submitTx({
+                    network: horizonTx.network,
+                    xdr: horizonTx.xdr
+                })
+                    .then(async () => {
+                        const txInfo = await loadTx(txhash)
+                        setTxInfo(txInfo)
+                    })
+            })
             .catch(e => setError(e))
         return null
     }, [txhash], () => clearTimeout(statusWatcher.current))
@@ -45,18 +58,17 @@ export default withErrorBoundary(function TxView() {
     }, [txInfo, loadPeriodicallyTx])
 
     useEffect(() => {
-        if (txInfo && !txInfo.submitted) {
-            statusWatcher.current = setTimeout(() => {
-                checkStatus()
-            }, statusRefreshInterval * 1000)
+        if (!txInfo?.submitted) {
+            statusWatcher.current = setTimeout(checkStatus, statusRefreshInterval * 1000)
 
             //check active tab
             document.addEventListener('visibilitychange', checkStatus)
-            return () => {
-                document.removeEventListener('visibilitychange', checkStatus)
-            }
         }
-    }, [txInfo, checkStatus])
+        return () => {
+            clearTimeout(statusWatcher.current)
+            document.removeEventListener('visibilitychange', checkStatus)
+        }
+    }, [txInfo?.status, checkStatus])
 
     const updateTx = useCallback(txInfo => setTxInfo(txInfo), [setTxInfo])
 
@@ -107,7 +119,7 @@ export default withErrorBoundary(function TxView() {
                         <h3>Status</h3>
                         <hr/>
                         <div className="space">
-                            <HorizonSubmitTxView txInfo={txInfo}/>
+                            <HorizonSubmitTxView txInfo={txInfo} onUpdate={updateTx}/>
                         </div>
                         <TxAddSignatureView txInfo={txInfo} onUpdate={updateTx}/>
                     </div>
