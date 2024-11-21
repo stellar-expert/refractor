@@ -1,7 +1,7 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
 import {useParams} from 'react-router'
 import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, withErrorBoundary} from '@stellar-expert/ui-framework'
-import {checkTxSubmitted, loadTx, submitTx} from '../../infrastructure/tx-dispatcher'
+import {loadTx, checkTxSubmitted, apiSubmitTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'
 import TxSignaturesView from './details/tx-signatures-view'
@@ -24,7 +24,7 @@ export default withErrorBoundary(function TxView() {
                 if (!horizonTx.submitted)
                     return setTxInfo(txInfo)
                 //Send transaction to the server
-                await submitTx({
+                await apiSubmitTx({
                     network: horizonTx.network,
                     xdr: horizonTx.xdr
                 })

@@ -62,7 +62,7 @@ export async function validateNewTx(data) {
     return res
 }
 
-export async function submitTx(data) {
+export async function apiSubmitTx(data) {
     //validate and prepare the data
     const parsedData = await validateNewTx(data)
     //submit ot the server

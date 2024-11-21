@@ -1,7 +1,7 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
 import {Button, withErrorBoundary} from '@stellar-expert/ui-framework'
-import {checkTxSubmitted} from '../../../infrastructure/tx-dispatcher'
+import {checkTxSubmitted, loadTx} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
 import {horizonErrorHandler} from './horizon-error-handler'
 
@@ -16,7 +16,7 @@ export default withErrorBoundary(function HorizonSubmitTxView({txInfo, onUpdate}
             checkTxSubmitted(txInfo)
                 .then(tx => setIsExist(!!tx.submitted))
         }
-    }, [submit, submitted])
+    }, [hash, status, submit, submitted])
 
     const submitTx = useCallback(() => {
         const {passphrase, horizon} = config.networks[network]
