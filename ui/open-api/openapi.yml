@@ -22,15 +22,15 @@ info:
     handling `TX_BAD_AUTH_EXTRA` errors in case of too many signatures applied to a transaction.
     Refractor ensures that signatures are valid and consistent.
 
-  termsOfService: 'https://refractor.stellar.expert/'
+  termsOfService: 'https://refractor.space/'
   contact:
-    url: 'https://refractor.stellar.expert/'
+    url: 'https://refractor.space/'
     email: info@stellar.expert
   license:
     name: MIT
     url: 'https://tldrlegal.com/license/mit-license'
   x-logo:
-    url: 'https://refractor.stellar.expert/img/refractor-small-logo.png'
+    url: 'https://refractor.space/img/refractor-small-logo.png'
 servers:
   - url: 'https://api.refractor.space'
 paths:

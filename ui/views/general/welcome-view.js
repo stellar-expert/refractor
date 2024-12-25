@@ -28,7 +28,7 @@ export default function WelcomeView() {
             identifier.
 
             Alternatively, a person who uploaded the transaction can share a direct web link
-            (e.g. <code>https://refractor.stellar.expert/tx/4b50...3dad</code>) pointing to a page where other people
+            (e.g. <code>https://refractor.space/tx/4b50...3dad</code>) pointing to a page where other people
             can sign the transaction using a convenient Albedo web interface.
             The website shows information about current signing status, suitable signers, and thresholds.
         </p>
