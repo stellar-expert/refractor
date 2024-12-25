@@ -11,7 +11,8 @@ export default class LobstrProvider {
     async signTx({xdr, network}) {
         await this.init()
         if (!(await this.provider.isConnected()))
-            throw new Error(`Lobstr wallet not connected`)
+            throw new Error({msg: `Lobstr wallet not connected`})
+        await this.provider.getPublicKey()
         return await this.provider.signTransaction(xdr)
     }
 }
