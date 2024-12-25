@@ -13,8 +13,8 @@ class InMemoryDataProvider extends DataProvider {
         await this.save()
     }
 
-    async findTransaction(txId) {
-        return this.storage[txId]
+    async findTransaction(hash) {
+        return this.storage[hash]
     }
 
     async updateTransaction(hash, update, expectedCurrentStatus) {
