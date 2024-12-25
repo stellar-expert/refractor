@@ -24,7 +24,7 @@ export default function WelcomeView() {
         <p>
             Once uploaded to the server, the transaction cannot be deleted or modified. Other
             services and wallets can access and sign it by a standard URL like{' '}
-            <code>https://refractor-api.stellar.expert/tx/4b50...3dad</code> where its hash serves as a unique
+            <code>https://api.refractor.space/tx/4b50...3dad</code> where its hash serves as a unique
             identifier.
 
             Alternatively, a person who uploaded the transaction can share a direct web link

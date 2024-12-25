@@ -13,7 +13,7 @@ info:
     automatically), the service either submits the transaction to Stellar network or executes a callback.
 
     Once uploaded to the server, the transaction cannot be deleted or modified. Other services and wallets can access
-    and sign it by a standard URL like `https://refractor-api.stellar.expert/tx/4b50...3dad` where its hash serves as
+    and sign it by a standard URL like `https://api.refractor.space/tx/4b50...3dad` where its hash serves as
     a unique identifier.
 
     Refractor automatically discovers potential signers and computes the thresholds. The signing process is
@@ -32,7 +32,7 @@ info:
   x-logo:
     url: 'https://refractor.stellar.expert/img/refractor-small-logo.png'
 servers:
-  - url: 'https://refractor-api.stellar.expert'
+  - url: 'https://api.refractor.space'
 paths:
   /tx:
     post:
