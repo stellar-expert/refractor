@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Refractor
-  version: 0.1.0
+  version: 0.1.1
   description: |
     [Refractor](/) is a pending transactions storage and multisig aggregator for Stellar Network.
 
@@ -13,7 +13,7 @@ info:
     automatically), the service either submits the transaction to Stellar network or executes a callback.
 
     Once uploaded to the server, the transaction cannot be deleted or modified. Other services and wallets can access
-    and sign it by a standard URL like `https://api.refractor.stellar.expert/tx/4b50...3dad` where its hash serves as
+    and sign it by a standard URL like `https://refractor-api.stellar.expert/tx/4b50...3dad` where its hash serves as
     a unique identifier.
 
     Refractor automatically discovers potential signers and computes the thresholds. The signing process is
@@ -32,7 +32,7 @@ info:
   x-logo:
     url: 'https://refractor.stellar.expert/img/refractor-small-logo.png'
 servers:
-  - url: 'https://api.refractor.stellar.expert'
+  - url: 'https://refractor-api.stellar.expert'
 paths:
   /tx:
     post:
