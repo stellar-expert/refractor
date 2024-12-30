@@ -1,7 +1,6 @@
 import React, {useCallback, useState} from 'react'
-import {Button} from '@stellar-expert/ui-framework'
+import {Button, Dialog} from '@stellar-expert/ui-framework'
 import {apiSubmitTx} from '../../infrastructure/tx-dispatcher'
-import DialogView from '../component/dialog-view'
 
 export default function AddXdrView({isOpen, changeVisible, txInfo, onUpdate}) {
     const [inProgress, setInProgress] = useState(false)
@@ -29,14 +28,13 @@ export default function AddXdrView({isOpen, changeVisible, txInfo, onUpdate}) {
             })
     }, [txInfo, signedXdr])
 
-    return <DialogView dialogOpen={isOpen}>
+    return <Dialog dialogOpen={isOpen}>
         <h3>Import transaction signatures</h3>
         <textarea value={signedXdr} disabled={inProgress} onChange={changeSignedXdr}
                   className="text-small text-monospace condensed"
                   placeholder="Copy-paste base64-encoded transaction XDR here to import transaction signatures (new signatures will be added to the stored transaction)"
                   style={{
                       width: '100%',
-                      height: '100%',
                       minHeight: '8rem',
                       maxHeight: '32rem',
                       display: 'block',
@@ -56,5 +54,5 @@ export default function AddXdrView({isOpen, changeVisible, txInfo, onUpdate}) {
                 <Button block disabled={inProgress} onClick={importXdr}>Import</Button>
             </div>
         </div>
-    </DialogView>
+    </Dialog>
 }
