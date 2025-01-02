@@ -1,24 +1,22 @@
 import React, {useState, useCallback, useEffect} from 'react'
 import {Horizon, TransactionBuilder} from '@stellar/stellar-sdk'
 import {Button, withErrorBoundary} from '@stellar-expert/ui-framework'
-import {checkTxSubmitted} from '../../../infrastructure/tx-dispatcher'
+import {checkTxSubmitted, loadTx} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
 import {horizonErrorHandler} from './horizon-error-handler'
 
-export default withErrorBoundary(function HorizonSubmitTxView({txInfo}) {
+export default withErrorBoundary(function HorizonSubmitTxView({txInfo, onUpdate}) {
     const {readyToSubmit, hash, submit, submitted, xdr, status, network, error} = txInfo
     const [inProgress, setInProgress] = useState(false)
     const [isExist, setIsExist] = useState(true)
 
     useEffect(() => {
-        if (!txInfo.submit && !txInfo.submitted) {
+        if (!submit && !submitted) {
             //check existence of transaction in Horizon
             checkTxSubmitted(txInfo)
-                .then(tx => {
-                    setIsExist(!!tx.submitted)
-                })
+                .then(tx => setIsExist(!!tx.submitted))
         }
-    }, [txInfo])
+    }, [hash, status, submit, submitted])
 
     const submitTx = useCallback(() => {
         const {passphrase, horizon} = config.networks[network]
@@ -27,8 +25,9 @@ export default withErrorBoundary(function HorizonSubmitTxView({txInfo}) {
 
         setInProgress(true)
         server.submitTransaction(tx)
-            .then(() => {
-                window.location.reload()
+            .then(async () => {
+                const submittedTx = await loadTx(hash)
+                onUpdate(submittedTx)
             })
             .catch(e => {
                 if (e.response.data) {
