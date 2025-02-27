@@ -85,8 +85,8 @@ export default function AddTxView() {
                 all additional signatures will be added to this transaction.
                 <br/>
                 You can prepare a transaction using{' '}
-                <a href="views/tx/add/add-tx-view#txbuilder" target="_blank">Stellar Laboratory</a> or any{' '}
-                <a href="views/tx/add/add-tx-view#sdks" target="_blank"> Stellar SDK</a>.
+                <a href="https://lab.stellar.org/" target="_blank">Stellar Laboratory</a> or any{' '}
+                <a href="https://developers.stellar.org/docs/tools/sdks" target="_blank"> Stellar SDK</a>.
             </>}>
                 <textarea value={data.xdr} disabled={inProgress} onChange={changeXdr}
                           className="text-small text-monospace condensed mobile-micro-space-bottom" placeholder="Base64-encoded transaction envelope"
