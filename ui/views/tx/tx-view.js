@@ -15,25 +15,28 @@ const statusRefreshInterval = 4//4 sec.
 export default withErrorBoundary(function TxView() {
     const {txhash} = useParams()
     const statusWatcher = useRef()
-    const [error, setError] = useState(null)
     const [txInfo, setTxInfo] = useDependantState(() => {
-        setError('')
         loadTx(txhash)
             .then(async txInfo => {
-                const horizonTx = await checkTxSubmitted(txInfo)
-                if (!horizonTx.submitted)
-                    return setTxInfo(txInfo)
-                //Send transaction to the server
-                await apiSubmitTx({
-                    network: horizonTx.network,
-                    xdr: horizonTx.xdr
-                })
-                    .then(async () => {
-                        const txInfo = await loadTx(txhash)
-                        setTxInfo(txInfo)
+                if (!txInfo.submitted) {
+                    const horizonTx = await checkTxSubmitted(txInfo)
+                    if (!horizonTx.submitted)
+                        return setTxInfo(txInfo)
+
+                    //Send transaction to the server
+                    await apiSubmitTx({
+                        network: horizonTx.network,
+                        xdr: horizonTx.xdr
                     })
+                        .then(async () => {
+                            const txInfo = await loadTx(txhash)
+                            setTxInfo(txInfo)
+                        })
+                }
             })
-            .catch(e => setError(e))
+            .catch(e => {
+                notify({type: 'error', message: e.message || e.toString()})
+            })
         return null
     }, [txhash], () => clearTimeout(statusWatcher.current))
 
@@ -72,8 +75,6 @@ export default withErrorBoundary(function TxView() {
 
     const updateTx = useCallback(txInfo => setTxInfo(txInfo), [setTxInfo])
 
-    if (error)
-        throw error
     if (!txInfo)
         return <div className="loader"/>
     return <>

@@ -2,7 +2,7 @@ export default class XBullProvider {
     title = 'xBull'
 
     init() {
-        return import(/* webpackChunkName: "xbull-provider" */'@creit-tech/xbull-wallet-connect')
+        return import(/* webpackChunkName: "xbull-provider" */'@creit.tech/xbull-wallet-connect')
             .then(module => {
                 this.provider = module.xBullWalletConnect
             })
