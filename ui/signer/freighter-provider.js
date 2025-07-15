@@ -10,8 +10,14 @@ export default class FreighterProvider {
 
     async signTx({xdr, network}) {
         await this.init()
-        if (!(await this.provider.isConnected()))
+        const connected = await this.provider.isConnected()
+        if (connected.error) {
+            console.error(connected.error)
+        }
+        if (!connected.isConnected)
             throw new Error({msg: `Freighter wallet not connected`})
+        await this.provider.requestAccess()
+        await this.provider.getAddress()
         return await this.provider.signTransaction(xdr, {networkPassphrase: network})
     }
 }
