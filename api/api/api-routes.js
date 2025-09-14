@@ -6,17 +6,17 @@ const {registerRoute} = require('./router'),
 module.exports = function registerRoutes(app) {
     registerRoute(app,
         '/',
-        {rate: 'general'},
+        {},
         () => serviceInfo())
 
     registerRoute(app,
         'tx/:hash',
-        {rate: 'general'},
+        {},
         ({params}) => loadRehydrateTx(params.hash))
 
     registerRoute(app,
         '/tx',
-        {rate: 'strict', method: 'post'},
+        {method: 'post'},
         async ({body}) => {
             const signer = new Signer(body)
             await signer.init()
