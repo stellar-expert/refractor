@@ -1,11 +1,25 @@
-.signature-options {
-  .button {
-    width: 25%;
+.stellar-wallets-kit {
+  & > div {
+    background-color: var(--color-modal-bg)!important;
+    backdrop-filter: blur(2px);
   }
 
-  img {
-    height: 1.6em;
-    vertical-align: top;
-    margin-top: 0.3em;
+  & > section {
+    min-width: 18em;
+    border: 1px solid var(--color-contrast-border);
+    border-radius: 0.3rem!important;
+
+    div {
+      overflow: hidden!important;
+      overflow-y: auto!important;
+    }
+
+    header > div {
+      overflow-y: hidden!important;
+    }
+  }
+
+  button {
+    border: none;
   }
 }

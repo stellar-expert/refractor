@@ -1,7 +1,7 @@
 import React, {useCallback, useState} from 'react'
-import {Button, ButtonGroup, withErrorBoundary} from '@stellar-expert/ui-framework'
+import {Button, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {apiSubmitTx} from '../../../infrastructure/tx-dispatcher'
-import {delegateTxSigning, getAllProviders} from '../../../signer/tx-signer'
+import {delegateTxSigning} from '../../../signer/tx-signer'
 import AddXdrView from '../add-xdr-view'
 import './add-signatures.scss'
 
@@ -23,29 +23,20 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
     if (txInfo.readyToSubmit || txInfo.submitted)
         return null
 
-    const providers = getAllProviders()
     return <div className="space">
         <div className="text-small dimmed">Sign transaction</div>
         <div className="signature-options micro-space">
-            <div className="desktop-only">
-                <ButtonGroup style={{display: 'flex'}}>
-                    {providers.map(provider =>
-                        <Button key={provider.title} block outline disabled={inProgress} onClick={requestSignature} data-provider={provider.title}>
-                            <img src={`/img/wallets/${provider.title.toLowerCase()}.svg`}/> {provider.title}
-                        </Button>)}
-                    <Button block outline disabled={inProgress} onClick={toggleImportModal}>
-                        <i className="icon icon-download"/> Import
+            <div className="row">
+                <div className="column column-50">
+                    <Button block outline disabled={inProgress} onClick={requestSignature}>
+                        <i className="icon icon-wallet"/> Stellar wallets
                     </Button>
-                </ButtonGroup>
-            </div>
-            <div className="mobile-only">
-                {providers.filter(p => !!p.mobileSupported).map(provider =>
-                    <Button key={provider.title} outline block disabled={inProgress} onClick={requestSignature} data-provider={provider.title}>
-                        <img src={`/img/wallets/${provider.title.toLowerCase()}.svg`}/> {provider.title}
-                    </Button>)}
-                <Button block outline disabled={inProgress} onClick={toggleImportModal}>
-                    <i className="icon icon-download"/> Import
-                </Button>
+                </div>
+                <div className="column column-50">
+                    <Button block outline disabled={inProgress} onClick={toggleImportModal}>
+                        <i className="icon icon-download"/> Import signed XDR
+                    </Button>
+                </div>
             </div>
         </div>
         {!!inProgress && <div className="loader"/>}
@@ -54,15 +45,9 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
 })
 
 async function processSignature(provider, txInfo) {
-    let signedTx
+    const {signedTxXdr} = await delegateTxSigning(txInfo.xdr, txInfo.network)
     try {
-        signedTx = await delegateTxSigning(provider, txInfo.xdr, txInfo.network)
-    } catch (e) {
-        notify({type: 'warning', message: e?.msg || 'Failed to obtain a transaction signature'})
-        throw e
-    }
-    try {
-        return await apiSubmitTx({...txInfo, xdr: signedTx})
+        return await apiSubmitTx({...txInfo, xdr: signedTxXdr})
     } catch (e) {
         notify({type: 'error', message: 'Failed to store transaction signature. Please repeat the process later.'})
         throw e
