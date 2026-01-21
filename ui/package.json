@@ -1,7 +1,7 @@
 {
   "name": "@stellar-expert/refractor-ui",
   "private": true,
-  "version": "0.6.4",
+  "version": "0.7.0",
   "author": "team@stellar.expert",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {
@@ -15,18 +15,16 @@
     "url": "https://github.com/stellar-expert/refractor.git"
   },
   "dependencies": {
-    "@albedo-link/intent": "^0.12.0",
-    "@creit.tech/xbull-wallet-connect": "0.3.0",
-    "@lobstrco/signer-extension-api": "1.0.0-beta.0",
-    "@stellar-expert/asset-descriptor": "^1.4.0",
+    "@creit-tech/stellar-wallets-kit": "npm:@jsr/creit-tech__stellar-wallets-kit@2.0.0-beta.9",
+    "@stellar-expert/asset-descriptor": "^1.5.0",
     "@stellar-expert/client-cache": "github:stellar-expert/client-cache",
     "@stellar-expert/formatter": "^2.5.0",
     "@stellar-expert/navigation": "github:stellar-expert/navigation#v1.0.2",
     "@stellar-expert/tx-signers-inspector": "^1.8.2",
-    "@stellar-expert/ui-framework": "^1.14.14",
-    "@stellar/freighter-api": "^4.1.0",
-    "@stellar/stellar-sdk": "13.1.0",
+    "@stellar-expert/ui-framework": "^1.16.5",
+    "@stellar/stellar-sdk": "14.4.3",
     "classnames": "^2.3.2",
+    "viem": "2.21.0",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
