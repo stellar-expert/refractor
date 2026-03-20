@@ -1,8 +1,8 @@
-const FsDataProvider = require('./fs-data-provider'),
-    MongodbDataProvider = require('./mongodb-data-provider'),
-    MongodbFirestoreDataProvider = require('./mongodb-firestore-data-provider'),
-    InMemoryDataProvider = require('./inmemory-data-provider'),
-    {storage} = require('../app.config.json')
+const {storage} = require('../app.config.json')
+const FsDataProvider = require('./fs-data-provider')
+const MongodbDataProvider = require('./mongodb-data-provider')
+const MongodbFirestoreDataProvider = require('./mongodb-firestore-data-provider')
+const InMemoryDataProvider = require('./inmemory-data-provider')
 
 class StorageLayer {
     async initDataProvider(providerName = storage) {

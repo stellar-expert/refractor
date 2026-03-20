@@ -1,6 +1,6 @@
-const {Firestore, FieldPath} = require('@google-cloud/firestore'),
-    {firestore} = require('../app.config.json'),
-    MongodbDataProvider = require('./mongodb-data-provider')
+const {Firestore} = require('@google-cloud/firestore')
+const {firestore} = require('../app.config.json')
+const MongodbDataProvider = require('./mongodb-data-provider')
 
 /**
  *
@@ -23,7 +23,10 @@ class MongodbFirestoreDataProvider extends MongodbDataProvider {
         this.firestore = new Firestore({
             projectId: firestore.project_id,
             credentials: firestore,
-            ignoreUndefinedProperties: true
+            ssl: true,
+            useBigInt: true,
+            ignoreUndefinedProperties: true,
+            openTelemetry: false
         })
         console.log(`Connected to Firestore data source ${firestore.project_id}`)
     }

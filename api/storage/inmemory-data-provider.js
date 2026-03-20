@@ -1,5 +1,5 @@
-const DataProvider = require('./data-provider'),
-    {matchPredicate} = require('./simple-predicate-matcher')
+const DataProvider = require('./data-provider')
+const {matchPredicate} = require('./simple-predicate-matcher')
 
 class InMemoryDataProvider extends DataProvider {
     storage
@@ -19,7 +19,8 @@ class InMemoryDataProvider extends DataProvider {
 
     async updateTransaction(hash, update, expectedCurrentStatus) {
         const tx = await this.findTransaction(hash)
-        if (!tx) return false
+        if (!tx)
+            return false
         if (expectedCurrentStatus !== undefined && tx.status !== expectedCurrentStatus) return false
         Object.assign(tx, update)
         await this.save()

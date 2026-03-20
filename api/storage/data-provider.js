@@ -13,7 +13,7 @@ class DataProvider {
 
     /**
      *
-     * @param {String} hash
+     * @param {string} hash
      * @return {Promise<TxModel>}
      */
     async findTransaction(hash) {
@@ -32,7 +32,7 @@ class DataProvider {
 
     /**
      *
-     * @param {String} hash
+     * @param {string} hash
      * @param {Object} update
      * @param {TxStatus} [expectedCurrentStatus]
      * @return {Promise<Boolean>}
@@ -43,7 +43,7 @@ class DataProvider {
 
     /**
      *
-     * @param {String} hash
+     * @param {string} hash
      * @param {TxStatus} newStatus
      * @param {TxStatus} expectedCurrentStatus?
      * @param {Error|String} error?

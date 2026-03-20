@@ -6,9 +6,9 @@ const {Keypair} = require('@stellar/stellar-sdk')
  * @return {string}
  */
 function hintToMask(hint) {
-    const partialPublicKey = Buffer.concat([Buffer.alloc(28), hint]),
-        hintKeypair = new Keypair({type: 'ed25519', publicKey: partialPublicKey}),
-        pk = hintKeypair.publicKey()
+    const partialPublicKey = Buffer.concat([Buffer.alloc(28), hint])
+    const hintKeypair = new Keypair({type: 'ed25519', publicKey: partialPublicKey})
+    const pk = hintKeypair.publicKey()
     return pk.substr(0, 1) + '_'.repeat(46) + pk.substr(47, 5) + '_'.repeat(4)
 }
 
@@ -25,7 +25,7 @@ function formatHint(hint) {
 /**
  * Check if the hint matches the specific key.
  * @param {Buffer} hint - Hint to check.
- * @param {String} key - Key to compare.
+ * @param {string} key - Key to compare.
  * @return {boolean}
  */
 function hintMatchesKey(hint, key) {
@@ -35,8 +35,8 @@ function hintMatchesKey(hint, key) {
 /**
  * Find matching key by the signature hint from a list of available keys.
  * @param {Buffer} hint - Hint to look for.
- * @param {Array<String>} allKeys - Array of potentially matching keys.
- * @return {String|null}
+ * @param {Array<string>} allKeys - Array of potentially matching keys.
+ * @return {string|null}
  */
 function findKeysByHint(hint, allKeys) {
     return allKeys.find(key => hintMatchesKey(hint, key))
@@ -44,13 +44,14 @@ function findKeysByHint(hint, allKeys) {
 
 /**
  * Find a signature by public key from the list of signatures.
- * @param {String} pubkey
+ * @param {Buffer} hashRaw
+ * @param {string} pubkey
  * @param {Array<TxSignature>} allSignatures
- * @returns {*}
+ * @returns {TxSignature}
  */
-function findSignatureByKey(pubkey, allSignatures = []) {
+function findSignatureByKey(hashRaw, pubkey, allSignatures = []) {
     const matchingSignatures = allSignatures.filter(sig => hintMatchesKey(sig.hint(), pubkey))
-    return matchingSignatures.find(sig=>Keypair.fromPublicKey(pubkey))
+    return matchingSignatures.find(sig => Keypair.fromPublicKey(pubkey).verifySignature(hashRaw, sig.signature()))
 }
 
 module.exports = {

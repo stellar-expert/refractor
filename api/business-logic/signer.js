@@ -1,13 +1,13 @@
-const {TransactionBuilder, FeeBumpTransaction, Keypair} = require('@stellar/stellar-sdk'),
-    {inspectTransactionSigners} = require('@stellar-expert/tx-signers-inspector'),
-    TxSignature = require('../models/tx-signature'),
-    {resolveNetwork, resolveNetworkParams} = require('./network-resolver'),
-    {standardError} = require('./std-error'),
-    storageLayer = require('../storage/storage-layer'),
-    {loadTxSourceAccountsInfo} = require('./account-info-provider'),
-    {sliceTx, parseTxParams} = require('./tx-params-parser'),
-    {rehydrateTx} = require('./tx-loader'),
-    {hintMatchesKey, hintToMask} = require('./signature-hint-utils')
+const {TransactionBuilder, FeeBumpTransaction, Keypair} = require('@stellar/stellar-sdk')
+const {inspectTransactionSigners} = require('@stellar-expert/tx-signers-inspector')
+const TxSignature = require('../models/tx-signature')
+const storageLayer = require('../storage/storage-layer')
+const {hintMatchesKey, hintToMask} = require('./signature-hint-utils')
+const {resolveNetwork, resolveNetworkParams} = require('./network-resolver')
+const {standardError} = require('./std-error')
+const {rehydrateTx} = require('./tx-loader')
+const {loadTxSourceAccountsInfo} = require('./account-info-provider')
+const {sliceTx, parseTxParams} = require('./tx-params-parser')
 
 class Signer {
     /**
@@ -41,7 +41,7 @@ class Signer {
      */
     tx
     /**
-     * @type {String}
+     * @type {string}
      */
     hash
     /**
@@ -51,7 +51,7 @@ class Signer {
     /**
      * @type {'draft'|'created'|'updated'|'unchanged'}
      */
-    status = 'draft'
+    status
     /**
      * @type {TxModel}
      */
@@ -69,7 +69,7 @@ class Signer {
      */
     signaturesToProcess
     /**
-     * @type {Array<String>}
+     * @type {Array<string>}
      */
     potentialSigners
     /**
@@ -130,11 +130,12 @@ class Signer {
     }
 
     processNewSignatures() {
-        if (!this.signaturesToProcess.length) return
+        if (!this.signaturesToProcess.length)
+            return
         //skip existing
         const newSignatures = this.signaturesToProcess.filter(sig => {
             const newSignature = sig.signature().toString('base64')
-            return !this.txInfo.signatures.some(existing => existing.signature === newSignature)
+            return !this.txInfo.signatures.some(existing => existing.signature.toString('base64') === newSignature)
         })
         //search for invalid signature
         for (let signature of newSignatures) {

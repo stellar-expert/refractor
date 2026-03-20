@@ -1,6 +1,6 @@
-const InMemoryDataProvider = require('./inmemory-data-provider'),
-    path = require('path'),
-    fs = require('fs').promises
+const fs = require('node:fs').promises
+const path = require('node:path')
+const InMemoryDataProvider = require('./inmemory-data-provider')
 
 const fileName = path.join(__dirname, '../', 'data.json')
 

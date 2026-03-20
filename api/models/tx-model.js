@@ -1,13 +1,13 @@
 class TxModel {
     /**
      * Transaction hash.
-     * @type {String}
+     * @type {string}
      */
     hash
 
     /**
      * Network (0-pubnet or 1-testnet)
-     * @type {Number}
+     * @type {number}
      */
     network
 
@@ -25,13 +25,13 @@ class TxModel {
 
     /**
      * Submit transactions to the network once signed.
-     * @type {Boolean}
+     * @type {boolean}
      */
     submit
 
     /**
      * Callback URL where the transaction will be sent once signed.
-     * @type {String}
+     * @type {string}
      */
     callbackUrl
 
@@ -43,13 +43,13 @@ class TxModel {
 
     /**
      * Point in time when a transaction becomes valid (populated from a tx timebounds).
-     * @type {Number}
+     * @type {number}
      */
     minTime
 
     /**
      * Expiration date (UNIX timestamp).
-     * @type {Number}
+     * @type {number}
      */
     maxTime
 
@@ -61,7 +61,7 @@ class TxModel {
 
     /**
      * Submitted transaction timestamp (UNIX timestamp).
-     * @type {Number}
+     * @type {number}
      */
     submitted
 }

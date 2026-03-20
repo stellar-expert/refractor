@@ -1,6 +1,6 @@
-const {normalizeNetworkName, resolveNetwork} = require('./network-resolver'),
-    storageLayer = require('../storage/storage-layer'),
-    {TransactionBuilder} = require('@stellar/stellar-sdk')
+const {TransactionBuilder} = require('@stellar/stellar-sdk')
+const storageLayer = require('../storage/storage-layer')
+const {normalizeNetworkName, resolveNetwork} = require('./network-resolver')
 
 async function loadRehydrateTx(hash) {
     const txInfo = await storageLayer.dataProvider.findTransaction(hash)
@@ -22,8 +22,10 @@ function rehydrateTx(txInfo) {
     const tx = TransactionBuilder.fromXDR(xdr, resolveNetwork(network).passphrase)
     //rehydrate - set network and add signatures from tx info
     res.network = normalizeNetworkName(network)
-    for (const {key, signature} of txInfo.signatures) {
-        tx.addSignature(key, signature.toString('base64'))
+    if (txInfo.signatures instanceof Array) {
+        for (const {key, signature} of txInfo.signatures) {
+            tx.addSignature(key, signature.toString('base64'))
+        }
     }
     res.xdr = tx.toXDR()
     return res

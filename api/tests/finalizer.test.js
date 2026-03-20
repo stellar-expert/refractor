@@ -1,115 +1,141 @@
-const finalizer = require('../business-logic/finalization/finalizer'),
-    storageLayer = require('../storage/storage-layer'),
-    {setCallbackHandler} = require('../business-logic/finalization/callback-handler'),
-    {setSubmitTransactionCallback} = require('../business-logic/finalization/horizon-handler')
+jest.mock('../business-logic/tx-loader')
+jest.mock('../business-logic/rpc-connector')
+jest.mock('../business-logic/finalization/callback-handler')
+jest.mock('../business-logic/timestamp-utils')
 
-test('high-level finalizer logic', async () => {
-    await storageLayer.initDataProvider('inmemory')
-    await storageLayer.dataProvider.saveTransaction({
-        'hash': '89d6c423a51e030b392f0e7505e9f3b66be11cb1477aecda79a34e5ae61060e4',
-        'network': 1,
-        'xdr': 'AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAGQAAAAAAAAAAQAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAAAAAAAAAJiWgAAAAAAAAAAA',
-        'signatures': [
-            {
-                'key': 'GBJVUCDVNUM3UASLDXPBDXLHJBSVOEGTJX5J6P3JD7DQKVQCYCBY5PP2',
-                'signature': 'b1N3ZHZIjuxU+5Fgz1Kj65FntxUOK4V8fxePNmoIc1J5DESkBcPzWTs8ULLldhnqJo6I4+L+xSzZt8+yiwQDBQ=='
-            },
-            {
-                'key': 'GDNMOFMXT7ZGAN3SV5LBYYJVYEUPM5LQWL2NF2WW7JFG4LQLRFU2MQ3I',
-                'signature': 'Bj2HCKG7UejTGwN2Dg6seQis+m1Jy0HfKBlQQIoJKHTlnpHpWgcQ0W0UOmmflLl3/zWnl7yzp7Douo3+4tNeAg=='
-            }
-        ],
-        'submit': true,
-        'minTime': 0,
-        'status': 'ready'
-    })
-    await storageLayer.dataProvider.saveTransaction({
-        'hash': 'd7e4f7cb585b517ec198afcb5f8501ac8aafda64d43150e2852de37cd577c772',
-        'network': 1,
-        'xdr': 'AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAGQACCbgAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAQAAAADaxxWXn/JgN3KvVhxhNcEo9nVwsvTS6tb6Sm4uC4lppgAAAAAAAAAAAJiWgAAAAAAAAAAA',
-        'signatures': [
-            {
-                'key': 'GDNMOFMXT7ZGAN3SV5LBYYJVYEUPM5LQWL2NF2WW7JFG4LQLRFU2MQ3I',
-                'signature': 'QuXBu82h+stfWPblpopKrf1K6atdDQlEIFA55X+HIgco4x7Ex8S+APlCeIuqeS1o3IB4rl20tRtoUuSVibTECw=='
-            },
-            {
-                'key': 'GBJVUCDVNUM3UASLDXPBDXLHJBSVOEGTJX5J6P3JD7DQKVQCYCBY5PP2',
-                'signature': 'gPChxAzbKmUILh+j6cM3g4d2DBxnSydZIVAZfTE3+3HP53s3f+IXezGf76tpb2E7PfAsSHwyj2GkAbA1KmUhAA=='
-            }
-        ],
-        'callbackUrl': 'https://postman-echo.com/',
-        'minTime': 0,
-        'status': 'ready'
-    })
-    await storageLayer.dataProvider.saveTransaction({
-        'hash': 'e59a325bad4dec41bdbee7c172663164c98d768ce6861c3ea6f4c5988ee98d94',
-        'network': 0,
-        'xdr': 'AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAMgACCbgAAAAAgAAAAEAAAAAAAAAAAAAAABihthYAAAAAQAAAAUxMTExMQAAAAAAAAEAAAAAAAAAAQAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAAAAAAAAAJiWgAAAAAAAAAAA',
-        'signatures': [],
-        'minTime': 0,
-        'status': 'pending'
-    })
-    await storageLayer.dataProvider.saveTransaction({
-        'hash': 'e59a325bad4dec41bdbee7c172663164c98d768ce6861c3ea6f4c5988ee98d95',
-        'network': 0,
-        'xdr': 'A',
-        'signatures': [],
-        'minTime': 9999999999,
-        'status': 'pending'
-    })
-    await storageLayer.dataProvider.saveTransaction({
-        'hash': 'b41593701fd2abd7083005f341539cdabd9ca20061da59af9018b060d995f30e',
-        'network': 1,
-        'xdr': 'AAAAAgAAAABTWgh1bRm6Aksd3hHdZ0hlVxDTTfqfP2kfxwVWAsCDjgAAAGQACCbgAAAAAgAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAQxMTExAAAAAQAAAAAAAAABAAAAAFNaCHVtGboCSx3eEd1nSGVXENNN+p8/aR/HBVYCwIOOAAAAAAAAAAAHJw4AAAAAAAAAAAA=',
-        'signatures': [
-            {
-                'key': 'GDNMOFMXT7ZGAN3SV5LBYYJVYEUPM5LQWL2NF2WW7JFG4LQLRFU2MQ3I',
-                'signature': 'KYywpOZvDAdMdKO1PheptqMud0Du1hT29ylPr4QqClFx+jyE7JhMW4HjiUdRBD9OEz+k4vIrdoeRNrx0ldA7Cg=='
-            },
-            {
-                'key': 'GBJVUCDVNUM3UASLDXPBDXLHJBSVOEGTJX5J6P3JD7DQKVQCYCBY5PP2',
-                'signature': '163pcVW3n7py3aqdP1Mm8wCwdqbsHymJQ1e6GdaToJ1tsJUKgEIgvQjq9IejMVqQDCrRiXrbiQHMddv6HilqAQ=='
-            }
-        ],
-        'submit': true,
-        'callbackUrl': 'https://postman-echo.com/',
-        'minTime': 0,
-        'status': 'ready'
+const storageLayer = require('../storage/storage-layer')
+const InMemoryDataProvider = require('../storage/inmemory-data-provider')
+const {rehydrateTx} = require('../business-logic/tx-loader')
+const {submitTransaction} = require('../business-logic/rpc-connector')
+const {processCallback} = require('../business-logic/finalization/callback-handler')
+const {getUnixTimestamp} = require('../business-logic/timestamp-utils')
+const finalizer = require('../business-logic/finalization/finalizer')
+
+beforeEach(async () => {
+    jest.useFakeTimers()
+    const provider = new InMemoryDataProvider()
+    await provider.init()
+    storageLayer.dataProvider = provider
+
+    getUnixTimestamp.mockReturnValue(1000)
+    rehydrateTx.mockImplementation(txInfo => ({...txInfo, rehydrated: true}))
+    submitTransaction.mockResolvedValue(true)
+    processCallback.mockResolvedValue()
+})
+
+afterEach(() => {
+    finalizer.stop()
+    jest.useRealTimers()
+})
+
+function makeTx(overrides = {}) {
+    return {
+        hash: 'txhash1',
+        status: 'ready',
+        network: 1,
+        xdr: 'AAAA',
+        signatures: [],
+        minTime: 0,
+        ...overrides
+    }
+}
+
+describe('processTx', () => {
+    test('skips tx if status is not ready', async () => {
+        const cb = jest.fn()
+        await finalizer.processTx({...makeTx(), status: 'pending'}, cb)
+        expect(cb).toHaveBeenCalledWith()
     })
 
-    finalizer.targetQueueSize = 1
-    finalizer.tickerTimeout = 100
-    finalizer.setQueueConcurrency(1)
+    test('skips tx if lock fails (status already changed)', async () => {
+        const tx = makeTx()
+        await storageLayer.dataProvider.saveTransaction(tx)
+        // Change status so lock fails
+        await storageLayer.dataProvider.updateTxStatus(tx.hash, 'processing', 'ready')
 
-    await new Promise(resolve => {
-        const callbacksExecuted = [],
-            transactionsSubmitted = []
-        setCallbackHandler(txInfo => new Promise(resolve => {
-            callbacksExecuted.push(txInfo.hash)
-            setTimeout(() => resolve({statusCode: 200}), 10)
-        }))
+        const cb = jest.fn()
+        await finalizer.processTx(tx, cb)
+        expect(cb).toHaveBeenCalledWith()
+    })
 
-        setSubmitTransactionCallback(txInfo => new Promise(resolve => {
-            transactionsSubmitted.push(txInfo.hash)
-            setTimeout(() => resolve({result: 'ok'}), 10)
-        }))
+    test('marks expired transaction as failed', async () => {
+        const tx = makeTx({maxTime: 500})
+        await storageLayer.dataProvider.saveTransaction(tx)
+        getUnixTimestamp.mockReturnValue(1000)
 
-        finalizer.start()
-        setTimeout(() => {
-            //first check - 2 entries should be ready
-            expect(callbacksExecuted).toStrictEqual(['d7e4f7cb585b517ec198afcb5f8501ac8aafda64d43150e2852de37cd577c772'])
-            expect(transactionsSubmitted).toStrictEqual(['89d6c423a51e030b392f0e7505e9f3b66be11cb1477aecda79a34e5ae61060e4'])
-        }, 80)
+        const cb = jest.fn()
+        await finalizer.processTx(tx, cb)
 
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('failed')
+        expect(cb).toHaveBeenCalledWith(expect.any(Error))
+    })
 
-        setTimeout(async () => {
-            //second check - the queue should be processed entirely
-            expect(callbacksExecuted).toStrictEqual(['d7e4f7cb585b517ec198afcb5f8501ac8aafda64d43150e2852de37cd577c772', 'b41593701fd2abd7083005f341539cdabd9ca20061da59af9018b060d995f30e'])
-            expect(transactionsSubmitted).toStrictEqual(['89d6c423a51e030b392f0e7505e9f3b66be11cb1477aecda79a34e5ae61060e4', 'b41593701fd2abd7083005f341539cdabd9ca20061da59af9018b060d995f30e'])
-            const processedEntries = await storageLayer.dataProvider.listTransactions({status: 'processed'}).toArray()
-            expect(processedEntries.map(v => v.hash)).toStrictEqual(['89d6c423a51e030b392f0e7505e9f3b66be11cb1477aecda79a34e5ae61060e4', 'd7e4f7cb585b517ec198afcb5f8501ac8aafda64d43150e2852de37cd577c772', 'b41593701fd2abd7083005f341539cdabd9ca20061da59af9018b060d995f30e'])
-            finalizer.stop()
-                .then(resolve)
-        }, 250)
+    test('processes callback when callbackUrl is set', async () => {
+        const tx = makeTx({callbackUrl: 'http://example.com/cb'})
+        await storageLayer.dataProvider.saveTransaction(tx)
+
+        const cb = jest.fn()
+        await finalizer.processTx(tx, cb)
+
+        expect(processCallback).toHaveBeenCalled()
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('processed')
+        expect(cb).toHaveBeenCalledWith(null)
+    })
+
+    test('submits transaction when submit is true', async () => {
+        const tx = makeTx({submit: true})
+        await storageLayer.dataProvider.saveTransaction(tx)
+
+        const cb = jest.fn()
+        await finalizer.processTx(tx, cb)
+
+        expect(submitTransaction).toHaveBeenCalled()
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('processed')
+        expect(stored.submitted).toBe(1000)
+        expect(cb).toHaveBeenCalledWith(null)
+    })
+
+    test('marks tx as failed when callback throws', async () => {
+        processCallback.mockRejectedValue(new Error('callback failed'))
+        const tx = makeTx({callbackUrl: 'http://example.com/cb'})
+        await storageLayer.dataProvider.saveTransaction(tx)
+
+        const cb = jest.fn()
+        await finalizer.processTx(tx, cb)
+
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('failed')
+        expect(stored.error).toBe('callback failed')
+        expect(cb).toHaveBeenCalledWith(expect.any(Error))
+    })
+
+    test('marks tx as failed when submission throws', async () => {
+        submitTransaction.mockRejectedValue(new Error('submission failed'))
+        const tx = makeTx({submit: true})
+        await storageLayer.dataProvider.saveTransaction(tx)
+
+        const cb = jest.fn()
+        await finalizer.processTx(tx, cb)
+
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('failed')
+        expect(cb).toHaveBeenCalledWith(expect.any(Error))
+    })
+})
+
+describe('resetProcessingStatus', () => {
+    test('resets processing transactions to ready', async () => {
+        await storageLayer.dataProvider.saveTransaction({hash: 'tx1', status: 'processing', minTime: 0})
+        await storageLayer.dataProvider.saveTransaction({hash: 'tx2', status: 'processing', minTime: 0})
+        await storageLayer.dataProvider.saveTransaction({hash: 'tx3', status: 'pending', minTime: 0})
+
+        await finalizer.resetProcessingStatus()
+
+        expect((await storageLayer.dataProvider.findTransaction('tx1')).status).toBe('ready')
+        expect((await storageLayer.dataProvider.findTransaction('tx2')).status).toBe('ready')
+        expect((await storageLayer.dataProvider.findTransaction('tx3')).status).toBe('pending')
     })
 })

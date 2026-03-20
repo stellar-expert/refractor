@@ -1,21 +1,20 @@
-const MongoClient = require('mongodb').MongoClient,
-    {name: appname} = require('../package.json'),
-    config = require('../app.config'),
-    DataProvider = require('./data-provider'),
-    TxSignature = require('../models/tx-signature')
+const MongoClient = require('mongodb').MongoClient
+const {name: appname} = require('../package.json')
+const config = require('../app.config')
+const TxSignature = require('../models/tx-signature')
+const DataProvider = require('./data-provider')
 
 class MongodbDataProvider extends DataProvider {
     async init() {
         const options = {
             appname,
             promoteValues: true,
-            promoteLongs: false,
-            keepAlive: true,
-            useUnifiedTopology: true,
+            useBigInt64: true,
             directConnection: true,
             retryWrites: true,
             authSource: 'admin',
-            minPoolSize: 2
+            minPoolSize: 2,
+            maxPoolSize: 20,
         }
 
         const connection = await MongoClient.connect(config.db, options)
@@ -50,20 +49,21 @@ class MongodbDataProvider extends DataProvider {
 
     /**
      *
-     * @param {String} hash
+     * @param {string} hash
      * @return {Promise<TxModel>}
      */
     async findTransaction(hash) {
         const doc = await this.txCollection
             .findOne({_id: hash})
-        if (!doc) return null
+        if (!doc)
+            return null
         doc.hash = doc._id
         delete doc._id
         if (doc.signatures) {
             doc.signatures = doc.signatures.map(s => {
                 const ts = new TxSignature()
                 ts.key = s.key
-                ts.signature = s.signature.buffer
+                ts.signature = s.signature.value()
                 return ts
             })
         }

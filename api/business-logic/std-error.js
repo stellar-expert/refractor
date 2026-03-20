@@ -1,7 +1,7 @@
 /**
  * Prepare a unified error with extended status.
- * @param {Number} status
- * @param {String} message
+ * @param {number} status
+ * @param {string} message
  * @return {Error}
  */
 function standardError(status, message) {

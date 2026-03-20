@@ -1,9 +1,9 @@
-const createQueue = require('fastq'),
-    storageLayer = require('../../storage/storage-layer'),
-    {rehydrateTx} = require('../tx-loader'),
-    {processCallback} = require('./callback-handler'),
-    {submitTransaction} = require('./horizon-handler'),
-    {getUnixTimestamp} = require('../timestamp-utils')
+const createQueue = require('fastq')
+const storageLayer = require('../../storage/storage-layer')
+const {rehydrateTx} = require('../tx-loader')
+const {getUnixTimestamp} = require('../timestamp-utils')
+const {submitTransaction} = require('../rpc-connector')
+const {processCallback} = require('./callback-handler')
 
 class Finalizer {
     constructor() {
@@ -34,7 +34,9 @@ class Finalizer {
         } catch (e) {
             console.error(e)
         }
-        this.processorTimerHandler = setTimeout(() => this.scheduleTransactionsBatch(), this.tickerTimeout) // wait 5 seconds to drain the queue and check for new entries
+        if (this.processorTimerHandler === 0) //pipeline stop executed
+            return
+        this.processorTimerHandler = setTimeout(() => this.scheduleTransactionsBatch(), this.tickerTimeout) // wait to drain the queue and check for new entries
     }
 
     setQueueConcurrency(concurrency) {
@@ -47,14 +49,15 @@ class Finalizer {
      * @param {Function} cb
      */
     async processTx(txInfo, cb) {
-        if (txInfo.status !== 'ready') return
+        if (txInfo.status !== 'ready')
+            return cb()
         try {
             //lock tx
             if (!await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'processing', 'ready'))
-                return //failed to obtain a lock - some other thread is currently processing this transaction
+                return cb()//failed to obtain a lock - some other thread is currently processing this transaction
         } catch (e) {
             console.error(e)
-            return //invalid current state
+            return cb()//invalid current state
         }
         try {
             if (txInfo.maxTime && txInfo.maxTime < getUnixTimestamp())
@@ -74,8 +77,7 @@ class Finalizer {
             console.error('TX ' + txInfo.hash + ' processing failed')
             console.error(e)
             await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'failed', 'processing', e)
-            cb(e)
-            return
+            return cb(e)
         }
         cb(null)
     }
@@ -92,7 +94,7 @@ class Finalizer {
         this.finalizerQueue.kill()
         //wait for all current tasks to finish
         return new Promise(resolve => {
-            let finalizerCheckInterval = setInterval(() => {
+            const finalizerCheckInterval = setInterval(() => {
                 if (this.finalizerQueue.idle()) {
                     clearInterval(finalizerCheckInterval)
                     resolve()

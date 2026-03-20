@@ -1,7 +1,7 @@
 /**
  * Convert date to UNIX timestamp format
  * @param {Date} [date] - Date object to convert
- * @return {Number}
+ * @return {number}
  */
 function getUnixTimestamp(date = undefined) {
     if (date === undefined) {

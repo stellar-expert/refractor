@@ -1,5 +1,6 @@
-const {standardError} = require('./std-error'),
-    {networks} = require('../app.config.json')
+const {Networks} = require('@stellar/stellar-sdk')
+const {networks} = require('../app.config.json')
+const {standardError} = require('./std-error')
 
 function normalizeNetworkName(network) {
     switch (network) {
@@ -19,10 +20,13 @@ function normalizeNetworkName(network) {
     }
 }
 
+for (let network of Object.keys(networks))
+    networks[network].passphrase = Networks[network.toUpperCase()]
+
 /**
  *
- * @param {String} network
- * @return {{horizon: String, network: String, passphrase: String}}
+ * @param {string} network
+ * @return {{rpc: String, network: String, passphrase: String}}
  */
 function resolveNetwork(network) {
     return networks[normalizeNetworkName(network)]
@@ -30,16 +34,14 @@ function resolveNetwork(network) {
 
 /**
  *
- * @param {String} network
- * @return {Number}
+ * @param {string} network
+ * @return {number}
  */
 function resolveNetworkId(network) {
     switch (normalizeNetworkName(network)) {
         case 'public':
-        case '0':
             return 0
         case 'testnet':
-        case '1':
             return 1
         default:
             throw standardError(400, 'Unidentified network: ' + network)

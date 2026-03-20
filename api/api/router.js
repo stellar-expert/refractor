@@ -1,22 +1,10 @@
-const cors = require('cors'),
-    rateLimit = require('express-rate-limit')
+const cors = require('cors')
 
 const defaultCorsOptions = {
     optionsSuccessStatus: 200,
     origin: function (origin, callback) {
         callback(null, true) // allow all origins for now
     }
-}
-
-const rateLimits = {
-    general: rateLimit({
-        windowMs: 60 * 1000, // max 120 requests per minute
-        max: 120
-    }),
-    strict: rateLimit({ // max 10 requests per minute
-        windowMs: 60 * 1000,
-        max: 10
-    })
 }
 
 function processResponse(res, promise, headers, prettyPrint = false) {
@@ -59,26 +47,25 @@ module.exports = {
      * @param {string} route - Relative route path.
      * @param {object} options - Additional options.
      * @param {'get'|'post'} [options.method] - Route method. Default: 'get'
-     * @param {'general'|'strict'} [options.rate] - Rate limiting rules. Default: 'general'
      * @param {object} [options.headers] - Additional response headers. Default: {}.
      * @param {routeHandler} handler - Request handler.
      */
     registerRoute(app, route, options, handler) {
-        const {method = 'get', rate = 'general', headers} = options
-        //middleware - CORS and rate limiting
+        const {method = 'get', headers} = options
+        //middleware - CORS
         const corsMiddleware = cors({...defaultCorsOptions})
         //normalize route
         if (route.indexOf('/') !== 0) {
             route = '/' + route
         }
         //register request handler
-        app[method.toLowerCase()](route, [corsMiddleware, rateLimits[rate]], function (req, res) {
+        app[method.toLowerCase()](route, [corsMiddleware], function (req, res) {
             processResponse(res, handler(req), headers, req.query && req.query.prettyPrint !== undefined)
         })
         //register pre-flight request handler
         if (method.toLowerCase() !== 'get') {
             app.options(route, [corsMiddleware], function (req, res) {
-                res.text(method.toUpperCase())
+                res.send(method.toUpperCase())
             })
         }
     }

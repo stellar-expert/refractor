@@ -1,7 +1,7 @@
 class TxSignature {
     /**
      * Signature pubkey.
-     * @type {String}
+     * @type {string}
      */
     key
 

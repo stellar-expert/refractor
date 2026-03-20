@@ -3,11 +3,11 @@
 
     console.log('Starting up Refractor API')
 
-    const http = require('http'),
-        express = require('express'),
-        bodyParser = require('body-parser'),
-        {port, trustProxy} = require('./app.config'),
-        finalizer = require('./business-logic/finalization/finalizer')
+    const http = require('http')
+    const express = require('express')
+    const bodyParser = require('body-parser')
+    const {port, trustProxy} = require('./app.config')
+    const finalizer = require('./business-logic/finalization/finalizer')
 
     //setup connectors
     console.log('StellarCore DB connection - initialized')
@@ -32,31 +32,30 @@
 
     app.use(bodyParser.json())
     app.use(bodyParser.urlencoded({extended: false}))
-    // error handler
-    app.use((err, req, res, next) => {
-        if (err) console.error(err)
-        res.status(500).end()
-    })
 
     /**
      * Finalize running tasks and close connections
-     * @param exitCode
+     * @param {number|string} exitCode
      */
     async function gracefulExit(exitCode = 0) {
-        //exit in any case in 10 seconds
+        if (exitCode === 'SIGINT' || exitCode === 'SIGTERM') {
+            exitCode = 0
+        }
+        //exit in any case in 5 seconds
         setTimeout(() => {
             console.error('Failed to perform clean exit')
             process.exit(-1)
         }, 5000) //wait max 5 seconds
-
-        await new Promise(resolve => {
-            setTimeout(async () => {
-                finalizer.stop()
-                console.log('Clean exit')
-                process.exit(exitCode)
-                resolve()
-            }, 1000)
-        })
+        //try to wait for finishing running tasks
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        try {
+            await finalizer.stop()
+            console.log('Clean exit')
+            process.exit(exitCode)
+        } catch (e) {
+            console.error('Failed to perform finalization', e)
+            process.exit(exitCode)
+        }
     }
 
     process.on('uncaughtException', async err => {
@@ -71,13 +70,20 @@
         await gracefulExit(1)
     })
 
-    process.on('message', msg => msg === 'shutdown' && gracefulExit()) // handle messages from pm2
+    process.on('message', msg => msg === 'shutdown' && gracefulExit(0)) // handle messages from pm2
     process.on('SIGINT', gracefulExit)
     process.on('SIGTERM', gracefulExit)
 
 
     //register API routes
     require('./api/api-routes')(app)
+    // error handler
+    app.use((err, req, res, next) => {
+        if (err)
+            console.error(err)
+        res.status(500).end()
+    })
+
     console.log('API routes - initialized')
 
     const serverPort = parseInt(process.env.PORT || port || '3000')

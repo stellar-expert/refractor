@@ -1,17 +1,17 @@
-const {StrKey} = require('@stellar/stellar-sdk'),
-    {standardError} = require('./std-error'),
-    {resolveNetwork, resolveNetworkId} = require('./network-resolver'),
-    TxModel = require('../models/tx-model'),
-    {getUnixTimestamp} = require('./timestamp-utils')
+const {StrKey} = require('@stellar/stellar-sdk')
+const TxModel = require('../models/tx-model')
+const {standardError} = require('./std-error')
+const {resolveNetworkId} = require('./network-resolver')
+const {getUnixTimestamp} = require('./timestamp-utils')
 
 /**
  *
  * @param {Transaction} tx
  * @param {'pubnet'|'testnet'} network
- * @param {String}callbackUrl
- * @param {Boolean} submit
- * @param {Array<String>} desiredSigners
- * @param {Number} expires
+ * @param {string} callbackUrl
+ * @param {boolean} submit
+ * @param {Array<string>} desiredSigners
+ * @param {number} expires
  * @returns {TxModel}
  */
 function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expires = 0}) {
