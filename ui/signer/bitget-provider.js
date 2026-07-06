@@ -1,7 +1,7 @@
 export default class BitgetProvider {
     title = 'Bitget'
 
-    isAvailable() {
+    checkAvailable() {
         return !!window.bitkeep?.stellar
     }
 

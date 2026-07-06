@@ -1,7 +1,7 @@
 export default class OneKeyProvider {
     title = 'OneKey'
 
-    isAvailable() {
+    checkAvailable() {
         return !!window.$onekey?.stellar
     }
 

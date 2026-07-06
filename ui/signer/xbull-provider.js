@@ -1,7 +1,7 @@
 export default class XBullProvider {
     title = 'xBull'
 
-    isAvailable() {
+    checkAvailable() {
         //connects to both the extension and the web wallet, works everywhere
         return true
     }

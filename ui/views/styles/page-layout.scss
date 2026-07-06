@@ -50,10 +50,6 @@ $top-menu-line-height: 2.2em;
   background-size: auto 1em;
 }
 
-.dd-list.solo {
-  min-width: 25rem;
-}
-
 @media (max-width: $responsive-mobile-browser-width) {
   code {
     word-break: break-word;

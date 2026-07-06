@@ -3,7 +3,7 @@ import config from '../app.config.json'
 export default class RabetProvider {
     title = 'Rabet'
 
-    isAvailable() {
+    checkAvailable() {
         //Rabet is slow to attach its global, give it some time before answering
         return new Promise(resolve => setTimeout(() => resolve(!!window.rabet), 100))
     }

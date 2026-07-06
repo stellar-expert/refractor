@@ -5,7 +5,6 @@ import {delegateTxSigning, getAllProviders, getAvailableProviders} from '../../.
 import AddXdrView from '../add-xdr-view'
 import './add-signatures.scss'
 
-const selectedWalletKey = 'preferredWallet'
 //static list for the mobile block - only wallets that work on mobile devices
 const mobileProviders = getAllProviders().filter(provider => !!provider.mobileSupported)
 
@@ -14,17 +13,15 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
     const [isOpen, setIsOpen] = useState(false)
     //null while the wallet detection is in progress
     const [providers, setProviders] = useState(null)
-    const [wallet, setWallet] = useState(() => localStorage.getItem(selectedWalletKey) || null)
+    const [wallet, setWallet] = useState(null)
 
     useEffect(() => {
         let unmounted = false
         getAvailableProviders()
-            .then(available => {
+            .then(providers => {
                 if (unmounted)
                     return
-                setProviders(available)
-                //auto-select previously used wallet or fall back to the first available one
-                setWallet(prev => available.some(p => p.title === prev) ? prev : (available[0]?.title || null))
+                setProviders(providers)
             })
         return () => {
             unmounted = true
@@ -42,7 +39,6 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
     //remember the choice and immediately request a signature with the selected wallet
     const selectAndSign = useCallback(value => {
         setWallet(value)
-        localStorage.setItem(selectedWalletKey, value)
         signWith(value)
     }, [signWith])
 
@@ -50,10 +46,14 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
 
     const toggleImportModal = useCallback(() => setIsOpen(prev => !prev), [])
 
-    const walletOptions = useMemo(() => (providers || []).map(provider => ({
+    const walletOptions = (providers || []).sort((a, b) => b.available - a.available).map(provider => ({
         value: provider.title,
-        title: <><WalletIcon wallet={provider.title}/>{provider.title}&nbsp;</>
-    })), [providers])
+        title: <span style={!provider.available ? {filter: 'grayscale(1)'}:{}}>
+            <WalletIcon wallet={provider.title}/>{provider.title}&nbsp;
+            {!provider.available&&<span className="dimmed text-tiny">(not connected)</span>}
+        </span>,
+        disabled: !provider.available
+    }))
 
     if (txInfo.readyToSubmit || txInfo.submitted)
         return null
@@ -65,13 +65,13 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
                 <div className="row">
                     <div className="column column-50">
                         {providers?.length ?
-                            <Dropdown className="wallet-select" options={walletOptions} value={wallet} onChange={selectAndSign} solo
-                                      disabled={inProgress} showToggle={false} header={<h3>Select a wallet</h3>}
-                                      hint="Sign with one of the available wallets"
+                            <Dropdown className="wallet-select" options={walletOptions} value="" onChange={selectAndSign} solo
+                                      disabled={inProgress} showToggle={false} header={<h3>Choose Wallet</h3>}
+                                      hint="Use any supported wallet to sign the transaction"
                                       title={<Button block disabled={inProgress}>Sign</Button>}/> :
-                            !providers ?
-                                <div className="loader inline"/> :
-                                <span className="dimmed">No wallets detected</span>}
+                            <Button block disabled={true}>Sign</Button>
+                        }
+                        {/*<span className="dimmed text-tiny">No supported wallets detected</span>*/}
                     </div>
                     <div className="column column-50">
                         <Button block outline disabled={inProgress} onClick={toggleImportModal}>
@@ -98,7 +98,7 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
 const WalletIcon = React.memo(function WalletIcon({wallet}) {
     //hide the icon if it's missing for a given wallet
     const hideMissing = useCallback(e => e.target.style.display = 'none', [])
-    return <img src={`/img/wallets/${wallet.toLowerCase()}.svg`} alt="" onError={hideMissing}/>
+    return <span className="wallet-icon" style={{backgroundImage: `url(/img/wallets/${wallet.toLowerCase()}.svg)`}}/>
 })
 
 async function processSignature(provider, txInfo) {

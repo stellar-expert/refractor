@@ -1,7 +1,7 @@
 export default class FreighterProvider {
     title = 'Freighter'
 
-    async isAvailable() {
+    async checkAvailable() {
         //newer Freighter versions don't inject a window global - ask the extension
         //via the postMessage handshake (2s timeout built into the api)
         await this.init()

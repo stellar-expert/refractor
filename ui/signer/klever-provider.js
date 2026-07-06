@@ -1,7 +1,7 @@
 export default class KleverProvider {
     title = 'Klever'
 
-    isAvailable() {
+    checkAvailable() {
         return !!window.kleverWallet?.stellar
     }
 

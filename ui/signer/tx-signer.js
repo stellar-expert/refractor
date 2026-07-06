@@ -24,7 +24,7 @@ export function getAllProviders() {
 }
 
 //treat a wallet as unavailable if it doesn't respond within this time
-const detectionTimeout = 3000
+const detectionTimeout = 1000
 
 /**
  * Detect signer providers available in the current browser
@@ -34,14 +34,16 @@ export async function getAvailableProviders() {
     const available = await Promise.all(getAllProviders().map(async provider => {
         let timer
         try {
-            const detection = Promise.resolve(provider.isAvailable())
+            const detection = Promise.resolve(provider.checkAvailable())
             const timeout = new Promise(resolve => {
                 timer = setTimeout(() => resolve(false), detectionTimeout)
             })
-            return (await Promise.race([detection, timeout])) ? provider : null
+            provider.available = (await Promise.race([detection, timeout]))
+            return provider
         } catch (e) {
             console.error(e)
-            return null
+            provider.available = false
+            return provider
         } finally {
             clearTimeout(timer)
         }

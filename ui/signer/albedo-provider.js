@@ -3,7 +3,7 @@ export default class AlbedoProvider {
 
     mobileSupported = true
 
-    isAvailable() {
+    checkAvailable() {
         //web-based signer, works everywhere
         return true
     }

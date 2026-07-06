@@ -1,7 +1,7 @@
 export default class CactusLinkProvider {
     title = 'CactusLink'
 
-    isAvailable() {
+    checkAvailable() {
         return !!window.cactuslink_stellar
     }
 

@@ -1,7 +1,7 @@
 export default class HanaProvider {
     title = 'Hana'
 
-    isAvailable() {
+    checkAvailable() {
         return !!window.hanaWallet?.stellar
     }
 

@@ -33,7 +33,7 @@ function sendFordefiMessage(type, params) {
 export default class FordefiProvider {
     title = 'Fordefi'
 
-    isAvailable() {
+    checkAvailable() {
         return !!window.FordefiProviders?.StellarProvider
     }
 

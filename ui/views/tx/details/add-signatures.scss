@@ -18,9 +18,15 @@
 //wallet icons in the dropdown header and the portaled options list
 .signature-options,
 .wallet-select {
-
-  img {
-    height: 1.6em;
+  .dd-list-item{
+    min-width: 10em;
+  }
+  .wallet-icon {
+    display: inline-block;
+    height: 1.8em;
+    width: 1.8em;
+    background-size: contain;
+    background-repeat: no-repeat;
     border-radius: $border-radius-input;
     vertical-align: middle;
     margin-right: 0.4em;
