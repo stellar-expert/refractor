@@ -1,6 +1,14 @@
 export default class FreighterProvider {
     title = 'Freighter'
 
+    async isAvailable() {
+        //newer Freighter versions don't inject a window global - ask the extension
+        //via the postMessage handshake (2s timeout built into the api)
+        await this.init()
+        const res = await this.provider.isConnected()
+        return !!res?.isConnected
+    }
+
     init() {
         return import(/* webpackChunkName: "freighter-provider" */'@stellar/freighter-api')
             .then(module => {

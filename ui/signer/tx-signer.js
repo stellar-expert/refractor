@@ -3,16 +3,50 @@ import AlbedoProvider from './albedo-provider'
 import FreighterProvider from './freighter-provider'
 import LobstrProvider from './lobstr-provider'
 import XBullProvider from './xbull-provider'
+import RabetProvider from './rabet-provider'
+import HanaProvider from './hana-provider'
+import KleverProvider from './klever-provider'
+import OneKeyProvider from './onekey-provider'
+import BitgetProvider from './bitget-provider'
+import CactusLinkProvider from './cactuslink-provider'
+import FordefiProvider from './fordefi-provider'
 
 const signerProviders = {}
 //create instances for all available providers
-for (let providerClass of [AlbedoProvider, FreighterProvider, LobstrProvider, XBullProvider]) {
+for (let providerClass of [AlbedoProvider, FreighterProvider, LobstrProvider, XBullProvider, RabetProvider,
+    HanaProvider, KleverProvider, OneKeyProvider, BitgetProvider, CactusLinkProvider, FordefiProvider]) {
     const provider = new providerClass()
     signerProviders[provider.title] = provider
 }
 
 export function getAllProviders() {
     return Object.values(signerProviders)
+}
+
+//treat a wallet as unavailable if it doesn't respond within this time
+const detectionTimeout = 3000
+
+/**
+ * Detect signer providers available in the current browser
+ * @return {Promise<object[]>}
+ */
+export async function getAvailableProviders() {
+    const available = await Promise.all(getAllProviders().map(async provider => {
+        let timer
+        try {
+            const detection = Promise.resolve(provider.isAvailable())
+            const timeout = new Promise(resolve => {
+                timer = setTimeout(() => resolve(false), detectionTimeout)
+            })
+            return (await Promise.race([detection, timeout])) ? provider : null
+        } catch (e) {
+            console.error(e)
+            return null
+        } finally {
+            clearTimeout(timer)
+        }
+    }))
+    return available.filter(Boolean)
 }
 
 export async function delegateTxSigning(providerName, xdr, network) {
