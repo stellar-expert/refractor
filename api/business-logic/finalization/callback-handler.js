@@ -1,8 +1,10 @@
-const axios = require('axios')
-
 let callbackHandler = function (txInfo) {
     const {tx, network, hash, callbackUrl} = txInfo
-    return axios.post(callbackUrl, {tx, hash, network})
+    return fetch(callbackUrl, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({tx, hash, network})
+    })
 }
 
 /**

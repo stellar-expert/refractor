@@ -5,9 +5,8 @@ import Layout from './layout-view'
 import TxView from './tx/tx-view'
 import AddTxView from './tx/add/add-tx-view'
 import NotFoundView from './general/not-found-view'
-import WelcomeView from './general/welcome-view'
 
-//import Home from './pages/home-page-view'
+//home page `/` is served as a static HTML page (static/index.html), outside the React app
 
 function AppRouter({history}) {
     return <Router history={history}>
@@ -15,7 +14,6 @@ function AppRouter({history}) {
             <Switch>
                 <Route path="/tx/add" component={AddTxView}/>
                 <Route path="/tx/:txhash" component={TxView}/>
-                <Route path="/" exact component={WelcomeView}/>
                 <Route component={NotFoundView}/>
             </Switch>
         </Layout>

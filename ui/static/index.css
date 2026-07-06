@@ -1,0 +1,326 @@
+/* ============================================================
+   Refractor — shared styles
+   Extracted from static/index.html and static/api-docs.html.
+   Groups the design tokens, base reset, and repeated
+   component/block/section patterns common to both pages.
+   ============================================================ */
+
+/* ---------- Design tokens ---------- */
+:root {
+    /* surfaces */
+    --bg: #0b262d;
+    --bg-deep: #08181d;
+    --bg-hero: #050f14;
+    --surface: #10272e;
+    --surface-step: #12333b;
+    --surface-usecase: #0f2a31;
+    --surface-code: #0a1a20;
+    --surface-code-alt: #0c1f26;
+    --node-bg: #0c2c34;
+
+    /* text */
+    --text: #e2edef;
+    --text-muted: #a9c1c6;
+    --text-dim: #8fb3ba;
+    --text-faint: #5e7d84;
+    --heading: #f2f9fb;
+    --heading-soft: #eef6f8;
+    --heading-note: #dfeef1;
+
+    /* accent */
+    --accent: #5cc2e0;
+    --accent-deep: #3bb6d8;
+    --accent-light: #7be0f5;
+    --accent-dark: #2fb6d6;
+    --accent-glow: #8ad6ee;
+
+    /* lines / veils */
+    --line: rgba(120, 180, 190, 0.16);
+    --line-soft: rgba(120, 180, 190, 0.12);
+    --line-strong: rgba(120, 180, 190, 0.3);
+    --card-border: rgba(120, 180, 190, 0.14);
+    --accent-veil: rgba(92, 194, 224, 0.12);
+    --accent-glow-shadow: rgba(92, 194, 224, 0.6);
+
+    /* fonts */
+    --font-sans: 'ClearSans', system-ui, sans-serif;
+    --font-display: 'Roboto Condensed', Arial, Helvetica, sans-serif;
+    --font-mono: Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+
+    /* beveled clip-paths */
+    --clip-card: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
+    --clip-card-inner: polygon(17px 0, 100% 0, 100% calc(100% - 17px), calc(100% - 17px) 100%, 0 100%, 0 17px);
+    --clip-note: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+    --clip-note-inner: polygon(13px 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%, 0 13px);
+    --clip-panel: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+
+/* ---------- Base reset (shared <style> block) ---------- */
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: rgba(92, 194, 224, 0.3); }
+
+/* ---------- Brand accent bar (header / footer / docs top) ---------- */
+.accent-bar {
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-dark), var(--accent), var(--accent-light));
+}
+
+/* ---------- Typography helpers ---------- */
+.eyebrow {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--accent);
+}
+
+.label-mono {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+}
+
+.section-title {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0;
+    color: var(--heading);
+}
+
+.card-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(1.25rem, 2.6vw, 1.7rem);
+    letter-spacing: -0.01em;
+    margin: 0 0 12px;
+    color: var(--heading-soft);
+}
+
+.card-text {
+    margin: 0;
+    font-size: clamp(0.98rem, 1.6vw, 1.08rem);
+    line-height: 1.65;
+    color: var(--text-muted);
+}
+
+/* Inline monospace code chip (e.g. TX_BAD_AUTH_EXTRA, sample URLs) */
+.code-chip {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: var(--accent-veil);
+    color: var(--accent-glow);
+    padding: 1px 6px;
+    border-radius: 5px;
+}
+
+/* ---------- Beveled card (border tint + inner surface) ---------- */
+.card {
+    clip-path: var(--clip-card);
+    background: var(--card-border);
+    padding: 1.5px;
+}
+
+.card-inner {
+    clip-path: var(--clip-card-inner);
+    background: var(--surface);
+    padding: clamp(22px, 3vw, 32px);
+}
+
+/* deeper surface variant used by the "how it works" steps */
+.card-inner--step { background: var(--surface-step); }
+
+/* Smaller "notes & limitations" style card */
+.note-card {
+    clip-path: var(--clip-note);
+    background: var(--line-soft);
+    padding: 1.5px;
+}
+
+.note-card-inner {
+    clip-path: var(--clip-note-inner);
+    background: var(--surface-step);
+    padding: 22px 24px;
+}
+
+/* Flat beveled panel (docs samples / accordions) */
+.panel {
+    clip-path: var(--clip-panel);
+    background: var(--surface-code);
+}
+
+/* ---------- Skewed action buttons ---------- */
+.btn {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    padding: 15px 34px;
+    transform: skewX(-12deg);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+/* counter-skew the label so text stays upright */
+.btn > span {
+    display: inline-block;
+    transform: skewX(12deg);
+}
+
+.btn-primary {
+    color: #08222a;
+    background: linear-gradient(135deg, var(--accent), var(--accent-deep));
+    box-shadow: 0 12px 34px rgba(92, 194, 224, 0.28);
+    font-weight: 600;
+}
+
+.btn-secondary {
+    color: #cfe4e8;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(120, 180, 190, 0.4);
+}
+
+/* ---------- Timeline node (features / how-it-works rails) ---------- */
+.node {
+    position: relative;
+    z-index: 2;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: var(--node-bg);
+    border: 2px solid var(--line-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .5s ease;
+}
+
+/* numbered variant used in the "how it works" steps */
+.node-numbered {
+    width: 48px;
+    height: 48px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 19px;
+    color: #6f9199;
+}
+
+/* small rotated diamond marker inside feature nodes */
+.node-diamond {
+    width: 13px;
+    height: 13px;
+    background: currentColor;
+    transform: rotate(45deg);
+    border-radius: 2px;
+}
+
+/* Rail track + animated fill (features / how-it-works) */
+.track-line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--line);
+    border-radius: 2px;
+}
+
+.track-fill {
+    position: absolute;
+    top: 0;
+    width: 3px;
+    height: 0%;
+    background: linear-gradient(180deg, var(--accent-light), var(--accent-deep));
+    border-radius: 2px;
+    box-shadow: 0 0 18px var(--accent-glow-shadow);
+    z-index: 1;
+}
+
+/* ---------- Use-cases carousel ---------- */
+/* round prev/next arrows (individual left/right offset stays inline) */
+.uc-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 40;
+    width: clamp(44px, 5vw, 54px);
+    height: clamp(44px, 5vw, 54px);
+    border-radius: 50%;
+    background: rgba(11, 38, 45, 0.82);
+    border: 2px solid rgba(120, 180, 190, 0.32);
+    color: #cfe4e8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    transition: all .25s ease;
+}
+
+/* stacked/animated card (JS drives transform, opacity, z-index, filter) */
+.uc-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    cursor: pointer;
+    transition: transform .55s cubic-bezier(.33, .1, .25, 1), opacity .5s ease, filter .5s ease;
+    will-change: transform;
+}
+
+.uc-card-border {
+    clip-path: var(--clip-card);
+    background: var(--line);
+    padding: 1.5px;
+    transition: background .4s ease;
+}
+
+.uc-card-inner {
+    clip-path: var(--clip-card-inner);
+    background: var(--surface-usecase);
+    padding: 26px 24px;
+    min-height: 198px;
+}
+
+/* the "01".."09" index label */
+.uc-index {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    margin-bottom: 14px;
+}
+
+.uc-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.02rem;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+    margin: 0 0 12px;
+    color: var(--heading-soft);
+}
+
+.uc-text {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.62;
+    color: var(--text-muted);
+}

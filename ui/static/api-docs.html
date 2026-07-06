@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en-US" translate="no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Refractor API Documentation</title>
+    <meta name="description" content="Refractor API reference - store pending Stellar transactions and retrieve signing status via a simple HTTP API.">
+    <meta name="referrer" content="no-referrer">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#0b262d">
+    <link rel="stylesheet" href="/fonts.css">
+    <link rel="stylesheet" href="/index.css">
+<style>
+  body { color: #cddee2; }
+  a { color: #5cc2e0; }
+  pre { margin: 0; }
+</style>
+</head>
+<body>
+<div id="docroot" style="position:relative; display:flex; min-height:100vh; background:#0b262d; color:#cddee2;">
+  <div class="accent-bar" style="position:absolute; top:0; left:0; right:0; z-index:20;"></div>
+
+  <main id="main" style="flex:1; min-width:0; position:relative;">
+    <div id="rail" style="position:absolute; top:0; left:0; bottom:0; width:50%; background:#08181d; border-right:1px solid rgba(120,180,190,0.12);"></div>
+
+    <div style="position:relative;">
+      <section data-op-row="" style="display:flex; align-items:flex-start;">
+        <div data-docs="" style="flex:1 1 50%; min-width:0; padding:clamp(30px,4vw,60px) clamp(28px,4vw,56px);">
+          <div style="max-width:720px;">
+            <h1 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:700; font-size:clamp(2rem,4vw,2.7rem); line-height:1.1; letter-spacing:-0.02em; margin:0 0 18px; color:#f2f9fb;">Refractor API&nbsp;<span style="color: rgb(92, 194, 224); font-weight: 600; font-size: 0.6em; vertical-align: middle;">0.1.1</span></h1>
+            <div style="font-size:14.5px; line-height:1.9; color:#9fbac0;">
+              E-mail: <a href="mailto:info@stellar.expert" style="text-decoration:none;">info@stellar.expert</a> &nbsp;|&nbsp; URL: <a href="/" style="text-decoration:none;">https://refractor.space/</a><br>
+              License: <a href="#" style="text-decoration:none;">MIT</a> &nbsp;|&nbsp; <a href="#" style="text-decoration:none;">Terms of Service</a>
+            </div>
+            <h2 id="tx-endpoint" style="scroll-margin-top:24px; font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:700; font-size:1.9rem; letter-spacing:-0.01em; margin:52px 0 0; color:#f2f9fb; padding-top:32px; border-top:1px solid rgba(120,180,190,0.12);">/tx endpoint</h2>
+          </div>
+        </div>
+        <div data-samples="" style="flex:1 1 50%; min-width:0; order:-1; padding:clamp(30px,4vw,44px) 40px;">
+          <a href="/" style="display:flex; align-items:center; gap:11px; text-decoration:none; margin-bottom:36px;">
+            <img src="/img/refractor-logo-512.svg" alt="Refractor" style="display:block; width:28px; height:28px; filter:drop-shadow(0 0 10px rgba(92,194,224,0.4));">
+            <span style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:20px; color:#eef6f8; letter-spacing:-0.01em;">refractor</span>
+          </a>
+          <nav style="display:flex; flex-direction:column; gap:2px;">
+            <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#8fb3ba; padding:8px 12px 12px 14px;">/tx endpoint</div>
+            <a href="#op-store" data-nav="" style="display:flex; align-items:center; gap:9px; padding:8px 12px; font-size:14px; color:#eaf6f9; text-decoration:none; background:rgba(92,194,224,0.12); border-left:2px solid #5cc2e0; transition:all .2s ease;">
+              <span style="flex:0 0 auto; font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:9px; font-weight:600; letter-spacing:0.05em; color:#062028; background:linear-gradient(135deg,#5cc2e0,#3bb6d8); padding:2px 6px; border-radius:3px;">POST</span>
+              Store a transaction
+            </a>
+            <a href="#op-retrieve" data-nav="" style="display:flex; align-items:center; gap:9px; padding:8px 12px; font-size:14px; color:#a9c1c6; text-decoration:none; border-left:2px solid transparent; transition:all .2s ease;">
+              <span style="flex:0 0 auto; font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:9px; font-weight:600; letter-spacing:0.05em; color:#05201a; background:linear-gradient(135deg,#5fcf98,#3fae7a); padding:2px 6px; border-radius:3px;">GET</span>
+              Retrieve transaction info
+            </a>
+          </nav>
+        </div>
+      </section>
+      <section id="op-store" data-op-row="" style="scroll-margin-top:16px; display:flex; align-items:flex-start;">
+        <div data-docs="" style="flex:1 1 50%; min-width:0; padding:clamp(20px,3vw,40px) clamp(28px,4vw,56px) clamp(30px,4vw,56px);">
+          <div style="max-width:720px;">
+            <h3 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.5rem; letter-spacing:-0.01em; margin:0 0 16px; color:#eef6f8;">Store a transaction</h3>
+            <p style="font-size:15px; line-height:1.75; color:#c3d6da; margin:0 0 30px;">Sends a transaction (with or without signatures) to the server. If the transaction with the same hash doesn't exist on the server yet, the transaction and its signatures are stored on the server. Otherwise, Refractor finds new signatures and applies them to the existing transaction. Invalid or redundant signatures are discarded automatically.</p>
+
+            <div style="display:flex; align-items:baseline; gap:12px; padding-bottom:12px; border-bottom:1px solid rgba(120,180,190,0.16); margin-bottom:24px;">
+              <span class="label-mono">Request body schema:</span>
+              <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:13px; color:#8ad6ee;">application/json</span>
+            </div>
+            <div style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.05rem; color:#dfeef1; margin-bottom:8px;">Transaction description</div>
+
+            <div style="position:relative; padding-left:24px; border-left:2px solid rgba(120,180,190,0.18); margin-top:14px;">
+
+              <div style="position:relative; padding:18px 0; border-bottom:1px solid rgba(120,180,190,0.08);">
+                <span style="position:absolute; left:-24px; top:29px; width:15px; height:2px; background:rgba(120,180,190,0.3);"></span>
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; font-weight:500; color:#eef6f8;">network</span>
+                  <span style="font-size:11px; color:#e07a7a;">required</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0 6px;">
+                  <span style="font-size:13px; color:#8fb3ba;">string</span>
+                  <span style="font-size:12px; color:#7f9aa1;">Enum:</span>
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#8ad6ee; background:rgba(92,194,224,0.1); border:1px solid rgba(92,194,224,0.25); padding:1px 8px; border-radius:4px;">"public"</span>
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#8ad6ee; background:rgba(92,194,224,0.1); border:1px solid rgba(92,194,224,0.25); padding:1px 8px; border-radius:4px;">"testnet"</span>
+                </div>
+                <div style="font-size:14px; line-height:1.6; color:#a9c1c6;">Stellar network name ("public" or "testnet").</div>
+              </div>
+
+              <div style="position:relative; padding:18px 0; border-bottom:1px solid rgba(120,180,190,0.08);">
+                <span style="position:absolute; left:-24px; top:29px; width:15px; height:2px; background:rgba(120,180,190,0.3);"></span>
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; font-weight:500; color:#eef6f8;">xdr</span>
+                  <span style="font-size:11px; color:#e07a7a;">required</span>
+                </div>
+                <div style="margin:8px 0 6px;"><span style="font-size:13px; color:#8fb3ba;">string</span></div>
+                <div style="font-size:14px; line-height:1.6; color:#a9c1c6;">Base64-encoded Stellar transaction XDR with or without signatures.</div>
+              </div>
+
+              <div style="position:relative; padding:18px 0; border-bottom:1px solid rgba(120,180,190,0.08);">
+                <span style="position:absolute; left:-24px; top:29px; width:15px; height:2px; background:rgba(120,180,190,0.3);"></span>
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; font-weight:500; color:#eef6f8;">expires</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0 6px;">
+                  <span style="font-size:13px; color:#8fb3ba;">integer</span>
+                  <span style="font-size:12px; color:#7f9aa1;">Default:</span>
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#e6b980; background:rgba(230,185,128,0.12); border:1px solid rgba(230,185,128,0.3); padding:1px 8px; border-radius:4px;">"Current date + 30 days"</span>
+                </div>
+                <div style="font-size:14px; line-height:1.6; color:#a9c1c6;">Transaction expiration date (UNIX timestamp), by default equals the transaction maxTime if not set.</div>
+              </div>
+
+              <div style="position:relative; padding:18px 0; border-bottom:1px solid rgba(120,180,190,0.08);">
+                <span style="position:absolute; left:-24px; top:29px; width:15px; height:2px; background:rgba(120,180,190,0.3);"></span>
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; font-weight:500; color:#eef6f8;">callbackUrl</span>
+                </div>
+                <div style="margin:8px 0 6px;"><span style="font-size:13px; color:#8fb3ba;">string</span></div>
+                <div style="font-size:14px; line-height:1.6; color:#a9c1c6;">Callback URL where the transaction will be POSTed once ready.</div>
+              </div>
+
+              <div style="position:relative; padding:18px 0;">
+                <span style="position:absolute; left:-24px; top:29px; width:15px; height:2px; background:rgba(120,180,190,0.3);"></span>
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; font-weight:500; color:#eef6f8;">submit</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0 6px;">
+                  <span style="font-size:13px; color:#8fb3ba;">boolean</span>
+                  <span style="font-size:12px; color:#7f9aa1;">Default:</span>
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#b998e6; background:rgba(185,152,230,0.12); border:1px solid rgba(185,152,230,0.3); padding:1px 8px; border-radius:4px;">false</span>
+                </div>
+                <div style="font-size:14px; line-height:1.6; color:#a9c1c6;">Whether the transaction should be automatically submitted to Horizon once ready.</div>
+              </div>
+
+            </div>
+
+            <h3 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.4rem; letter-spacing:-0.01em; margin:44px 0 20px; color:#eef6f8;">Responses</h3>
+
+            <div data-acc="" style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:rgba(94,193,142,0.1); margin-bottom:12px;">
+              <div data-acc-head="" style="display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer;">
+                <span data-chev="" style="font-size:11px; color:#6ec38f; transform:rotate(-90deg); transition:transform .2s ease;">▾</span>
+                <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-weight:600; font-size:14px; color:#6ec38f;">200</span>
+                <span style="font-size:14px; color:#9dd3b4;">Transaction stored/updated successfully</span>
+              </div>
+              <div data-acc-body="" style="display:none; padding:0 18px 16px 42px; font-size:14px; line-height:1.6; color:#9dc0b0;">Returns the stored transaction object with the current signing status.</div>
+            </div>
+
+            <div data-acc="" style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:rgba(224,122,122,0.09); margin-bottom:12px;">
+              <div data-acc-head="" style="display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer;">
+                <span data-chev="" style="font-size:11px; color:#e07a7a; transition:transform .2s ease;">▾</span>
+                <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-weight:600; font-size:14px; color:#e07a7a;">400</span>
+                <span style="font-size:14px; color:#dba0a0;">Invalid parameters, possible errors:</span>
+              </div>
+              <div data-acc-body="" style="padding:0 18px 16px 42px;">
+                <ul style="margin:2px 0 0; padding-left:18px; font-size:14px; line-height:1.85; color:#d19898;">
+                  <li>Unidentified network</li>
+                  <li>Invalid transaction XDR</li>
+                  <li>Invalid URL supplied in "callbackUrl" parameter</li>
+                  <li>Invalid "requestedSigners" parameter</li>
+                  <li>Invalid "expires" parameter</li>
+                  <li>Invalid transaction's "timebounds.maxTime" value — the transaction already expired</li>
+                </ul>
+              </div>
+            </div>
+
+            <div data-acc="" style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:rgba(224,122,122,0.09);">
+              <div data-acc-head="" style="display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer;">
+                <span data-chev="" style="font-size:11px; color:#e07a7a; transition:transform .2s ease;">▾</span>
+                <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-weight:600; font-size:14px; color:#e07a7a;">406</span>
+                <span style="font-size:14px; color:#dba0a0;">Not supported, possible errors:</span>
+              </div>
+              <div data-acc-body="" style="padding:0 18px 16px 42px;">
+                <ul style="margin:2px 0 0; padding-left:18px; font-size:14px; line-height:1.85; color:#d19898;">
+                  <li>FeeBump transactions not supported</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POST samples -->
+        <div data-samples="" style="flex:1 1 50%; min-width:0; order:-1; padding:clamp(20px,3vw,40px) 40px;">
+          <div style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:#0c1f26; display:flex; align-items:center; gap:12px; padding:13px 16px; margin-bottom:26px;">
+            <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:11px; font-weight:600; letter-spacing:0.06em; color:#062028; background:linear-gradient(135deg,#5cc2e0,#3bb6d8); padding:3px 9px; border-radius:3px;">POST</span>
+            <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; color:#eef6f8; flex:1;">/tx</span>
+            <span style="font-size:11px; color:#5c7a81;">▾</span>
+          </div>
+
+          <div style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1rem; color:#eef6f8; margin-bottom:12px;">Request samples</div>
+          <div style="margin-bottom:14px;">
+            
+          </div>
+          <div class="panel" style="margin-bottom:34px;">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; padding:14px 16px; border-bottom:1px solid rgba(120,180,190,0.08);">
+              <div>
+                <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#7f9aa1; margin-bottom:4px;">Content type</div>
+                <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:13px; color:#cdd;">application/json</div>
+              </div>
+              <span data-copy="req-json" style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#5cc2e0; cursor:pointer;">Copy</span>
+            </div>
+            <div style="padding:14px 16px; overflow-x:auto;">
+<pre id="req-json" style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12.5px; line-height:1.7; color:#6f9199; white-space:pre;">{
+  <span style="color:#8ad6ee;">"network"</span>: <span style="color:#86c99a;">"testnet"</span>,
+  <span style="color:#8ad6ee;">"xdr"</span>: <span style="color:#86c99a;">"AAAAAgAAAABTWgh1bRm6Aksd…"</span>
+}</pre>
+            </div>
+          </div>
+
+          <div style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1rem; color:#eef6f8; margin-bottom:12px;">Response samples</div>
+          <div style="margin-bottom:14px;">
+            <span style="display:inline-block; font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#05201a; background:linear-gradient(135deg,#5fcf98,#3fae7a); padding:7px 22px; transform:skewX(-12deg); font-weight:600;"><span style="display:inline-block; transform:skewX(12deg);">200</span></span>
+          </div>
+          <div class="panel">
+            <div style="padding:14px 16px; border-bottom:1px solid rgba(120,180,190,0.08);">
+              <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#7f9aa1; margin-bottom:4px;">Content type</div>
+              <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:13px; color:#cdd;">application/json</div>
+            </div>
+            <div style="display:flex; gap:18px; padding:10px 16px 4px;">
+              
+              
+              
+            </div>
+            <div style="padding:6px 16px 16px; overflow-x:auto;">
+<pre id="resp-json" style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12.5px; line-height:1.7; color:#6f9199; white-space:pre;">{
+  <span style="color:#8ad6ee;">"network"</span>: <span style="color:#86c99a;">"testnet"</span>,
+  <span style="color:#8ad6ee;">"xdr"</span>: <span style="color:#86c99a;">"AAAAAgAAAABTWgh1bRm6Aksd…"</span>,
+  <span style="color:#8ad6ee;">"minTime"</span>: <span style="color:#e6b980;">1527178665</span>,
+  <span style="color:#8ad6ee;">"maxTime"</span>: <span style="color:#e6b980;">1727178665</span>,
+  <span style="color:#8ad6ee;">"callbackUrl"</span>: <span style="color:#86c99a;">"https://my.server/callback"</span>,
+  <span style="color:#8ad6ee;">"submit"</span>: <span style="color:#b998e6;">false</span>,
+  <span style="color:#8ad6ee;">"signatures"</span>: [ ],
+  <span style="color:#8ad6ee;">"status"</span>: <span style="color:#86c99a;">"pending"</span>,
+  <span style="color:#8ad6ee;">"submitted"</span>: <span style="color:#e6b980;">1627178665</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="op-retrieve" data-op-row="" style="scroll-margin-top:16px; display:flex; align-items:flex-start; border-top:1px solid rgba(120,180,190,0.12);">
+        <div data-docs="" style="flex:1 1 50%; min-width:0; padding:clamp(30px,4vw,56px) clamp(28px,4vw,56px);">
+          <div style="max-width:720px;">
+            <h3 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.5rem; letter-spacing:-0.01em; margin:0 0 16px; color:#eef6f8;">Retrieve transaction info</h3>
+            <p style="font-size:15px; line-height:1.75; color:#c3d6da; margin:0 0 30px;">Returns transaction information and signing status for a given transaction hash.</p>
+
+            <div style="padding-bottom:12px; border-bottom:1px solid rgba(120,180,190,0.16); margin-bottom:20px;">
+              <span class="label-mono">Path parameters</span>
+            </div>
+
+            <div style="position:relative; padding-left:24px; border-left:2px solid rgba(120,180,190,0.18);">
+              <div style="position:relative; padding:18px 0;">
+                <span style="position:absolute; left:-24px; top:29px; width:15px; height:2px; background:rgba(120,180,190,0.3);"></span>
+                <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; font-weight:500; color:#eef6f8;">txHash</span>
+                  <span style="font-size:11px; color:#e07a7a;">required</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0 8px;">
+                  <span style="font-size:13px; color:#8fb3ba;">string (TxHash)</span>
+                  <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#e6b980; background:rgba(230,185,128,0.1); border:1px solid rgba(230,185,128,0.28); padding:1px 8px; border-radius:4px;">^[a-f0-9]{64}$</span>
+                </div>
+                <div style="font-size:12px; color:#7f9aa1; margin-bottom:6px;">Example:</div>
+                <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12.5px; line-height:1.6; color:#8ad6ee; background:rgba(92,194,224,0.08); border:1px solid rgba(92,194,224,0.18); padding:8px 12px; border-radius:6px; word-break:break-all; margin-bottom:12px;">a1ef625e2bda7e71493b8a6bb4b03fa6512a67593d99acacfe5fb59b79e28154</div>
+                <div style="font-size:14px; line-height:1.6; color:#a9c1c6;">Transaction hash.</div>
+              </div>
+            </div>
+
+            <h3 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.4rem; letter-spacing:-0.01em; margin:44px 0 20px; color:#eef6f8;">Responses</h3>
+
+            <div data-acc="" style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:rgba(94,193,142,0.1); margin-bottom:12px;">
+              <div data-acc-head="" style="display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer;">
+                <span data-chev="" style="font-size:11px; color:#6ec38f; transform:rotate(-90deg); transition:transform .2s ease;">▾</span>
+                <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-weight:600; font-size:14px; color:#6ec38f;">200</span>
+                <span style="font-size:14px; color:#9dd3b4;">Transaction info retrieved</span>
+              </div>
+              <div data-acc-body="" style="display:none; padding:0 18px 16px 42px; font-size:14px; line-height:1.6; color:#9dc0b0;">Returns the transaction object and its current signing status.</div>
+            </div>
+
+            <div data-acc="" style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:rgba(224,122,122,0.09);">
+              <div data-acc-head="" style="display:flex; align-items:center; gap:12px; padding:14px 18px; cursor:pointer;">
+                <span data-chev="" style="font-size:11px; color:#e07a7a; transform:rotate(-90deg); transition:transform .2s ease;">▾</span>
+                <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-weight:600; font-size:14px; color:#e07a7a;">404</span>
+                <span style="font-size:14px; color:#dba0a0;">Transaction not found</span>
+              </div>
+              <div data-acc-body="" style="display:none; padding:0 18px 16px 42px; font-size:14px; line-height:1.6; color:#d19898;">No stored transaction matches the supplied hash.</div>
+            </div>
+          </div>
+        </div>
+
+        <div data-samples="" style="flex:1 1 50%; min-width:0; order:-1; padding:clamp(30px,3vw,44px) 40px;">
+          <div style="clip-path:polygon(12px 0,100% 0,100% calc(100% - 12px),calc(100% - 12px) 100%,0 100%,0 12px); background:#0c1f26; display:flex; align-items:center; gap:12px; padding:13px 16px; margin-bottom:26px;">
+            <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:11px; font-weight:600; letter-spacing:0.06em; color:#05201a; background:linear-gradient(135deg,#5fcf98,#3fae7a); padding:3px 9px; border-radius:3px;">GET</span>
+            <span style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:14px; color:#eef6f8; flex:1;">/tx/{txHash}</span>
+            <span style="font-size:11px; color:#5c7a81;">▾</span>
+          </div>
+
+          <div style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1rem; color:#eef6f8; margin-bottom:12px;">Response samples</div>
+          <div style="margin-bottom:14px;">
+            <span style="display:inline-block; font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#05201a; background:linear-gradient(135deg,#5fcf98,#3fae7a); padding:7px 22px; transform:skewX(-12deg); font-weight:600;"><span style="display:inline-block; transform:skewX(12deg);">200</span></span>
+          </div>
+          <div class="panel">
+            <div style="padding:14px 16px; border-bottom:1px solid rgba(120,180,190,0.08);">
+              <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:#7f9aa1; margin-bottom:4px;">Content type</div>
+              <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:13px; color:#cdd;">application/json</div>
+            </div>
+            <div style="display:flex; gap:18px; padding:10px 16px 4px;">
+              
+              
+              
+            </div>
+            <div style="padding:6px 16px 16px; overflow-x:auto;">
+<pre id="get-resp-json" style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12.5px; line-height:1.7; color:#6f9199; white-space:pre;">{
+  <span style="color:#8ad6ee;">"network"</span>: <span style="color:#86c99a;">"testnet"</span>,
+  <span style="color:#8ad6ee;">"xdr"</span>: <span style="color:#86c99a;">"AAAAAgAAAABTWgh1bRm6Aksd…"</span>,
+  <span style="color:#8ad6ee;">"minTime"</span>: <span style="color:#e6b980;">1527178665</span>,
+  <span style="color:#8ad6ee;">"maxTime"</span>: <span style="color:#e6b980;">1727178665</span>,
+  <span style="color:#8ad6ee;">"callbackUrl"</span>: <span style="color:#86c99a;">"https://my.server/tx-signed"</span>,
+  <span style="color:#8ad6ee;">"submit"</span>: <span style="color:#b998e6;">false</span>,
+  <span style="color:#8ad6ee;">"signatures"</span>: [
+    { <span style="color:#5c7a81;">
+    <span style="color:#8ad6ee;">"key"</span>: <span style="color:#86c99a;">"GA4K90L1NP…"</span>,
+    <span style="color:#8ad6ee;">"signature"</span>: <span style="color:#86c99a;">"d30a85c…"</span>
+  </span> }
+  ],
+  <span style="color:#8ad6ee;">"status"</span>: <span style="color:#86c99a;">"pending"</span>,
+  <span style="color:#8ad6ee;">"submitted"</span>: <span style="color:#e6b980;">1627178665</span>
+}</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+</div>
+<script>
+(() => {
+    const onClick = e => {
+        const head = e.target.closest('[data-acc-head]')
+        if (head) {
+            const body = head.parentElement.querySelector('[data-acc-body]')
+            const chev = head.querySelector('[data-chev]')
+            const open = body.style.display !== 'none'
+            body.style.display = open ? 'none' : ''
+            if (chev) chev.style.transform = open ? 'rotate(-90deg)' : 'rotate(0deg)'
+            return
+        }
+        const cp = e.target.closest('[data-copy]')
+        if (cp) {
+            const el = document.getElementById(cp.getAttribute('data-copy'))
+            if (el && navigator.clipboard) {
+                navigator.clipboard.writeText(el.innerText).then(() => {
+                    const prev = cp.textContent
+                    cp.textContent = 'Copied'
+                    setTimeout(() => { cp.textContent = prev }, 1200)
+                }).catch(() => {})
+            }
+        }
+    }
+    const onResize = () => {
+        const stack = (window.innerWidth || document.documentElement.clientWidth) < 1080
+        const rail = document.getElementById('rail')
+        if (rail) rail.style.display = stack ? 'none' : ''
+        document.querySelectorAll('[data-op-row]').forEach(r => { r.style.flexDirection = stack ? 'column' : 'row' })
+        document.querySelectorAll('[data-docs]').forEach(d => { d.style.flex = stack ? '1 1 auto' : '1 1 50%' })
+        document.querySelectorAll('[data-samples]').forEach(s => {
+            s.style.flex = stack ? '1 1 auto' : '1 1 50%'
+            s.style.width = stack ? '100%' : ''
+            s.style.order = '-1'
+        })
+        const root = document.getElementById('docroot')
+        if (root) root.style.flexDirection = stack ? 'column' : 'row'
+    }
+    const onScroll = () => {
+        const ids = ['op-store', 'op-retrieve']
+        let cur = ids[0]
+        ids.forEach(id => {
+            const el = document.getElementById(id)
+            if (el && el.getBoundingClientRect().top < 160) cur = id
+        })
+        document.querySelectorAll('[data-nav]').forEach(a => {
+            const on = a.getAttribute('href') === '#' + cur
+            a.style.background = on ? 'rgba(92,194,224,0.12)' : 'transparent'
+            a.style.color = on ? '#eaf6f9' : '#a9c1c6'
+            a.style.borderLeftColor = on ? '#5cc2e0' : 'transparent'
+        })
+    }
+    document.addEventListener('click', onClick)
+    window.addEventListener('resize', onResize)
+    window.addEventListener('scroll', onScroll, {passive: true})
+    onResize()
+    onScroll()
+})()
+</script>
+</body>
+</html>

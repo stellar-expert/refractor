@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en-US" translate="no">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Refractor - transactions storage and multisig aggregator for Stellar Network</title>
+    <meta name="description" content="Refractor is a pending transactions storage and multisig aggregator for Stellar Network. Collect all signatures effortlessly.">
+    <meta name="referrer" content="no-referrer">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#0b262d">
+    <link rel="stylesheet" href="/fonts.css">
+    <link rel="stylesheet" href="/index.css">
+<style>
+  body { overflow-x: hidden; }
+  @keyframes bob { 0%,100% { transform: translateY(0); opacity: .8; } 50% { transform: translateY(6px); opacity: .4; } }
+  @keyframes floatglow { 0%,100% { transform: translate(0,0); } 50% { transform: translate(-30px,20px); } }
+  @media (max-width: 640px) { .nav-docs-link { display: none !important; } .brand-word { display: none !important; } }
+  @media (max-width: 760px) {
+    .hero-content { text-align: center !important; }
+    .hero-content p { margin-left: auto !important; margin-right: auto !important; }
+    .hero-actions { justify-content: center !important; }
+    .hero-actions .hero-btn { width: 100% !important; }
+    .footer-btn { width: 100% !important; text-align: center !important; }
+    .vertical-divider {display:none;}
+  }
+</style>
+</head>
+<body>
+<div style="min-height:100vh; background:#0b262d;">
+  <header id="site-header" style="position:sticky; top:0; z-index:50; background:transparent; border-bottom:1px solid transparent; transition:background .3s ease, border-color .3s ease;">
+    <div class="accent-bar"></div>
+    <div style="max-width: 1400px; margin: 0 auto; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap">
+      <a href="#top" style="display:flex; align-items:center; gap:12px; text-decoration:none;">
+        <img src="/img/refractor-logo-512.svg" alt="Refractor" style="display: block; height: 36px; filter: drop-shadow(0 0 12px rgba(92,194,224,0.4))">
+
+        <span class="brand-word" style="font-size: 20px; color: #eef6f8; letter-spacing: -0.01em; margin: 0 0 -1em -0.4em">refractor</span>
+        
+      </a>
+      <nav style="display:flex; align-items:center; gap:clamp(14px,3vw,30px); flex-wrap:wrap;">
+        <a href="/tx/add" class="btn btn-primary" style="letter-spacing:0.08em; text-transform:uppercase; padding:9px 22px; font-weight:500; box-shadow:0 6px 20px rgba(92,194,224,0.25);"><span>Upload Transaction</span></a>
+      </nav>
+    </div>
+  </header>
+  <section id="top" style="position:relative; min-height:100vh; margin-top:-68px; display:flex; align-items:center; overflow:hidden; padding:120px clamp(20px,5vw,48px) 60px; background-color:#050f14; background-image:url('/img/hero-lens.jpg'); background-size:cover; background-position:32% center; background-repeat:no-repeat;">
+        <div style="position:relative; max-width:1400px; margin:0 auto; width:100%; display:flex; justify-content:flex-end;">
+      <div class="hero-content" style="max-width:600px; text-align:right;">
+        
+        <h1 style="font-family: 'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight: 300; font-size: clamp(1.8rem,6vw,3.6rem); line-height: 1.02; letter-spacing: -0.03em; margin: 0 0 40vh; color: #f2f9fb; text-wrap: balance; text-transform: uppercase">
+          Collect all signatures<br><span style="background: linear-gradient(120deg, rgb(123, 224, 245), rgb(59, 182, 216)) text; color: transparent;">Effortlessly</span></h1>
+        <p style="font-size:clamp(1.05rem,2.2vw,1.4rem); line-height:1.6; color:#c3d6da; max-width:520px; margin:0 0 40px; margin-left:auto;">
+          Refractor is a pending transaction storage<br>and multisig aggregator for Stellar Network.<br></p>
+        <div class="hero-actions" style="display:flex; gap:20px; flex-wrap:wrap; justify-content:flex-end;">
+          <a href="#how" class="hero-btn btn btn-secondary" style="background:rgba(255,255,255,0.06); padding:16px 34px;"><span>Learn how it works</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="features" style="min-height:100vh; padding:clamp(70px,12vh,140px) clamp(20px,5vw,48px);">
+    <div style="max-width:1040px; margin:0 auto;">
+      <div style="margin-bottom:clamp(50px,9vh,110px);">
+        <div class="eyebrow" style="margin-bottom:14px;">/ Features</div>
+        <h2 class="section-title">Untangling multisig complexity</h2>
+      </div>
+
+      <div id="feat-track" style="position:relative;">
+        <div class="track-line" style="left:50%; transform:translateX(-50%);"></div>
+        <div id="feat-fill" class="track-fill" style="left:50%; transform:translateX(-50%);"></div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-end;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Truly intelligent</h3>
+                <p class="card-text">Refractor analyses every source account, detects eligible signers, and computes threshold based on their weights.</p>
+              </div>
+            </div>
+          </div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0;"></div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0;"></div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-start;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Coordinated aggregation</h3>
+                <p class="card-text">Signatures are gathered and merged server-side, avoiding concurrent-signing conflicts and submission errors. Every signature is validated.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-end;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Free storage</h3>
+                <p class="card-text">Store any pending transaction at no cost. Once uploaded it's lives there until it is fully singed and executed.</p>
+              </div>
+            </div>
+          </div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0;"></div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0;"></div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-start;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Share unique URL</h3>
+                <p class="card-text">Share a direct web link where anyone can sign using any Stellar wallet — with live signing status and thresholds.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-end;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Check what's inside</h3>
+                <p class="card-text">Do not sign transactions blindly, see what's inside in details. Detailed operation descriptions ensure that you can make confident decisions.</p>
+              </div>
+            </div>
+          </div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0;"></div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0;"></div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-start;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Flexible automation</h3>
+                <p class="card-text">Use callback URLs to handle signed transactions, plug in external services, or send notifications as soon as they are ready.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px); margin-bottom:clamp(16px,2.5vh,30px);">
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-end;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">Intuitive signing</h3>
+                <p class="card-text">Painless and straightforward transaction signing experience even for users without sufficient technical expertise.</p>
+              </div>
+            </div>
+          </div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0;"></div>
+        </div>
+        <div data-row="" style="position:relative; display:flex; align-items:center; gap:clamp(12px,2vw,20px);">
+          <div style="flex:1; min-width:0;"></div>
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node">
+              <span class="node-diamond"></span>
+            </div>
+          </div>
+          <div style="flex:1; min-width:0; display:flex; justify-content:flex-start;">
+            <div data-card="" class="card" style="width:100%; max-width:440px; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+              <div class="card-inner">
+                <h3 class="card-title">API for developers</h3>
+                <p class="card-text">Use Refractor in your projects through API integration. Originally built for multisig-based governance, it can facilitate many other use cases.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section id="use-cases" style="position:relative; overflow:hidden; padding:clamp(70px,12vh,140px) clamp(16px,4vw,48px); background-color:#071b21; background-image:radial-gradient(rgba(120,180,190,0.06) 1.2px, transparent 1.2px); background-size:26px 26px; background-position:center;">
+    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:60vw; height:60vw; max-width:620px; max-height:620px; background:radial-gradient(circle, rgba(92,194,224,0.11), transparent 55%); pointer-events:none;"></div>
+
+    <div style="position:relative; max-width:1040px; margin:0 auto clamp(44px,7vh,76px); text-align:center;">
+      <div class="eyebrow" style="margin-bottom:14px;">/ Use cases</div>
+      <h2 class="section-title" style="text-wrap:balance;">Where multisig matters</h2>
+    </div>
+
+    <div style="position:relative; max-width:1180px; margin:0 auto;">
+      <button id="uc-prev" type="button" aria-label="Previous use case" class="uc-nav" style="left:clamp(0px,1.5vw,20px);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg>
+      </button>
+      <button id="uc-next" type="button" aria-label="Next use case" class="uc-nav" style="right:clamp(0px,1.5vw,20px);">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"></path></svg>
+      </button>
+
+      <div id="uc-viewport" style="position:relative; height:clamp(440px,60vh,540px); overflow:hidden;">
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">01</div>
+                <h3 class="uc-title">Corporate treasury controls</h3>
+                <p class="uc-text">Require N-of-M executive sign-off (e.g., CFO + 2 directors) for outgoing payments from the corporate vault.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">02</div>
+                <h3 class="uc-title">DAO / community treasury</h3>
+                <p class="uc-text">Elected or token-weighted signers control fund disbursement, with off-chain governance voting.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">03</div>
+                <h3 class="uc-title">Exchange / custodian cold storage</h3>
+                <p class="uc-text">Distribute signer keys across several key holders or air-gapped devices in different geographic locations, none of which alone meets the signing threshold.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">04</div>
+                <h3 class="uc-title">Buyer / seller / arbiter escrow</h3>
+                <p class="uc-text">Classic 2-of-3 setup where the arbiter only needs to co-sign in a dispute.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">05</div>
+                <h3 class="uc-title">Real estate / asset co-ownership</h3>
+                <p class="uc-text">Fractional owners as signers with weights proportional to ownership stake.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">06</div>
+                <h3 class="uc-title">Anchor / issuer compliance gating</h3>
+                <p class="uc-text">Require both an operational signer and a compliance officer signer for asset issuance or freezing actions.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">07</div>
+                <h3 class="uc-title">Preauthorized transaction signers</h3>
+                <p class="uc-text">Hash a future transaction and add it as a signer, enabling trustless conditional execution (e.g., atomic swaps, scheduled disbursement) with hashed proofs.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">08</div>
+                <h3 class="uc-title">Personal 2FA wallets</h3>
+                <p class="uc-text">Require confirmation from a second device or hardware key added as a signer, so a compromised phone alone can't move funds.</p>
+              </div>
+            </div>
+          </div>
+          <div data-uc-card="" class="uc-card">
+            <div data-uc-border="" class="uc-card-border">
+              <div class="uc-card-inner">
+                <div class="uc-index">09</div>
+                <h3 class="uc-title">Mutual fund / trustee pooled accounts</h3>
+                <p class="uc-text">Trustees each hold a signer, with weights reflecting fiduciary role, enforcing joint sign-off per fund governance rules.</p>
+              </div>
+            </div>
+          </div>
+      </div>
+
+      <div id="uc-dots" style="display:flex; justify-content:center; align-items:center; gap:9px; margin-top:clamp(28px,4vh,40px);"></div>
+    </div>
+  </section>
+  <section id="how" style="min-height:100vh; padding:clamp(70px,12vh,140px) clamp(20px,5vw,48px); background:#0e2f37;">
+    <div style="max-width:860px; margin:0 auto;">
+      <div style="margin-bottom:clamp(50px,9vh,110px);">
+        <div class="eyebrow" style="margin-bottom:14px;">/ How it works</div>
+        <h2 class="section-title">Easy to use</h2>
+      </div>
+
+      <div id="how-track" style="position:relative;">
+        <div class="track-line" style="left:28px; transform:translateX(-50%);"></div>
+        <div id="how-fill" class="track-fill" style="left:28px; transform:translateX(-50%);"></div>
+
+        <div data-row="" style="position:relative; display:flex; gap:clamp(16px,3vw,34px); align-items:flex-start; margin-bottom:clamp(44px,9vh,110px);">
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node node-numbered">1</div>
+          </div>
+          <div data-card="" class="card" style="flex:1; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+            <div class="card-inner card-inner--step">
+              <h3 class="card-title">Prepare &amp; upload</h3>
+              <p class="card-text">Compose your transaction, then store it on Refractor. Just&nbsp;choose the network (Stellar Pubnet and Testnet supported), set an expiration date, and decide whether it should be submitted automatically once signed.&nbsp;Want to plug in some automation? Set a callback URL that will received a fully signed transaction.</p>
+            </div>
+          </div>
+        </div>
+
+        <div data-row="" style="position:relative; display:flex; gap:clamp(16px,3vw,34px); align-items:flex-start; margin-bottom:clamp(44px,9vh,110px);">
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node node-numbered">2</div>
+          </div>
+          <div data-card="" class="card" style="flex:1; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+            <div class="card-inner card-inner--step">
+              <h3 class="card-title">Share the link</h3>
+              <p class="card-text">Refractor generates a unique link for your based on the transaction hash (e.g.&nbsp;&nbsp;<span class="code-chip">refractor.space/tx/3da4…e981</span>). Just share it with your co-signers and that's it — our service will take of the rest. No need to coordinate who exactly should sign the transaction and in what order. Refractor can analyze a configured multisig scheme and determine eligible signers automatically.</p>
+            </div>
+          </div>
+        </div>
+
+        <div data-row="" style="position:relative; display:flex; gap:clamp(16px,3vw,34px); align-items:flex-start; margin-bottom:clamp(44px,9vh,110px);">
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node node-numbered">3</div>
+          </div>
+          <div data-card="" class="card" style="flex:1; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+            <div class="card-inner card-inner--step">
+              <h3 class="card-title">Wait for signatures</h3>
+              <p class="card-text">Eligible key holders can sign a proposed transaction using any Stellar wallet. Refractor validates each signature, and tracks progress&nbsp;against the calculated signing threshold. Without this a transaction will fail if it contains not enough signatures or more than required (yes, you heard it right, a transaction with too much signatures will be discarded by Stellar). All invalid, malformed, duplicate, or excessive signatures get rejected.</p>
+            </div>
+          </div>
+        </div>
+
+        <div data-row="" style="position:relative; display:flex; gap:clamp(16px,3vw,34px); align-items:flex-start;">
+          <div style="flex:0 0 auto; width:56px; display:flex; justify-content:center;">
+            <div data-node="" class="node node-numbered">4</div>
+          </div>
+          <div data-card="" class="card" style="flex:1; opacity:0.6; transform:translateY(8px); transition:all .5s ease;">
+            <div class="card-inner card-inner--step">
+              <h3 class="card-title">Transaction is ready<br></h3>
+              <p class="card-text">The moment the required threshold is reached, Refractor either submits the transaction to the Stellar network or fires your custom callback depending on settings.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:clamp(70px,11vh,130px);">
+        <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; letter-spacing:0.2em; text-transform:uppercase; color:#8fb3ba; margin-bottom:24px; display:flex; align-items:center; gap:12px;">
+          <span style="width:22px; height:1px; background:rgba(120,180,190,0.4);"></span>Notes &amp; limitations
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px;">
+          <div class="note-card">
+            <div class="note-card-inner">
+              <h4 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.05rem; margin:0 0 8px; color:#dfeef1;">Watch out sensitive data<br></h4>
+              <p style="margin:0; font-size:0.95rem; line-height:1.6; color:#94b0b6;">Anyone with the link can view transaction details, so avoid storing anything that could enable front-running or leak private information.</p>
+            </div>
+          </div>
+          <div class="note-card">
+            <div class="note-card-inner">
+              <h4 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.05rem; margin:0 0 8px; color:#dfeef1;">Auto-discovery mode</h4>
+              <p style="margin:0; font-size:0.95rem; line-height:1.6; color:#94b0b6;">A transaction source account must exist on-chain before transaction upload to ensure proper signers and weights retrieval.</p>
+            </div>
+          </div>
+          <div class="note-card">
+            <div class="note-card-inner">
+              <h4 style="font-family:'Roboto Condensed',Arial,Helvetica,sans-serif; font-weight:600; font-size:1.05rem; margin:0 0 8px; color:#dfeef1;">Ordering isn't guaranteed</h4>
+              <p style="margin:0; font-size:0.95rem; line-height:1.6; color:#94b0b6;">Autosubmit doesn't ensure strictly sequential ledger inclusion. Set timebounds on interdependent transactions when order matters.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer style="position:relative; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding:clamp(56px,9vh,90px) clamp(20px,5vw,48px) clamp(28px,4vh,44px);">
+    <div class="accent-bar" style="position:absolute; top:0; left:0; right:0;"></div>
+    <div style="position:absolute; top:20%; left:50%; transform:translateX(-50%); width:70vw; height:70vw; max-width:900px; max-height:900px; background:radial-gradient(circle, rgba(92,194,224,0.10), transparent 60%); pointer-events:none;"></div>
+    <div style="position:relative; max-width:820px; margin:0 auto; text-align:center; width:100%;">
+      <div style="display:inline-flex; align-items:center; gap:12px; margin-bottom:28px;">
+        <img src="/img/refractor-logo-512.svg" alt="Refractor" style="display:block; width:40px; height:40px; filter:drop-shadow(0 0 16px rgba(92,194,224,0.45));">
+      </div>
+      <div style="display:flex; align-items:stretch; justify-content:center; flex-wrap:wrap; gap:clamp(28px,5vw,56px); margin-bottom:56px;">
+        <div style="flex:0 1 340px; display:flex; flex-direction:column; align-items:center; gap:22px;">
+          <p style="font-size:clamp(1rem,2vw,1.18rem); line-height:1.55; color:#cbdde1; margin:0; text-wrap:balance;">Need a place to keep pending multisig transactions?</p>
+          <a href="/tx/add" class="footer-btn btn btn-primary"><span>Upload Transaction</span></a>
+        </div>
+        <div class="vertical-divider" style="width:1px; align-self:stretch; background:rgba(120,180,190,0.28);"></div>
+        <div style="flex:0 1 340px; display:flex; flex-direction:column; align-items:center; gap:22px;">
+          <p style="font-size:clamp(1rem,2vw,1.18rem); line-height:1.55; color:#cbdde1; margin:0; text-wrap:balance;">Would like to integrate this service with your app?</p>
+          <a href="/api-docs" class="footer-btn btn btn-secondary" style="background:rgba(255,255,255,0.04);"><span>API Documentation</span></a>
+        </div>
+      </div>
+      <div style="display: flex; gap: clamp(18px,4vw,30px); flex-wrap: wrap; justify-content: center; margin-bottom: 8px">
+        <a href="mailto:info@refractor.space" style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#8fb3ba; text-decoration:none;">✉ Contact us</a>
+        <a href="https://github.com/stellar-expert/refractor" style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:#8fb3ba; text-decoration:none;">◉ Source code</a>
+        
+      </div>
+      <div style="font-family:Consolas,'Liberation Mono',Menlo,Courier,monospace; font-size:12px; color:#5e7d84; letter-spacing:0.04em;"><span id="current-year">2026</span> © Refractor</div>
+    </div>
+  </footer>
+
+</div>
+<script>
+(() => {
+    document.getElementById('current-year').innerText = new Date().getFullYear()
+    let raf
+    const applyFeatLayout = () => {
+        const track = document.getElementById('feat-track')
+        if (!track) return
+        const mobile = (window.innerWidth || document.documentElement.clientWidth) < 760
+        const line = track.children[0]
+        const fill = document.getElementById('feat-fill')
+        if (line) line.style.left = mobile ? '28px' : '50%'
+        if (fill) fill.style.left = mobile ? '28px' : '50%'
+        const rows = track.querySelectorAll('[data-row]')
+        rows.forEach((row, ri) => {
+            const last = ri === rows.length - 1
+            row.style.alignItems = mobile ? 'flex-start' : 'center'
+            row.style.gap = mobile ? 'clamp(16px,3vw,30px)' : ''
+            // desktop: pull rows together so alternating cards interleave; mobile: normal stack
+            row.style.marginBottom = last ? '0px' : (mobile ? 'clamp(20px,3vh,34px)' : 'clamp(-56px,-5vh,-30px)')
+            Array.prototype.slice.call(row.children).forEach((cell, idx) => {
+                const isCard = !!cell.querySelector('[data-card]')
+                const isNode = !!cell.querySelector('[data-node]')
+                if (!isCard && !isNode) { // spacer cell
+                    cell.style.display = mobile ? 'none' : ''
+                    cell.style.order = ''
+                    return
+                }
+                cell.style.display = 'flex'
+                if (mobile) {
+                    cell.style.order = isNode ? '0' : '1'
+                    if (isCard) cell.style.justifyContent = 'flex-start'
+                } else {
+                    cell.style.order = ''
+                    if (isCard) cell.style.justifyContent = idx === 0 ? 'flex-end' : 'flex-start'
+                }
+            })
+        })
+    }
+    const setNode = (node, active) => {
+        if (node.__active === active) return
+        node.__active = active
+        node.style.borderColor = active ? '#5cc2e0' : 'rgba(120,180,190,0.3)'
+        node.style.color = active ? '#5cc2e0' : '#6f9199'
+        node.style.background = active ? '#123c47' : '#0c2c34'
+        node.style.boxShadow = active ? '0 0 0 6px rgba(92,194,224,0.10), 0 0 26px rgba(92,194,224,0.45)' : 'none'
+        const row = node.closest('[data-row]')
+        const card = row && row.querySelector('[data-card]')
+        if (card) {
+            card.style.opacity = active ? '1' : '0.6'
+            card.style.transform = active ? 'translateY(0)' : 'translateY(8px)'
+            card.style.background = active ? 'rgba(92,194,224,0.5)' : 'rgba(120,180,190,0.14)'
+        }
+    }
+    const updateTrack = (trackId, fillId) => {
+        const track = document.getElementById(trackId)
+        const fill = document.getElementById(fillId)
+        if (!track || !fill) return
+        const rect = track.getBoundingClientRect()
+        const vh = window.innerHeight || document.documentElement.clientHeight
+        let p = (vh * 0.52 - rect.top) / (rect.height || 1)
+        p = Math.max(0, Math.min(1, p))
+        fill.style.height = (p * 100).toFixed(2) + '%'
+        const fillBottomY = rect.top + p * rect.height
+        track.querySelectorAll('[data-node]').forEach(node => {
+            const nr = node.getBoundingClientRect()
+            setNode(node, fillBottomY >= nr.top + nr.height / 2)
+        })
+    }
+    const updateHeader = () => {
+        const header = document.getElementById('site-header')
+        if (!header) return
+        const scrolled = (window.scrollY || document.documentElement.scrollTop || 0) > 40
+        if (header.__scrolled === scrolled) return
+        header.__scrolled = scrolled
+        header.style.background = scrolled ? 'rgba(9,30,36,0.92)' : 'transparent'
+        header.style.borderBottomColor = scrolled ? 'rgba(120,180,190,0.14)' : 'transparent'
+    }
+    const tick = () => {
+        updateHeader()
+        updateTrack('feat-track', 'feat-fill')
+        updateTrack('how-track', 'how-fill')
+        raf = requestAnimationFrame(tick)
+    }
+    // use-cases carousel: enlarged center card overlapping its two neighbours, advances one at a time
+    const initUseCases = () => {
+        const vp = document.getElementById('uc-viewport')
+        const dotsBox = document.getElementById('uc-dots')
+        const prev = document.getElementById('uc-prev')
+        const next = document.getElementById('uc-next')
+        if (!vp || !dotsBox || !prev || !next) return
+        const cards = Array.prototype.slice.call(vp.querySelectorAll('[data-uc-card]'))
+        const n = cards.length
+        if (!n) return
+        let current = 0
+        for (let i = 0; i < n; i++) {
+            const dot = document.createElement('span')
+            dot.style.cssText = 'width:8px; height:8px; border-radius:50%; background:rgba(120,180,190,0.3); cursor:pointer; transition:all .3s ease;'
+            dot.addEventListener('click', () => { current = i; positionCards() })
+            dotsBox.appendChild(dot)
+        }
+        const dots = Array.prototype.slice.call(dotsBox.children)
+        const positionCards = () => {
+            const mobile = (window.innerWidth || document.documentElement.clientWidth) < 760
+            const spacing = mobile ? 0 : Math.min(330, Math.max(232, vp.clientWidth * 0.30))
+            cards.forEach((card, i) => {
+                let off = i - current
+                if (off > n / 2) off -= n
+                if (off < -n / 2) off += n
+                const abs = Math.abs(off)
+                let scale = 0.82, opacity = 0, z = 1, visible = false
+                if (off === 0) { scale = mobile ? 1.06 : 1.4; opacity = 1; z = 30; visible = true }
+                else if (abs === 1 && !mobile) { scale = 1; opacity = 0.72; z = 20; visible = true }
+                card.style.transform = 'translate(-50%,-50%) translateX(' + (off * spacing) + 'px) scale(' + scale + ')'
+                card.style.opacity = visible ? opacity : 0
+                card.style.zIndex = z
+                card.style.pointerEvents = visible ? 'auto' : 'none'
+                card.style.filter = off === 0 ? 'drop-shadow(0 20px 30px rgba(92,194,224,0.22))' : 'none'
+                const border = card.querySelector('[data-uc-border]')
+                if (border) border.style.background = off === 0 ? 'rgba(92,194,224,0.55)' : 'rgba(120,180,190,0.16)'
+            })
+            dots.forEach((d, i) => {
+                const on = i === current
+                d.style.width = on ? '26px' : '8px'
+                d.style.borderRadius = on ? '4px' : '50%'
+                d.style.background = on ? '#5cc2e0' : 'rgba(120,180,190,0.3)'
+            })
+        }
+        const go = dir => { current = ((current + dir) % n + n) % n; positionCards() }
+        cards.forEach((card, i) => card.addEventListener('click', () => { current = i; positionCards() }))
+        prev.addEventListener('click', () => go(-1))
+        next.addEventListener('click', () => go(1))
+        // touch swipe (mobile): swipe left -> next, swipe right -> prev
+        let touchX = 0, touchY = 0, swiping = false
+        vp.addEventListener('touchstart', e => {
+            const t = e.changedTouches[0]
+            touchX = t.clientX
+            touchY = t.clientY
+            swiping = true
+        }, {passive: true})
+        vp.addEventListener('touchend', e => {
+            if (!swiping) return
+            swiping = false
+            const t = e.changedTouches[0]
+            const dx = t.clientX - touchX
+            const dy = t.clientY - touchY
+            if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1)
+        }, {passive: true})
+        positionCards()
+        window.addEventListener('resize', positionCards)
+    }
+
+    applyFeatLayout()
+    window.addEventListener('resize', applyFeatLayout)
+    initUseCases()
+    raf = requestAnimationFrame(tick)
+})()
+</script>
+</body>
+</html>

@@ -5,10 +5,8 @@
   "author": "team@stellar.expert",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {
-    "build": "pnpm run build-ui && pnpm run build-api-docs",
-    "dev-server": "webpack serve --mode=development --config ./webpack-config.js",
-    "build-ui": "webpack --mode=production --config ./webpack-config.js",
-    "build-api-docs": "pnpm dlx redoc-cli@0.13.20 build open-api/openapi.yml -t open-api/openapi-template.hbs -o public/openapi.html --options.disableSearch --options.hideDownloadButton --options.hideLoading --options.expandSingleSchemaField --options.onlyRequiredInSamples --options.theme.colors.primary.main=#0691B7 --options.theme.typography.fontFamily=ClearSans --options.theme.typography.headings.fontFamily=RobotoCondensed --options.theme.typography.code.fontFamily=\"Consolas, 'Liberation Mono', Menlo, Courier, monospace\" --options.theme.typography.headings.fontWeight=300 --options.theme.typography.fontWeightRegular=300 --options.theme.typography.fontSize=16px --options.theme.logo.maxHeight=100px --options.theme.logo.gutter=8px --options.theme.spacing.sectionVertical=24px --options.theme.typography.headings.lineHeight=1.3em --options.theme.typography.menu.level1Items.textTransform=uppercase"
+    "build": "webpack --mode=production --config ./webpack-config.js",
+    "dev-server": "webpack serve --mode=development --config ./webpack-config.js"
   },
   "repository": {
     "type": "git",
@@ -18,14 +16,14 @@
     "@albedo-link/intent": "^0.13.0",
     "@creit.tech/xbull-wallet-connect": "0.4.0",
     "@lobstrco/signer-extension-api": "2.0.0",
-    "@stellar-expert/asset-descriptor": "^1.5.0",
+    "@stellar-expert/asset-descriptor": "2.0.0",
     "@stellar-expert/client-cache": "^1.1.0",
-    "@stellar-expert/formatter": "^3.0.0",
+    "@stellar-expert/formatter": "^3.1.0",
     "@stellar-expert/navigation": "^1.1.0",
-    "@stellar-expert/tx-signers-inspector": "^1.8.2",
-    "@stellar-expert/ui-framework": "^1.16.8",
+    "@stellar-expert/tx-signers-inspector": "1.8.2",
+    "@stellar-expert/ui-framework": "1.21.2",
     "@stellar/freighter-api": "^6.0.1",
-    "@stellar/stellar-sdk": "14.6.1",
+    "@stellar/stellar-sdk": "16.0.1",
     "classnames": "^2.5.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
@@ -37,6 +35,9 @@
     "@stellar-expert/eslint-config-js": "^1.1.0",
     "@stellar-expert/eslint-config-react": "^1.1.0",
     "@stellar-expert/webpack-template": "1.5.1"
+  },
+  "overrides": {
+    "@stellar/stellar-sdk": "16.0.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

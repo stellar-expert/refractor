@@ -10,10 +10,14 @@ function Layout({children}) {
         <div className="blue-ribbon"/>
         <div className="top-block">
             <div className="container">
-                <a href="/" className="logo"><img src="/img/refractor-small-logo.png" alt="refractor logo"/></a>
+                <a href="/" className="logo external-link">
+                    <img src="/img/refractor-logo-512.svg" alt="Refractor"
+                         style={{height: '36px', filter: 'drop-shadow(0 0 12px rgba(92,194,224,0.4))'}}/>
+                    <span className="brand-word condensed" style={{fontSize: '20px', margin: '0 0 -0.8em 0.2em'}}>refractor</span>
+                </a>
                 <MenuView>
                     <a href="/tx/add">Store transaction</a>
-                    <a href="/openapi.html" target="_blank">Documentation & API</a>
+                    <a href="/api-docs" target="_blank">Documentation & API</a>
                 </MenuView>
             </div>
         </div>
@@ -24,15 +28,14 @@ function Layout({children}) {
         </div>
         <div className="footer">
             <div className="dimmed container text-center">
-                <div>{new Date().getFullYear()}&nbsp;©&nbsp;Refractor Web <span className="dimmed">v{appVersion}</span></div>
+            <div>{new Date().getFullYear()}&nbsp;©&nbsp;Refractor</div>
                 <div>
                     <a href="mailto:info@stellar.expert" target="_blank" rel="noreferrer" className="dimmed">
                         <i className="icon-email"/> Contact us
                     </a>&emsp;
                     <a href="https://github.com/stellar-expert/refractor" target="_blank" rel="noreferrer" className="dimmed">
                         <i className="icon-github"/> Source code
-                    </a>&emsp;
-                    <ThemeSelector/>
+                    </a>
                 </div>
             </div>
         </div>
