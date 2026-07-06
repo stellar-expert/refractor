@@ -1,11 +1,28 @@
 .signature-options {
-  .button {
-    width: 25%;
+
+  //the dropdown header hosts the Sign button - make it fill the column
+  .wallet-select {
+    display: block;
+    padding: 0;
+
+    .dd-header {
+      display: block;
+    }
   }
+
+  .desktop-only .button {
+    margin-bottom: 0;
+  }
+}
+
+//wallet icons in the dropdown header and the portaled options list
+.signature-options,
+.wallet-select {
 
   img {
     height: 1.6em;
-    vertical-align: top;
-    margin-top: 0.3em;
+    border-radius: $border-radius-input;
+    vertical-align: middle;
+    margin-right: 0.4em;
   }
 }

@@ -3,6 +3,11 @@ export default class AlbedoProvider {
 
     mobileSupported = true
 
+    isAvailable() {
+        //web-based signer, works everywhere
+        return true
+    }
+
     init() {
         return import(/* webpackChunkName: "albedo-provider" */'@albedo-link/intent')
             .then(module => {

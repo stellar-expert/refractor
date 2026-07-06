@@ -1,6 +1,11 @@
 export default class XBullProvider {
     title = 'xBull'
 
+    isAvailable() {
+        //connects to both the extension and the web wallet, works everywhere
+        return true
+    }
+
     init() {
         return import(/* webpackChunkName: "xbull-provider" */'@creit.tech/xbull-wallet-connect')
             .then(module => {
