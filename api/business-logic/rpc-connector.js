@@ -113,7 +113,10 @@ let submitTransactionImpl = async function (tx) {
         if (res)
             break   //processed or failed
     }
-    const {status, resultXdr} = await rpcServer.pollTransaction(tx.hash, {attempts: 5})
+    const {status, resultXdr} = await rpcServer.pollTransaction(tx.hash, {
+        attempts: 12,
+        sleepStrategy: iter => 2000 + iter * 500 //2s + 0.5s per iteration backoff
+    })
     if (status === 'SUCCESS')
         return true
     if (resultXdr)
@@ -129,28 +132,31 @@ let submitTransactionImpl = async function (tx) {
  */
 async function sendTxToRpc(rpcServer, networkProps, tx) {
     try {
-        const {
-            status,
-            errorResult
-        } = await rpcServer.sendTransaction(TransactionBuilder.fromXDR(tx.xdr, networkProps.passphrase))
+        for (let i = 0; i < 3; i++) {
+            const {
+                status,
+                errorResult
+            } = await rpcServer.sendTransaction(TransactionBuilder.fromXDR(tx.xdr, networkProps.passphrase))
 
-        switch (status) {
-            case 'PENDING': //transaction is being considered by consensus
-            case 'DUPLICATE': //transaction is already PENDING
-                return true
-            case 'ERROR': //transaction rejected by transaction engine error: set when status is "ERROR". Base64 encoded, XDR serialized 'TransactionResult'
-                let err = 'Unknown tx submission error'
-                if (errorResult) {
-                    return formatErrorResult(errorResult)
-                }
-                /*if (res.diagnosticEvents?.length) {
-                    err += '\nDiagnostics: \n' + res.diagnosticEvents.map(e => e.toXDR('base64')).join('\n')
-                }*/
-                throw new Error(err)
-            case 'TRY_AGAIN_LATER':
-                return false
+            switch (status) {
+                case 'PENDING': //transaction is being considered by consensus
+                case 'DUPLICATE': //transaction is already PENDING
+                    return true
+                case 'ERROR': //transaction rejected by transaction engine error: set when status is "ERROR". Base64 encoded, XDR serialized 'TransactionResult'
+                    let err = 'Unknown tx submission error'
+                    if (errorResult) {
+                        return formatErrorResult(errorResult)
+                    }
+                    /*if (res.diagnosticEvents?.length) {
+                        err += '\nDiagnostics: \n' + res.diagnosticEvents.map(e => e.toXDR('base64')).join('\n')
+                    }*/
+                    throw new Error(err)
+                case 'TRY_AGAIN_LATER':
+                    continue
+            }
+            throw new Error('Unknown tx submission status: ' + status)
         }
-        throw new Error('Unknown tx submission status: ' + status)
+        return false //received TRY_AGAIN_LATER several times in a row
     } catch (e) {
         console.error('Failed to submit tx', e)
         return false

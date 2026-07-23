@@ -10,7 +10,6 @@
     const finalizer = require('./business-logic/finalization/finalizer')
 
     //setup connectors
-    console.log('StellarCore DB connection - initialized')
     await require('./storage/storage-layer').initDataProvider()
     console.log('Storage data provider - initialized')
     await finalizer.resetProcessingStatus()
