@@ -35,7 +35,7 @@ function buildTestRequest({sign = [], network = 'testnet'} = {}) {
     for (const kp of sign) {
         tx.sign(kp)
     }
-    return {xdr: tx.toXDR(), network}
+    return {xdr: tx.toXdr(), network}
 }
 
 function mockSchema(potentialSigners, feasible = false) {
@@ -82,14 +82,14 @@ describe('constructor', () => {
     test('throws 406 for FeeBump transactions', () => {
         // Build a fee bump tx
         const request = buildTestRequest({sign: [sourceKp]})
-        const innerTx = TransactionBuilder.fromXDR(request.xdr, Networks.TESTNET)
+        const innerTx = TransactionBuilder.fromXdr(request.xdr, Networks.TESTNET)
         const feeBump = TransactionBuilder.buildFeeBumpTransaction(
             Keypair.random(),
             '200',
             innerTx,
             Networks.TESTNET
         )
-        expect(() => new Signer({xdr: feeBump.toXDR(), network: 'testnet'}))
+        expect(() => new Signer({xdr: feeBump.toXdr(), network: 'testnet'}))
             .toThrow('FeeBump transactions not supported')
     })
 })

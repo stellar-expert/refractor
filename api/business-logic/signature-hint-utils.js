@@ -2,7 +2,7 @@ const {Keypair} = require('@stellar/stellar-sdk')
 
 /**
  * Convert the signature hint to the StrKey mask.
- * @param {Buffer} hint - Hint to convert.
+ * @param {Uint8Array} hint - Hint to convert.
  * @return {string}
  */
 function hintToMask(hint) {
@@ -14,7 +14,7 @@ function hintToMask(hint) {
 
 /**
  * Format the signature hint to the friendly form for UI.
- * @param {Buffer} hint - Hint to convert.
+ * @param {Uint8Array} hint - Hint to convert.
  * @return {string}
  */
 function formatHint(hint) {
@@ -24,7 +24,7 @@ function formatHint(hint) {
 
 /**
  * Check if the hint matches the specific key.
- * @param {Buffer} hint - Hint to check.
+ * @param {Uint8Array} hint - Hint to check.
  * @param {string} key - Key to compare.
  * @return {boolean}
  */
@@ -34,7 +34,7 @@ function hintMatchesKey(hint, key) {
 
 /**
  * Find matching key by the signature hint from a list of available keys.
- * @param {Buffer} hint - Hint to look for.
+ * @param {Uint8Array} hint - Hint to look for.
  * @param {Array<string>} allKeys - Array of potentially matching keys.
  * @return {string|null}
  */
@@ -44,14 +44,14 @@ function findKeysByHint(hint, allKeys) {
 
 /**
  * Find a signature by public key from the list of signatures.
- * @param {Buffer} hashRaw
+ * @param {Uint8Array} hashRaw
  * @param {string} pubkey
- * @param {Array<TxSignature>} allSignatures
- * @returns {TxSignature}
+ * @param {Array<Object>} allSignatures - Decorated signatures attached to a transaction.
+ * @returns {Object}
  */
 function findSignatureByKey(hashRaw, pubkey, allSignatures = []) {
-    const matchingSignatures = allSignatures.filter(sig => hintMatchesKey(sig.hint(), pubkey))
-    return matchingSignatures.find(sig => Keypair.fromPublicKey(pubkey).verifySignature(hashRaw, sig.signature()))
+    const matchingSignatures = allSignatures.filter(sig => hintMatchesKey(sig.hint.toBytes(), pubkey))
+    return matchingSignatures.find(sig => Keypair.fromPublicKey(pubkey).verify(hashRaw, sig.signature))
 }
 
 module.exports = {

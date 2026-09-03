@@ -12,18 +12,18 @@ async function loadAccountsInfo(network, accounts) {
         return batch(network, accounts)
     const {entries} = await invokeRpcMethod(network, 'getLedgerEntries', {keys: prepareAccountsQuery(accounts)})
     return entries.map(entry => {
-        const parsed = xdr.LedgerEntryData.fromXDR(entry.xdr, 'base64')
-        const value = parsed.value()._attributes
+        const parsed = xdr.LedgerEntryData.fromXdr(entry.xdr, 'base64')
+        const value = parsed.value
         const id = accountToString(value.accountId)
         const accountSigners = []
-        const [masterWeight, low_threshold, med_threshold, high_threshold] = value.thresholds
+        const [masterWeight, low_threshold, med_threshold, high_threshold] = value.thresholds.toBytes()
         if (masterWeight > 0) {
             accountSigners.push(formatSigner(id, masterWeight))
         }
         if (value.signers.length) {
             for (const signer of value.signers) {
-                const {key, weight} = signer._attributes
-                if (key._arm !== 'ed25519')
+                const {key, weight} = signer
+                if (key.type !== 'signerKeyTypeEd25519')
                     continue //TODO: add support for preauthorized transactions and other signer types
                 accountSigners.push(formatSigner(accountToString(key), weight))
             }
@@ -33,7 +33,7 @@ async function loadAccountsInfo(network, accounts) {
             id,
             account_id: id,
             signers: accountSigners,
-            sequence: value.seqNum._value.toString(),
+            sequence: value.seqNum.toString(),
             thresholds: {low_threshold, med_threshold, high_threshold}
         }
     })
@@ -55,7 +55,7 @@ function prepareAccountsQuery(accounts) {
         new xdr.LedgerKeyAccount({
             accountId: Keypair.fromPublicKey(address).xdrAccountId()
         })
-    ).toXDR('base64'))
+    ).toXdr('base64'))
 }
 
 function formatSigner(key, weight, type = 'ed25519_public_key') {
@@ -66,12 +66,15 @@ function formatSigner(key, weight, type = 'ed25519_public_key') {
     }
 }
 
+//an account id decodes as PublicKey and an account signer as SignerKey - separate unions
+const ed25519ArmTypes = ['publicKeyTypeEd25519', 'signerKeyTypeEd25519']
+
 function accountToString(accountXdr) {
     if (!accountXdr)
         return accountXdr
-    if (accountXdr._arm !== 'ed25519')
-        throw new TypeError('Unsupported account type: ' + accountXdr._arm)
-    return StrKey.encodeEd25519PublicKey(accountXdr._value)
+    if (!ed25519ArmTypes.includes(accountXdr.type))
+        throw new TypeError('Unsupported account type: ' + accountXdr.type)
+    return StrKey.encodeEd25519PublicKey(accountXdr.value.toBytes())
 }
 
 function invokeRpcMethod(network, method, params) {
@@ -136,7 +139,7 @@ async function sendTxToRpc(rpcServer, networkProps, tx) {
             const {
                 status,
                 errorResult
-            } = await rpcServer.sendTransaction(TransactionBuilder.fromXDR(tx.xdr, networkProps.passphrase))
+            } = await rpcServer.sendTransaction(TransactionBuilder.fromXdr(tx.xdr, networkProps.passphrase))
 
             switch (status) {
                 case 'PENDING': //transaction is being considered by consensus
@@ -165,9 +168,9 @@ async function sendTxToRpc(rpcServer, networkProps, tx) {
 
 function formatErrorResult(errorResult) {
     if (typeof errorResult === 'string') {
-        errorResult = xdr.TransactionResult.fromXDR(errorResult, 'base64')
+        errorResult = xdr.TransactionResult.fromXdr(errorResult, 'base64')
     }
-    return 'Tx error: ' + errorResult.result().switch().name
+    return 'Tx error: ' + errorResult.result.type
 }
 
 /**

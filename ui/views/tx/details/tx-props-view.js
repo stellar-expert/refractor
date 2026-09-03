@@ -7,7 +7,7 @@ import TxStatusView from './tx-status-view'
 import TxPreconditionsView from './tx-preconditions-view'
 
 export default withErrorBoundary(function TxPropsView({txInfo}) {
-    let tx = TransactionBuilder.fromXDR(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
+    let tx = TransactionBuilder.fromXdr(txInfo.xdr, Networks[txInfo.network.toUpperCase()])
     const isFeeBump = !!tx.innerTransaction
     const feeSponsor = isFeeBump && tx.feeSource
     if (isFeeBump) {

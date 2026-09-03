@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {useParams} from 'react-router'
-import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, withErrorBoundary} from '@stellar-expert/ui-framework'
+import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, useParams, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {loadTx, checkTxSubmitted, apiSubmitTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'

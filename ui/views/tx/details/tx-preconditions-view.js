@@ -1,4 +1,5 @@
 import React from 'react'
+import {SignerKey} from '@stellar/stellar-sdk'
 import {AccountAddress, InfoTooltip as Info} from '@stellar-expert/ui-framework'
 
 function formatDateUTC(date) {
@@ -62,7 +63,7 @@ function parseMinSequenceAge(preconditions) {
     if (!preconditions.minAccountSequenceAge)
         return null
     return <>
-        <span className="dimmed">Minimum account sequence age:</span> {preconditions.minAccountSequenceAge._value.toString()}{' '}
+        <span className="dimmed">Minimum account sequence age:</span> {preconditions.minAccountSequenceAge.toString()}{' '}
         <span className="dimmed">seconds</span>
         <Info link="https://developers.stellar.org/docs/glossary/transactions/#minimum-sequence-age">
             <p>
@@ -96,7 +97,10 @@ function parseExtraSigners(preconditions) {
         return null
     return <>
         <span className="dimmed">Required extra signer{extraSigners.length > 1 ? 's' : ''}:{' '}</span>
-        {extraSigners.map((s, i) => <span key={i + s}>{i > 0 && ', '}<AccountAddress account={s}/></span>)}
+        {extraSigners.map((signer, i) => {
+            const address = SignerKey.encodeSignerKey(signer)
+            return <span key={i + address}>{i > 0 && ', '}<AccountAddress account={address}/></span>
+        })}
         <Info link="https://developers.stellar.org/docs/glossary/transactions/#extra-signers">
             Extra signers precondition means it must have signatures that correspond to those extra signers,
             even if those signatures would not otherwise be required to authorize the transaction

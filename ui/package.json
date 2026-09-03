@@ -1,7 +1,7 @@
 {
   "name": "@stellar-expert/refractor-ui",
   "private": true,
-  "version": "0.8.0",
+  "version": "0.9.0",
   "author": "team@stellar.expert",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {
@@ -16,20 +16,16 @@
     "@albedo-link/intent": "^0.13.0",
     "@creit.tech/xbull-wallet-connect": "0.4.0",
     "@lobstrco/signer-extension-api": "2.0.0",
-    "@stellar-expert/asset-descriptor": "2.0.0",
-    "@stellar-expert/client-cache": "^1.1.0",
-    "@stellar-expert/formatter": "^3.1.0",
-    "@stellar-expert/navigation": "^1.1.0",
-    "@stellar-expert/tx-signers-inspector": "1.8.2",
-    "@stellar-expert/ui-framework": "1.21.2",
+    "@stellar-expert/formatter": "^3.2.0",
+    "@stellar-expert/tx-signers-inspector": "2.0.0",
+    "@stellar-expert/ui-framework": "3.0.1",
     "@stellar/freighter-api": "^6.0.1",
-    "@stellar/stellar-sdk": "16.0.1",
+    "@stellar/stellar-sdk": "17.0.1",
     "classnames": "^2.5.1",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-fast-compare": "^3.2.2",
-    "react-router": "^5.3.3"
+    "react-fast-compare": "^3.2.2"
   },
   "devDependencies": {
     "@stellar-expert/eslint-config-js": "^1.1.0",
@@ -37,7 +33,7 @@
     "@stellar-expert/webpack-template": "1.5.1"
   },
   "overrides": {
-    "@stellar/stellar-sdk": "16.0.1"
+    "@stellar/stellar-sdk": "17.0.1"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

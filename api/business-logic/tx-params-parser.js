@@ -18,7 +18,7 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
     const now = getUnixTimestamp()
     const txInfo = new TxModel()
     txInfo.network = resolveNetworkId(network)
-    txInfo.xdr = tx.toXDR()
+    txInfo.xdr = tx.toXdr()
     txInfo.signatures = []
 
     if (callbackUrl) {

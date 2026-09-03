@@ -20,7 +20,7 @@ export default withErrorBoundary(function HorizonSubmitTxView({txInfo, onUpdate}
 
     const submitTx = useCallback(() => {
         const {passphrase, horizon} = config.networks[network]
-        const tx = TransactionBuilder.fromXDR(xdr, passphrase)
+        const tx = TransactionBuilder.fromXdr(xdr, passphrase)
         const server = new Horizon.Server(horizon)
 
         setInProgress(true)

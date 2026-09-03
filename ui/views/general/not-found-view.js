@@ -7,7 +7,7 @@ export default function NotFoundView() {
             <h2>404<br/>PAGE NOT FOUND</h2>
             <div className="space">
                 Sorry, the page you are looking for was not found.
-                Start over from the <a href="/">home page</a>
+                Start over from the <a href="/" className="external-link">home page</a>
             </div>
         </div>
     </div>

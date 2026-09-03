@@ -1,7 +1,7 @@
 {
   "name": "@stellar-expert/refractor-api",
   "private": true,
-  "version": "0.5.1",
+  "version": "0.6.0",
   "author": "team@stellar.expert",
   "description": "Pending transactions storage and multisig aggregator for Stellar Network",
   "main": "api.js",
@@ -15,8 +15,8 @@
   },
   "dependencies": {
     "@google-cloud/firestore": "8.5.0",
-    "@stellar-expert/tx-signers-inspector": "1.8.2",
-    "@stellar/stellar-sdk": "16.0.1",
+    "@stellar-expert/tx-signers-inspector": "2.0.0",
+    "@stellar/stellar-sdk": "17.0.1",
     "body-parser": "2.3.0",
     "cors": "2.8.6",
     "express": "5.2.1",

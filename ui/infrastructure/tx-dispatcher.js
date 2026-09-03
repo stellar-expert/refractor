@@ -16,7 +16,7 @@ export async function validateNewTx(data) {
         throw new Error('Invalid network')
     //assume that a transaction is valid if we can parse it
     try {
-        TransactionBuilder.fromXDR(data.xdr, networkParams.passphrase)
+        TransactionBuilder.fromXdr(data.xdr, networkParams.passphrase)
         //TODO: add more complex checks in the future
     } catch (e) {
         throw new Error('Invalid transaction xdr')
@@ -95,7 +95,7 @@ export async function checkTxSubmitted(txInfo) {
 async function prepareTxInfo(txInfo) {
     //create Transaction object
     const {passphrase, horizon} = networks[txInfo.network]
-    const tx = TransactionBuilder.fromXDR(txInfo.xdr, passphrase)
+    const tx = TransactionBuilder.fromXdr(txInfo.xdr, passphrase)
     //discover signers and check whether it is fully signed
     const schema = await inspectTransactionSigners(tx, {horizon})
     txInfo.schema = schema

@@ -19,7 +19,7 @@ async function loadRehydrateTx(hash) {
  */
 function rehydrateTx(txInfo) {
     const {network, xdr, ...res} = txInfo
-    const tx = TransactionBuilder.fromXDR(xdr, resolveNetwork(network).passphrase)
+    const tx = TransactionBuilder.fromXdr(xdr, resolveNetwork(network).passphrase)
     //rehydrate - set network and add signatures from tx info
     res.network = normalizeNetworkName(network)
     if (txInfo.signatures instanceof Array) {
@@ -27,7 +27,7 @@ function rehydrateTx(txInfo) {
             tx.addSignature(key, signature.toString('base64'))
         }
     }
-    res.xdr = tx.toXDR()
+    res.xdr = tx.toXdr()
     return res
 }
 
