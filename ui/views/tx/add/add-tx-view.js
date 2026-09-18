@@ -1,7 +1,6 @@
 import React, {useCallback, useState} from 'react'
 import isEqual from 'react-fast-compare'
-import {Button, Dropdown} from '@stellar-expert/ui-framework'
-import {navigation} from '@stellar-expert/navigation'
+import {Button, Dropdown, navigation} from '@stellar-expert/ui-framework'
 import {apiSubmitTx} from '../../../infrastructure/tx-dispatcher'
 import config from '../../../app.config.json'
 

@@ -1,0 +1,7 @@
+shamefullyHoist: true
+allowBuilds:
+  '@parcel/watcher': false
+  '@swc/core': false
+  core-js: true
+  node-sass: true
+  unrs-resolver: false

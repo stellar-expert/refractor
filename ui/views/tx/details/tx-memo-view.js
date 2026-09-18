@@ -2,7 +2,7 @@ import React, {useRef} from 'react'
 import cn from 'classnames'
 import {Dropdown, InfoTooltip as Info, useDependantState} from '@stellar-expert/ui-framework'
 
-class MemoFormatter {
+export class MemoFormatter {
     constructor(memo, memoType) {
         this.memo = memo
         this.type = this.normalizeMemoType(memoType)
@@ -30,9 +30,9 @@ class MemoFormatter {
     encodeTo(encoding) {
         switch (encoding) {
             case 'base64':
-                return this.memo.toString('base64')
             case 'hex':
-                return this.memo.toString('hex')
+                //memo value may be a Buffer or a plain Uint8Array (SDK v17)
+                return Buffer.from(this.memo).toString(encoding)
         }
         throw new Error(`Not supported memo encoding: ${encoding}`)
     }
@@ -50,14 +50,11 @@ class MemoFormatter {
     }
 
     format(encoding) {
-        if (!encoding || encoding === 'base64' || !this.memo) {
-            if (!this.memo)
-                return '[empty]'
-            if (this.memo instanceof Uint8Array)
-                return this.memo.toString()
-            return this.memo
-        }
-        return this.encodeTo(encoding)
+        if (!this.memo)
+            return '[empty]'
+        if (this.isBinary)
+            return this.encodeTo(encoding || 'base64')
+        return this.memo.toString()
     }
 }
 

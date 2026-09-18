@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button, ThemeSelector} from '@stellar-expert/ui-framework'
-import {withRouter} from 'react-router'
+import {Button, ThemeSelector, withRouter} from '@stellar-expert/ui-framework'
 import Catcher from './general/catcher'
 import MenuView from './menu-view'
 

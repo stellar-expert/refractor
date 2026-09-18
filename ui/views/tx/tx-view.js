@@ -1,7 +1,6 @@
 import React, {useCallback, useEffect, useRef, useState} from 'react'
-import {useParams} from 'react-router'
-import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, withErrorBoundary} from '@stellar-expert/ui-framework'
-import {loadTx, checkTxSubmitted, apiSubmitTx} from '../../infrastructure/tx-dispatcher'
+import {BlockSelect, CopyToClipboard, isDocumentVisible, useDependantState, useParams, withErrorBoundary} from '@stellar-expert/ui-framework'
+import {loadTx} from '../../infrastructure/tx-dispatcher'
 import TxDetailsOperationsView from './details/tx-details-operations-view'
 import TxTransactionXDRView from './details/tx-transaction-xdr-view'
 import TxSignaturesView from './details/tx-signatures-view'
@@ -16,24 +15,9 @@ export default withErrorBoundary(function TxView() {
     const {txhash} = useParams()
     const statusWatcher = useRef()
     const [txInfo, setTxInfo] = useDependantState(() => {
+        //the server verifies on-chain state of failed transactions itself, no client-side re-post needed
         loadTx(txhash)
-            .then(async txInfo => {
-                if (!txInfo.submitted) {
-                    const horizonTx = await checkTxSubmitted(txInfo)
-                    if (!horizonTx.submitted)
-                        return setTxInfo(txInfo)
-
-                    //Send transaction to the server
-                    await apiSubmitTx({
-                        network: horizonTx.network,
-                        xdr: horizonTx.xdr
-                    })
-                        .then(async () => {
-                            const txInfo = await loadTx(txhash)
-                            setTxInfo(txInfo)
-                        })
-                }
-            })
+            .then(txInfo => setTxInfo(txInfo))
             .catch(e => {
                 notify({type: 'error', message: e.message || e.toString()})
             })
@@ -130,7 +114,7 @@ export default withErrorBoundary(function TxView() {
     </>
 })
 
-function getSignaturesStatus({readyToSubmit, signatures, schema}) {
+export function getSignaturesStatus({readyToSubmit, signatures, schema}) {
     if (!signatures?.length || !schema?.requirements)
         return ''
     if (schema.requirements.length > 1) //complex case

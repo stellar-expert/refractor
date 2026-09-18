@@ -27,7 +27,7 @@ export async function validateNewTx(data) {
     }
     //validate callback url
     if (data.callback) {
-        if (!/^http(s)?:\/\/[-a-zA-Z0-9_+.]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?$/.test(data.callback))
+        if (!/^https?:\/\/[-a-zA-Z0-9_+.]{2,256}\.[a-zA-Z]{2,63}\b(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?$/.test(data.callback))
             throw new Error('Invalid callback URL')
         res.callbackUrl = data.callback
     }

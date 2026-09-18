@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: Refractor
-  version: 0.1.1
+  version: 0.1.2
   description: |
     [Refractor](/) is a pending transactions storage and multisig aggregator for Stellar Network.
 
@@ -200,8 +200,16 @@ components:
             - failed
           example: pending
         submitted:
-          description: Submitted transaction timestamp (only if the transaction has been automatically submitted to the network)
+          description: Ledger submission timestamp (only if the transaction has been submitted to the network automatically or its execution has been confirmed via Horizon)
           type: integer
           example: 1627178665
+        updated:
+          description: Timestamp of the last automatic processing attempt or on-chain status check (UNIX timestamp)
+          type: integer
+          example: 1627178665
+        error:
+          description: Automatic processing error description (only if the transaction processing failed)
+          type: string
+          example: 'Tx error: txBadSeq'
 tags:
   - name: '/tx endpoint'
