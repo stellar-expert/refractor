@@ -71,12 +71,17 @@ class Finalizer {
                 await submitTransaction(txInfoFull)
                 update.submitted = getUnixTimestamp()
             }
+            update.updated = getUnixTimestamp()
             if (!await storageLayer.dataProvider.updateTransaction(txInfo.hash, update, 'processing'))
                 throw new Error(`State conflict after callback execution`)
         } catch (e) {
             console.error('TX ' + txInfo.hash + ' processing failed')
             console.error(e)
-            await storageLayer.dataProvider.updateTxStatus(txInfo.hash, 'failed', 'processing', e)
+            await storageLayer.dataProvider.updateTransaction(txInfo.hash, {
+                status: 'failed',
+                error: (e.message || e).toString(),
+                updated: getUnixTimestamp()
+            }, 'processing')
             return cb(e)
         }
         cb(null)

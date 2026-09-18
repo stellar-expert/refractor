@@ -8,6 +8,7 @@ const {standardError} = require('./std-error')
 const {rehydrateTx} = require('./tx-loader')
 const {loadTxSourceAccountsInfo} = require('./account-info-provider')
 const {sliceTx, parseTxParams} = require('./tx-params-parser')
+const {toBuffer} = require('./xdr-utils')
 
 class Signer {
     /**
@@ -15,9 +16,10 @@ class Signer {
      */
     constructor(request) {
         const {xdr, network} = request
+        const {passphrase} = resolveNetwork(network)
         let txEnvelope
         try {
-            txEnvelope = TransactionBuilder.fromXDR(xdr, resolveNetwork(network).passphrase)
+            txEnvelope = TransactionBuilder.fromXDR(xdr, passphrase)
         } catch (e) {
             throw standardError(400, `Invalid transaction XDR`)
         }
@@ -26,7 +28,7 @@ class Signer {
 
         const {tx, signatures} = sliceTx(txEnvelope)
         this.tx = tx
-        this.hashRaw = tx.hash()
+        this.hashRaw = toBuffer(tx.hash())
         this.hash = this.hashRaw.toString('hex')
         this.signaturesToProcess = signatures
         this.txInfo = parseTxParams(tx, request)
@@ -65,7 +67,7 @@ class Signer {
      */
     rejected
     /**
-     * @type {Array<Object>}
+     * @type {Array<{hint: Buffer, signature: Buffer}>}
      */
     signaturesToProcess
     /**
@@ -100,11 +102,11 @@ class Signer {
     }
 
     /**
-     * @param {Object} rawSignature
+     * @param {{hint: Buffer, signature: Buffer}} rawSignature
      */
     processSignature(rawSignature) {
         //get props from the raw signature
-        const {hint, signature} = rawSignature._attributes
+        const {hint, signature} = rawSignature
         //init wrapped signature object
         const signaturePair = new TxSignature()
         signaturePair.signature = signature
@@ -134,7 +136,7 @@ class Signer {
             return
         //skip existing
         const newSignatures = this.signaturesToProcess.filter(sig => {
-            const newSignature = sig.signature().toString('base64')
+            const newSignature = sig.signature.toString('base64')
             return !this.txInfo.signatures.some(existing => existing.signature.toString('base64') === newSignature)
         })
         //search for invalid signature

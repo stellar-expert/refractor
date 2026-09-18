@@ -1,0 +1,4 @@
+allowBuilds:
+  '@parcel/watcher': false
+  protobufjs: false
+  unrs-resolver: false

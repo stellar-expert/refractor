@@ -139,3 +139,89 @@ describe('resetProcessingStatus', () => {
         expect((await storageLayer.dataProvider.findTransaction('tx3')).status).toBe('pending')
     })
 })
+
+describe('scheduleTransactionsBatch', () => {
+    beforeEach(() => {
+        finalizer.processorTimerHandler = -1
+        finalizer.finalizerQueue.pause() //keep scheduled tasks in the queue
+    })
+
+    afterEach(() => {
+        clearTimeout(finalizer.processorTimerHandler)
+        finalizer.finalizerQueue.kill()
+        finalizer.finalizerQueue.resume()
+    })
+
+    test('queues ready transactions up to the target queue size and reschedules itself', async () => {
+        for (let i = 0; i < 3; i++) {
+            await storageLayer.dataProvider.saveTransaction(makeTx({hash: 'ready' + i}))
+        }
+        await storageLayer.dataProvider.saveTransaction(makeTx({hash: 'pending', status: 'pending'}))
+        await storageLayer.dataProvider.saveTransaction(makeTx({hash: 'future', minTime: 5000}))
+        finalizer.targetQueueSize = 2
+
+        await finalizer.scheduleTransactionsBatch()
+
+        expect(finalizer.finalizerQueue.length()).toBe(2)
+        expect(finalizer.processorTimerHandler).not.toBe(-1)
+        expect(finalizer.processorTimerHandler).not.toBe(0)
+        expect(jest.getTimerCount()).toBe(1)
+    })
+
+    test('skips transactions that are not ready yet', async () => {
+        await storageLayer.dataProvider.saveTransaction(makeTx({hash: 'pending', status: 'pending'}))
+        await storageLayer.dataProvider.saveTransaction(makeTx({hash: 'future', minTime: 5000}))
+        finalizer.targetQueueSize = 10
+
+        await finalizer.scheduleTransactionsBatch()
+
+        expect(finalizer.finalizerQueue.length()).toBe(0)
+    })
+
+    test('stops scheduling when the pipeline has been stopped', async () => {
+        await storageLayer.dataProvider.saveTransaction(makeTx({hash: 'ready'}))
+        finalizer.processorTimerHandler = 0 //stop() executed
+
+        await finalizer.scheduleTransactionsBatch()
+
+        expect(finalizer.finalizerQueue.length()).toBe(0)
+        expect(finalizer.processorTimerHandler).toBe(0)
+        expect(jest.getTimerCount()).toBe(0)
+    })
+
+    test('logs storage errors and keeps polling', async () => {
+        const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {})
+        storageLayer.dataProvider.listTransactions = () => {
+            throw new Error('db down')
+        }
+
+        await finalizer.scheduleTransactionsBatch()
+
+        expect(consoleErrorSpy).toHaveBeenCalledWith(expect.objectContaining({message: 'db down'}))
+        expect(jest.getTimerCount()).toBe(1)
+        consoleErrorSpy.mockRestore()
+    })
+})
+
+describe('processTx updated timestamp', () => {
+    test('bumps updated on successful processing', async () => {
+        const tx = makeTx({submit: true})
+        await storageLayer.dataProvider.saveTransaction(tx)
+        await finalizer.processTx(tx, jest.fn())
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('processed')
+        expect(stored.updated).toBe(1000)
+        expect(stored.submitted).toBe(1000)
+    })
+
+    test('bumps updated and stores error on failed processing', async () => {
+        submitTransaction.mockRejectedValue(new Error('Tx error: txBadSeq'))
+        const tx = makeTx({submit: true})
+        await storageLayer.dataProvider.saveTransaction(tx)
+        await finalizer.processTx(tx, jest.fn())
+        const stored = await storageLayer.dataProvider.findTransaction(tx.hash)
+        expect(stored.status).toBe('failed')
+        expect(stored.error).toBe('Tx error: txBadSeq')
+        expect(stored.updated).toBe(1000)
+    })
+})

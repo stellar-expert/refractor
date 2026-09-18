@@ -12,28 +12,27 @@ async function loadAccountsInfo(network, accounts) {
         return batch(network, accounts)
     const {entries} = await invokeRpcMethod(network, 'getLedgerEntries', {keys: prepareAccountsQuery(accounts)})
     return entries.map(entry => {
-        const parsed = xdr.LedgerEntryData.fromXDR(entry.xdr, 'base64')
-        const value = parsed.value()._attributes
+        const parsed = xdr.LedgerEntryData.fromXdr(entry.xdr, 'base64')
+        if (parsed.type !== 'account')
+            throw new TypeError('Unexpected ledger entry type: ' + parsed.type)
+        const value = parsed.account
         const id = accountToString(value.accountId)
         const accountSigners = []
-        const [masterWeight, low_threshold, med_threshold, high_threshold] = value.thresholds
+        const [masterWeight, low_threshold, med_threshold, high_threshold] = value.thresholds.toBytes()
         if (masterWeight > 0) {
             accountSigners.push(formatSigner(id, masterWeight))
         }
-        if (value.signers.length) {
-            for (const signer of value.signers) {
-                const {key, weight} = signer._attributes
-                if (key._arm !== 'ed25519')
-                    continue //TODO: add support for preauthorized transactions and other signer types
-                accountSigners.push(formatSigner(accountToString(key), weight))
-            }
+        for (const {key, weight} of value.signers) {
+            if (key.type !== 'signerKeyTypeEd25519')
+                continue //TODO: add support for preauthorized transactions and other signer types
+            accountSigners.push(formatSigner(accountToString(key), weight))
         }
 
         return {
             id,
             account_id: id,
             signers: accountSigners,
-            sequence: value.seqNum._value.toString(),
+            sequence: value.seqNum.toString(),
             thresholds: {low_threshold, med_threshold, high_threshold}
         }
     })
@@ -66,12 +65,17 @@ function formatSigner(key, weight, type = 'ed25519_public_key') {
     }
 }
 
+/**
+ * Encode XDR AccountId or SignerKey union as StrKey address.
+ * @param {xdr.AccountId|xdr.SignerKey} accountXdr
+ * @return {string}
+ */
 function accountToString(accountXdr) {
     if (!accountXdr)
         return accountXdr
-    if (accountXdr._arm !== 'ed25519')
-        throw new TypeError('Unsupported account type: ' + accountXdr._arm)
-    return StrKey.encodeEd25519PublicKey(accountXdr._value)
+    if (accountXdr.type !== 'publicKeyTypeEd25519' && accountXdr.type !== 'signerKeyTypeEd25519')
+        throw new TypeError('Unsupported account type: ' + accountXdr.type)
+    return StrKey.encodeEd25519PublicKey(accountXdr.ed25519.toBytes())
 }
 
 function invokeRpcMethod(network, method, params) {
@@ -120,7 +124,7 @@ let submitTransactionImpl = async function (tx) {
     if (status === 'SUCCESS')
         return true
     if (resultXdr)
-        throw new Error(formatErrorResult(resultXdr, 'base64'))
+        throw new Error(formatErrorResult(resultXdr))
     throw new Error('Failed to submit transaction')
 }
 
@@ -163,11 +167,15 @@ async function sendTxToRpc(rpcServer, networkProps, tx) {
     }
 }
 
+/**
+ * @param {xdr.TransactionResult|string} errorResult - Parsed TransactionResult or its base64-encoded XDR
+ * @return {string}
+ */
 function formatErrorResult(errorResult) {
     if (typeof errorResult === 'string') {
-        errorResult = xdr.TransactionResult.fromXDR(errorResult, 'base64')
+        errorResult = xdr.TransactionResult.fromXdr(errorResult, 'base64')
     }
-    return 'Tx error: ' + errorResult.result().switch().name
+    return 'Tx error: ' + errorResult.result.type
 }
 
 /**
@@ -187,4 +195,4 @@ function fakeSubmitTransaction(fn) {
     submitTransactionImpl = fn
 }
 
-module.exports = {loadAccountsInfo, submitTransaction, fakeSubmitTransaction}
+module.exports = {loadAccountsInfo, submitTransaction, fakeSubmitTransaction, formatErrorResult}

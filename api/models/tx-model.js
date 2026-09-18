@@ -64,6 +64,18 @@ class TxModel {
      * @type {number}
      */
     submitted
+
+    /**
+     * Last processing attempt or on-chain status check timestamp (UNIX timestamp).
+     * @type {number}
+     */
+    updated
+
+    /**
+     * Automatic processing error description.
+     * @type {string}
+     */
+    error
 }
 
 module.exports = TxModel

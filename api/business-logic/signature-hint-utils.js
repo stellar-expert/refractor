@@ -1,8 +1,9 @@
 const {Keypair} = require('@stellar/stellar-sdk')
+const {parseDecoratedSignature} = require('./xdr-utils')
 
 /**
  * Convert the signature hint to the StrKey mask.
- * @param {Buffer} hint - Hint to convert.
+ * @param {Buffer|Uint8Array} hint - Hint to convert.
  * @return {string}
  */
 function hintToMask(hint) {
@@ -14,7 +15,7 @@ function hintToMask(hint) {
 
 /**
  * Format the signature hint to the friendly form for UI.
- * @param {Buffer} hint - Hint to convert.
+ * @param {Buffer|Uint8Array} hint - Hint to convert.
  * @return {string}
  */
 function formatHint(hint) {
@@ -24,7 +25,7 @@ function formatHint(hint) {
 
 /**
  * Check if the hint matches the specific key.
- * @param {Buffer} hint - Hint to check.
+ * @param {Buffer|Uint8Array} hint - Hint to check.
  * @param {string} key - Key to compare.
  * @return {boolean}
  */
@@ -34,7 +35,7 @@ function hintMatchesKey(hint, key) {
 
 /**
  * Find matching key by the signature hint from a list of available keys.
- * @param {Buffer} hint - Hint to look for.
+ * @param {Buffer|Uint8Array} hint - Hint to look for.
  * @param {Array<string>} allKeys - Array of potentially matching keys.
  * @return {string|null}
  */
@@ -44,14 +45,17 @@ function findKeysByHint(hint, allKeys) {
 
 /**
  * Find a signature by public key from the list of signatures.
- * @param {Buffer} hashRaw
+ * @param {Buffer|Uint8Array} hashRaw
  * @param {string} pubkey
- * @param {Array<TxSignature>} allSignatures
- * @returns {TxSignature}
+ * @param {Array<xdr.DecoratedSignature>} allSignatures
+ * @returns {xdr.DecoratedSignature}
  */
 function findSignatureByKey(hashRaw, pubkey, allSignatures = []) {
-    const matchingSignatures = allSignatures.filter(sig => hintMatchesKey(sig.hint(), pubkey))
-    return matchingSignatures.find(sig => Keypair.fromPublicKey(pubkey).verifySignature(hashRaw, sig.signature()))
+    const keypair = Keypair.fromPublicKey(pubkey)
+    return allSignatures.find(sig => {
+        const {hint, signature} = parseDecoratedSignature(sig)
+        return hintMatchesKey(hint, pubkey) && keypair.verify(hashRaw, signature)
+    })
 }
 
 module.exports = {

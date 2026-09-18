@@ -63,7 +63,7 @@ class MongodbDataProvider extends DataProvider {
             doc.signatures = doc.signatures.map(s => {
                 const ts = new TxSignature()
                 ts.key = s.key
-                ts.signature = s.signature.value()
+                ts.signature = Buffer.from(s.signature.value())
                 return ts
             })
         }
@@ -99,6 +99,8 @@ class MongodbDataProvider extends DataProvider {
                 signatures: 1,
                 submit: 1,
                 submitted: 1,
+                updated: 1,
+                error: 1,
                 desiredSigners: 1
             }
         })

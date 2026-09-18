@@ -47,6 +47,13 @@ describe('parseTxParams', () => {
         expect(result.callbackUrl).toBe('https://example.com/callback')
     })
 
+    test('accepts callbackUrl with long top-level domain', () => {
+        const tx = buildTestTx()
+        for (const callbackUrl of ['https://refractor.stellar.expert/callback', 'https://my.service/success.php', 'https://hooks.example.network/']) {
+            expect(parseTxParams(tx, {network: 'testnet', callbackUrl}).callbackUrl).toBe(callbackUrl)
+        }
+    })
+
     test('rejects invalid callbackUrl', () => {
         const tx = buildTestTx()
         expect(() => parseTxParams(tx, {network: 'testnet', callbackUrl: 'not-a-url'}))
@@ -108,5 +115,57 @@ describe('sliceTx', () => {
         const {tx: sliced, signatures} = sliceTx(tx)
         expect(signatures).toHaveLength(1)
         expect(sliced._signatures).toEqual([])
+    })
+})
+
+describe('parseTxParams timebounds', () => {
+    function buildTxWithTimebounds(minTime, maxTime) {
+        const kp = Keypair.random()
+        return new TransactionBuilder(new Account(kp.publicKey(), '100'), {
+            fee: '100',
+            networkPassphrase: Networks.TESTNET,
+            timebounds: {minTime, maxTime}
+        })
+            .addOperation(Operation.payment({destination: Keypair.random().publicKey(), asset: Asset.native(), amount: '10'}))
+            .build()
+    }
+
+    test('populates minTime from transaction timebounds', () => {
+        const now = getUnixTimestamp()
+        const tx = buildTxWithTimebounds(now + 100, now + 1000)
+        const result = parseTxParams(tx, {network: 'testnet'})
+        expect(result.minTime).toBe(now + 100)
+    })
+
+    test('uses expires when it is earlier than transaction maxTime', () => {
+        const now = getUnixTimestamp()
+        const tx = buildTxWithTimebounds(0, now + 1000)
+        const result = parseTxParams(tx, {network: 'testnet', expires: now + 500})
+        expect(result.maxTime).toBe(now + 500)
+    })
+
+    test('clamps expires to transaction maxTime', () => {
+        const now = getUnixTimestamp()
+        const tx = buildTxWithTimebounds(0, now + 1000)
+        const result = parseTxParams(tx, {network: 'testnet', expires: now + 5000})
+        expect(result.maxTime).toBe(now + 1000)
+    })
+
+    test('defaults maxTime to transaction maxTime when expires is not supplied', () => {
+        const now = getUnixTimestamp()
+        const tx = buildTxWithTimebounds(0, now + 1000)
+        const result = parseTxParams(tx, {network: 'testnet'})
+        expect(result.maxTime).toBe(now + 1000)
+    })
+
+    test('leaves maxTime unset when neither expires nor tx maxTime is present', () => {
+        const result = parseTxParams(buildTxWithTimebounds(0, 0), {network: 'testnet'})
+        expect(result.maxTime).toBeUndefined()
+    })
+
+    test('rejects transactions that have already expired', () => {
+        const now = getUnixTimestamp()
+        const tx = buildTxWithTimebounds(0, now - 10)
+        expect(() => parseTxParams(tx, {network: 'testnet'})).toThrow('already expired')
     })
 })

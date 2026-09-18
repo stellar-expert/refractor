@@ -237,3 +237,15 @@ describe('toJSON', () => {
         expect(json.xdr).toBeTruthy()
     })
 })
+
+describe('processNewSignatures without signatures', () => {
+    test('does nothing for an unsigned transaction', async () => {
+        mockSchema([sourceKp.publicKey()])
+        const signer = new Signer(buildTestRequest())
+        await signer.init()
+        signer.processNewSignatures()
+        expect(signer.accepted).toEqual([])
+        expect(signer.rejected).toEqual([])
+        expect(signer.status).toBe('created')
+    })
+})

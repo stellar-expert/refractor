@@ -3,6 +3,7 @@ const TxModel = require('../models/tx-model')
 const {standardError} = require('./std-error')
 const {resolveNetworkId} = require('./network-resolver')
 const {getUnixTimestamp} = require('./timestamp-utils')
+const {parseDecoratedSignature} = require('./xdr-utils')
 
 /**
  *
@@ -22,7 +23,7 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
     txInfo.signatures = []
 
     if (callbackUrl) {
-        if (!/^http(s)?:\/\/[-a-zA-Z0-9_+.]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?$/m.test(callbackUrl))
+        if (!/^https?:\/\/[-a-zA-Z0-9_+.]{2,256}\.[a-zA-Z]{2,63}\b(\/[-a-zA-Z0-9@:%_+.~#?&/=]*)?$/.test(callbackUrl))
             throw standardError(400, 'Invalid URL supplied in "callbackUrl" parameter.')
         txInfo.callbackUrl = callbackUrl
     }
@@ -50,7 +51,8 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
     const txExpiration = (tx.timeBounds && parseInt(tx.timeBounds.maxTime)) || 0
     if (txExpiration && txExpiration < now)
         throw standardError(400, `Invalid transactions "timebounds.maxTime" value - the transaction already expired.`)
-    if (txExpiration > 0 && txExpiration < expires) {
+    //the tx cannot outlive its own timebounds - use tx expiration if it is earlier than requested or no expiration requested
+    if (txExpiration > 0 && (!expires || txExpiration < expires)) {
         expires = txExpiration
     }
     if (expires > 0) {
@@ -64,9 +66,14 @@ function parseTxParams(tx, {network, callbackUrl, submit, desiredSigners, expire
 }
 
 
+/**
+ * Detach signatures from the transaction.
+ * @param {Transaction} tx
+ * @return {{tx: Transaction, signatures: Array<{hint: Buffer, signature: Buffer}>}}
+ */
 function sliceTx(tx) {
-    const signatures = tx.signatures.slice()
-    tx._signatures = []
+    const signatures = tx.signatures.map(parseDecoratedSignature)
+    tx._signatures = [] //Transaction.signatures setter is not available for built transactions
     return {tx, signatures}
 }
 
