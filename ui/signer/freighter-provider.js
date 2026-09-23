@@ -26,6 +26,10 @@ export default class FreighterProvider {
             throw new Error({msg: `Freighter wallet not connected`})
         await this.provider.requestAccess()
         await this.provider.getAddress()
-        return await this.provider.signTransaction(xdr, {networkPassphrase: network})
+        //freighter-api v3+ resolves to {signedTxXdr, signerAddress, error?} rather than the XDR itself
+        const {signedTxXdr, error} = await this.provider.signTransaction(xdr, {networkPassphrase: network})
+        if (error)
+            throw new Error(error.message || 'Freighter did not sign the transaction')
+        return signedTxXdr
     }
 }

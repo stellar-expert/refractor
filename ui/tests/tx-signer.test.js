@@ -114,3 +114,33 @@ describe('delegateTxSigning', () => {
         await expect(delegateTxSigning('Unknown', 'TX_XDR', 'public')).rejects.toThrow()
     })
 })
+
+describe('Freighter provider', () => {
+    //@stellar/freighter-api v3+ resolves signTransaction to an object, not an XDR string
+    function stubFreighterApi(signResult) {
+        const freighter = provider('Freighter')
+        const api = {
+            isConnected: jest.fn().mockResolvedValue({isConnected: true}),
+            requestAccess: jest.fn().mockResolvedValue({address: 'GSIGNER'}),
+            getAddress: jest.fn().mockResolvedValue({address: 'GSIGNER'}),
+            signTransaction: jest.fn().mockResolvedValue(signResult)
+        }
+        jest.spyOn(freighter, 'init').mockImplementation(async function () {
+            this.provider = api
+        })
+        return {freighter, api}
+    }
+
+    test('returns the signed XDR string from the freighter-api result object', async () => {
+        const {freighter, api} = stubFreighterApi({signedTxXdr: 'SIGNED_XDR', signerAddress: 'GSIGNER'})
+        await expect(freighter.signTx({xdr: 'TX_XDR', network: 'Test SDF Network ; September 2015'}))
+            .resolves.toBe('SIGNED_XDR')
+        expect(api.signTransaction).toHaveBeenCalledWith('TX_XDR', {networkPassphrase: 'Test SDF Network ; September 2015'})
+    })
+
+    test('rejects with the wallet message when Freighter reports an error', async () => {
+        const {freighter} = stubFreighterApi({signedTxXdr: '', signerAddress: '', error: {message: 'User declined access'}})
+        await expect(freighter.signTx({xdr: 'TX_XDR', network: 'Test SDF Network ; September 2015'}))
+            .rejects.toThrow('User declined access')
+    })
+})
