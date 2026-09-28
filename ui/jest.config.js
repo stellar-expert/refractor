@@ -1,5 +1,9 @@
 module.exports = {
     testEnvironment: 'jsdom',
+    //jsdom defaults to the "browser" export condition, which preact and @preact/signals map to ESM builds
+    testEnvironmentOptions: {
+        customExportConditions: []
+    },
     roots: ['<rootDir>/tests'],
     transform: {
         '\\.jsx?$': ['@swc/jest', {

@@ -5,6 +5,10 @@ const pkgInfo = require('./package.json')
 
 const staticContent = 'static/'
 
+const apiOrigin = process.env.API_ORIGIN || (process.env.WEBPACK_SERVE ? 'http://localhost:3000' : null)
+if (!apiOrigin)
+    throw new Error('API_ORIGIN environment variable is required to build the UI')
+
 //create a static fonts.css file
 const bundledFonts = require.resolve('@stellar-expert/ui-framework/fonts/font.scss')
 
@@ -30,7 +34,7 @@ module.exports = initWebpackConfig({
     },
     define: {
         appVersion: pkgInfo.version,
-        apiOrigin: process.env.API_ORIGIN
+        apiOrigin
     },
     devServer: {
         host: '0.0.0.0',

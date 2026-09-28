@@ -27,7 +27,7 @@ describe('provider registry', () => {
     })
 
     test('only web-based wallets are marked as mobile-supported', () => {
-        expect(providers.filter(p => p.mobileSupported).map(p => p.title)).toEqual(['Albedo'])
+        expect(providers.filter(p => p.mobileSupported).map(p => p.title)).toEqual(['Albedo', 'xBull'])
     })
 
     test('browser-extension wallets report unavailable when their globals are missing', async () => {
@@ -115,32 +115,53 @@ describe('delegateTxSigning', () => {
     })
 })
 
-describe('Freighter provider', () => {
-    //@stellar/freighter-api v3+ resolves signTransaction to an object, not an XDR string
-    function stubFreighterApi(signResult) {
-        const freighter = provider('Freighter')
-        const api = {
-            isConnected: jest.fn().mockResolvedValue({isConnected: true}),
-            requestAccess: jest.fn().mockResolvedValue({address: 'GSIGNER'}),
-            getAddress: jest.fn().mockResolvedValue({address: 'GSIGNER'}),
-            signTransaction: jest.fn().mockResolvedValue(signResult)
-        }
-        jest.spyOn(freighter, 'init').mockImplementation(async function () {
-            this.provider = api
-        })
-        return {freighter, api}
+describe('kit module wrapper', () => {
+    const network = 'Test SDF Network ; September 2015'
+
+    //replace the lazy module loader with a stub so no real wallet SDK is pulled in
+    function stubModule(title, signTransaction) {
+        const p = provider(title)
+        const getAddress = jest.fn().mockResolvedValue({address: 'GSIGNER'})
+        jest.spyOn(p, 'init').mockResolvedValue({signTransaction, getAddress})
+        return Object.assign(p, {stubbedGetAddress: getAddress})
     }
 
-    test('returns the signed XDR string from the freighter-api result object', async () => {
-        const {freighter, api} = stubFreighterApi({signedTxXdr: 'SIGNED_XDR', signerAddress: 'GSIGNER'})
-        await expect(freighter.signTx({xdr: 'TX_XDR', network: 'Test SDF Network ; September 2015'}))
+    test('unwraps the signed XDR from the kit module result', async () => {
+        const signTransaction = jest.fn().mockResolvedValue({signedTxXdr: 'SIGNED_XDR', signerAddress: 'GSIGNER'})
+        await expect(stubModule('Freighter', signTransaction).signTx({xdr: 'TX_XDR', network}))
             .resolves.toBe('SIGNED_XDR')
-        expect(api.signTransaction).toHaveBeenCalledWith('TX_XDR', {networkPassphrase: 'Test SDF Network ; September 2015'})
+        expect(signTransaction).toHaveBeenCalledWith('TX_XDR', {address: 'GSIGNER', networkPassphrase: network})
     })
 
-    test('rejects with the wallet message when Freighter reports an error', async () => {
-        const {freighter} = stubFreighterApi({signedTxXdr: '', signerAddress: '', error: {message: 'User declined access'}})
-        await expect(freighter.signTx({xdr: 'TX_XDR', network: 'Test SDF Network ; September 2015'}))
+    test('propagates the error reported by the wallet', async () => {
+        const signTransaction = jest.fn().mockRejectedValue(new Error('User declined access'))
+        await expect(stubModule('Lobstr', signTransaction).signTx({xdr: 'TX_XDR', network}))
             .rejects.toThrow('User declined access')
+    })
+
+    test('fails loudly when the wallet returns no signature', async () => {
+        const signTransaction = jest.fn().mockResolvedValue({signedTxXdr: ''})
+        await expect(stubModule('Rabet', signTransaction).signTx({xdr: 'TX_XDR', network}))
+            .rejects.toThrow('Rabet did not sign the transaction')
+    })
+
+    test('connects before signing so the wallet issues a session key', async () => {
+        const p = stubModule('Lobstr', jest.fn().mockResolvedValue({signedTxXdr: 'SIGNED_XDR'}))
+        await p.signTx({xdr: 'TX_XDR', network})
+        expect(p.stubbedGetAddress).toHaveBeenCalled()
+    })
+
+    test('skips the connect step for Albedo, which selects the account while signing', async () => {
+        const p = stubModule('Albedo', jest.fn().mockResolvedValue({signedTxXdr: 'SIGNED_XDR'}))
+        await p.signTx({xdr: 'TX_XDR', network})
+        expect(p.stubbedGetAddress).not.toHaveBeenCalled()
+    })
+
+    test('loads the wallet module only once across repeated calls', async () => {
+        const p = provider('Hana')
+        const load = jest.spyOn(p, 'load').mockResolvedValue({isAvailable: async () => true})
+        p.modulePromise = null
+        await Promise.all([p.checkAvailable(), p.checkAvailable()])
+        expect(load).toHaveBeenCalledTimes(1)
     })
 })
