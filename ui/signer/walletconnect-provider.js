@@ -1,5 +1,6 @@
 import config from '../app.config.json'
 import {setWcStatus} from './walletconnect/wc-status'
+import {wcMobileWallets} from './walletconnect/wc-wallets'
 
 export default class WalletConnectProvider {
     title = 'WalletConnect'
@@ -17,8 +18,10 @@ export default class WalletConnectProvider {
             })
     }
 
-    async signTx({xdr, network}) {
+    async signTx({xdr, network, wallet}) {
         const chainId = resolveChainId(network)
+        //mobile wallet app chosen by the user - pairing and signing requests are passed via its deep links
+        const mobileWallet = wcMobileWallets.find(w => w.name === wallet) || null
         await this.init()
         const controller = new AbortController()
         const {origin} = window.location
@@ -34,7 +37,7 @@ export default class WalletConnectProvider {
                 //PNG rather than SVG - many mobile wallets can't render SVG icons
                 icons: [origin + '/img/refractor-small-logo.png']
             },
-            onStatus: status => setWcStatus(status && {...status, cancel: () => controller.abort()}),
+            onStatus: status => setWcStatus(status && {...status, mobileWallet, cancel: () => controller.abort()}),
             signal: controller.signal
         })
     }

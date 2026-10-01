@@ -2,12 +2,21 @@ import React, {useCallback, useEffect, useMemo, useState} from 'react'
 import {Button, Dropdown, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {apiSubmitTx} from '../../../infrastructure/tx-dispatcher'
 import {delegateTxSigning, getAllProviders, getAvailableProviders} from '../../../signer/tx-signer'
+import {wcMobileWallets} from '../../../signer/walletconnect/wc-wallets'
 import AddXdrView from '../add-xdr-view'
 import WalletConnectDialog from './walletconnect-dialog'
 import './add-signatures.scss'
 
-//static list for the mobile block - only wallets that work on mobile devices
-const mobileProviders = getAllProviders().filter(provider => !!provider.mobileSupported)
+//static list for the mobile block - only wallets that work on mobile devices;
+//wallet apps opened via WalletConnect deep links go right before the generic WalletConnect option
+const mobileOptions = getAllProviders()
+    .filter(provider => !!provider.mobileSupported)
+    .flatMap(({title}) => {
+        const option = {provider: title, title, icon: title}
+        if (title !== 'WalletConnect')
+            return [option]
+        return [...wcMobileWallets.map(w => ({provider: title, wallet: w.name, title: w.name, icon: w.icon})), option]
+    })
 
 export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate}) {
     const [inProgress, setInProgress] = useState(false)
@@ -29,9 +38,9 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
         }
     }, [])
 
-    const signWith = useCallback(provider => {
+    const signWith = useCallback((provider, wallet) => {
         setInProgress(true)
-        processSignature(provider, txInfo)
+        processSignature(provider, txInfo, wallet)
             .then(updatedTxInfo => onUpdate(updatedTxInfo))
             .catch(e => console.error(e))
             .finally(() => setInProgress(false))
@@ -43,7 +52,10 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
         signWith(value)
     }, [signWith])
 
-    const requestMobileSignature = useCallback(e => signWith(e.currentTarget.dataset.provider), [signWith])
+    const requestMobileSignature = useCallback(e => {
+        const {provider, wallet} = e.currentTarget.dataset
+        signWith(provider, wallet)
+    }, [signWith])
 
     const toggleImportModal = useCallback(() => setIsOpen(prev => !prev), [])
 
@@ -81,10 +93,10 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
                 </div>
             </div>
             <div className="mobile-only">
-                {mobileProviders.map(provider =>
-                    <Button key={provider.title} outline block disabled={inProgress} onClick={requestMobileSignature}
-                            data-provider={provider.title}>
-                        <WalletIcon wallet={provider.title}/> {provider.title}
+                {mobileOptions.map(option =>
+                    <Button key={option.title} outline block disabled={inProgress} onClick={requestMobileSignature}
+                            data-provider={option.provider} data-wallet={option.wallet}>
+                        {!!option.icon && <WalletIcon wallet={option.icon}/>} {option.title}
                     </Button>)}
                 <Button block outline disabled={inProgress} onClick={toggleImportModal}>
                     <i className="icon icon-download"/> Import
@@ -103,10 +115,10 @@ const WalletIcon = React.memo(function WalletIcon({wallet}) {
     return <span className="wallet-icon" style={{backgroundImage: `url(/img/wallets/${wallet.toLowerCase()}.svg)`}}/>
 })
 
-async function processSignature(provider, txInfo) {
+async function processSignature(provider, txInfo, wallet) {
     let signedTx
     try {
-        signedTx = await delegateTxSigning(provider, txInfo.xdr, txInfo.network)
+        signedTx = await delegateTxSigning(provider, txInfo.xdr, txInfo.network, {wallet})
     } catch (e) {
         notify({type: 'warning', message: e?.msg || e?.message || 'Failed to obtain a transaction signature'})
         throw e

@@ -227,9 +227,17 @@ export class RelayClient {
      * @private
      */
     onVisibilityChange() {
-        if (document.visibilityState === 'visible' && !this.socket && !this.closed) {
-            this.reconnect()
+        if (document.visibilityState !== 'visible' || this.closed)
+            return
+        //a suspended socket may still report OPEN state while the relay has already dropped it - always start over
+        const {socket} = this
+        if (socket?.readyState === WebSocket.CONNECTING)
+            return //reconnection already in progress
+        if (socket) {
+            this.socket = null
+            socket.close(1000)
         }
+        this.reconnect()
     }
 
     /**

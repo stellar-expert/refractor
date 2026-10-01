@@ -4,6 +4,9 @@
  * @property {string} [uri] - Pairing URI to show as QR code or open as a deep link
  * @property {Object} [wallet] - Connected wallet metadata (name, icons, redirect)
  * @property {string} [account] - Connected Stellar account address
+ * @property {number} [requestId] - Pending signing request id
+ * @property {string} [sessionTopic] - Session topic
+ * @property {{name: string, link: string}|null} [mobileWallet] - Mobile wallet app chosen by the user
  * @property {function} cancel - Aborts the flow
  */
 

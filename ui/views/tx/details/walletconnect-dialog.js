@@ -1,11 +1,17 @@
 import React, {useEffect, useState} from 'react'
 import {AccountAddress, Button, CopyToClipboard, Dialog, QrCode} from '@stellar-expert/ui-framework'
 import {getWcStatus, subscribeWcStatus} from '../../../signer/walletconnect/wc-status'
+import {formatPairingLink, formatRequestLink} from '../../../signer/walletconnect/wc-wallets'
 
 export default function WalletConnectDialog() {
     const [status, setStatus] = useState(getWcStatus)
 
-    useEffect(() => subscribeWcStatus(setStatus), [])
+    useEffect(() => {
+        const unsubscribe = subscribeWcStatus(setStatus)
+        //status may have changed between the first render and the subscription
+        setStatus(getWcStatus())
+        return unsubscribe
+    }, [])
 
     if (!status)
         return null
@@ -20,9 +26,11 @@ export default function WalletConnectDialog() {
     </Dialog>
 }
 
-function WalletConnectStage({stage, uri, wallet, account}) {
+function WalletConnectStage({stage, uri, wallet, account, requestId, sessionTopic, mobileWallet}) {
     switch (stage) {
-        case 'pairing':
+        case 'pairing': {
+            //wallets ignore bare "wc:" links on mobile, so use the deep link of the chosen wallet app if any
+            const pairingLink = mobileWallet ? formatPairingLink(mobileWallet.link, uri) : uri
             return <>
                 <div className="text-center">
                     <QrCode value={uri} size={280}/>
@@ -31,11 +39,16 @@ function WalletConnectStage({stage, uri, wallet, account}) {
                         <CopyToClipboard text={uri} title="Copy connection link"/>
                     </div>
                 </div>
-                <a className="button button-block mobile-only micro-space" href={uri}>Open in wallet</a>
+                <a className="button button-block mobile-only micro-space" href={pairingLink}>
+                    Open in {mobileWallet?.name || 'wallet'}
+                </a>
             </>
+        }
         case 'requesting': {
             const walletName = wallet?.name || 'your wallet'
-            const walletLink = wallet?.redirect?.native || wallet?.redirect?.universal
+            const walletLink = mobileWallet ?
+                formatRequestLink(mobileWallet.link, requestId, sessionTopic) :
+                wallet?.redirect?.native || wallet?.redirect?.universal
             return <>
                 <p>Confirm the transaction in {walletName}</p>
                 {!!account && <div className="text-small">

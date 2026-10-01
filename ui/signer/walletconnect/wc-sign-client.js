@@ -28,6 +28,8 @@ const rpcOpts = {
  * @property {string} [uri] - Pairing URI to show as QR code or open as a deep link
  * @property {Object} [wallet] - Connected wallet metadata (name, icons, redirect)
  * @property {string} [account] - Connected Stellar account address
+ * @property {number} [requestId] - Pending signing request id
+ * @property {string} [sessionTopic] - Session topic
  */
 
 /**
@@ -114,9 +116,10 @@ class SignFlow {
         const account = findAccount(settle.params.namespaces, chainId)
         if (!account)
             throw new Error(`Wallet does not support Stellar ${chainId.split(':')[1]} network`)
-        onStatus({stage: 'requesting', wallet: settle.params.controller?.metadata, account})
         //signing request
         const requestId = nextId()
+        //request id and session topic are needed to build the wallet deep link on mobile devices
+        onStatus({stage: 'requesting', wallet: settle.params.controller?.metadata, account, requestId, sessionTopic})
         const signResponse = this.waitForResponse(sessionTopic, requestId, requestTtl, 'Signing request expired')
         await this.guard(this.sendRequest(sessionTopic, requestId, 'wc_sessionRequest', {
             request: {method: 'stellar_signXDR', params: {xdr}},

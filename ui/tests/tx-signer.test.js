@@ -101,6 +101,12 @@ describe('delegateTxSigning', () => {
         expect(signTx).toHaveBeenCalledWith({xdr: 'TX_XDR', network: config.networks.testnet.passphrase})
     })
 
+    test('passes provider-specific options to the wallet', async () => {
+        const signTx = jest.spyOn(provider('WalletConnect'), 'signTx').mockResolvedValue('SIGNED')
+        await delegateTxSigning('WalletConnect', 'TX_XDR', 'public', {wallet: 'LOBSTR'})
+        expect(signTx).toHaveBeenCalledWith({xdr: 'TX_XDR', network: config.networks.public.passphrase, wallet: 'LOBSTR'})
+    })
+
     test('passes custom network passphrase through unchanged', async () => {
         const signTx = jest.spyOn(provider('Freighter'), 'signTx').mockResolvedValue('SIGNED')
         await delegateTxSigning('Freighter', 'TX_XDR', 'Custom Network ; 2026')
@@ -149,9 +155,10 @@ describe('Freighter provider', () => {
 
 describe('WalletConnect provider', () => {
     const wc = provider('WalletConnect')
+    const configuredProjectId = config.walletConnect.projectId
 
     afterEach(() => {
-        config.walletConnect.projectId = ''
+        config.walletConnect.projectId = configuredProjectId
     })
 
     function stubSignClient(signXdr) {
@@ -161,6 +168,7 @@ describe('WalletConnect provider', () => {
     }
 
     test('is available only when a project id is configured', () => {
+        config.walletConnect.projectId = ''
         expect(wc.checkAvailable()).toBe(false)
         config.walletConnect.projectId = 'test-project'
         expect(wc.checkAvailable()).toBe(true)
@@ -174,6 +182,18 @@ describe('WalletConnect provider', () => {
         await wc.signTx({xdr: 'TX_XDR', network: config.networks.public.passphrase})
         expect(signXdr.mock.calls.map(([args]) => args.chainId)).toEqual(['stellar:testnet', 'stellar:pubnet'])
         expect(signXdr.mock.calls[0][0]).toMatchObject({xdr: 'TX_XDR', projectId: 'test-project', metadata: {name: 'Refractor'}})
+    })
+
+    test('exposes the chosen mobile wallet app in flow status', async () => {
+        let observed
+        stubSignClient(async ({onStatus}) => {
+            onStatus({stage: 'pairing', uri: 'wc:test'})
+            observed = getWcStatus()
+            onStatus(null)
+            return 'SIGNED'
+        })
+        await wc.signTx({xdr: 'TX_XDR', network: config.networks.public.passphrase, wallet: 'LOBSTR'})
+        expect(observed.mobileWallet).toMatchObject({name: 'LOBSTR', link: 'lobstr://'})
     })
 
     test('rejects custom networks without loading the client', async () => {
@@ -193,7 +213,7 @@ describe('WalletConnect provider', () => {
         }))
         const pending = wc.signTx({xdr: 'TX_XDR', network: config.networks.testnet.passphrase})
         await new Promise(resolve => setTimeout(resolve))
-        expect(getWcStatus()).toMatchObject({stage: 'pairing', uri: 'wc:test'})
+        expect(getWcStatus()).toMatchObject({stage: 'pairing', uri: 'wc:test', mobileWallet: null})
         getWcStatus().cancel()
         await expect(pending).rejects.toThrow('Cancelled')
         expect(getWcStatus()).toBeNull()

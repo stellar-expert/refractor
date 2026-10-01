@@ -80,6 +80,7 @@ class FakeRelay {
 }
 
 class FakeWebSocket {
+    static CONNECTING = 0
     static OPEN = 1
 
     constructor(url) {
@@ -249,7 +250,7 @@ describe('signXdr', () => {
 
         expect(statuses.map(s => s?.stage ?? null)).toEqual(['connecting', 'pairing', 'requesting', null])
         expect(statuses[1].uri).toMatch(/^wc:[0-9a-f]{64}@2\?relay-protocol=irn&symKey=[0-9a-f]{64}&expiryTimestamp=\d+$/)
-        expect(statuses[2]).toEqual({stage: 'requesting', wallet: walletMetadata, account})
+        expect(statuses[2]).toMatchObject({stage: 'requesting', wallet: walletMetadata, account, sessionTopic: wallet.sessionTopic})
 
         //relay connection is authenticated
         const url = new URL(relay.sockets[0].url)
@@ -269,6 +270,8 @@ describe('signXdr', () => {
         const byMethod = method => sent.find(m => m.payload.method === method)
         expect(byMethod('wc_sessionPropose')).toMatchObject({tag: 1100, ttl: 300, topic: wallet.pairingTopic})
         expect(sent.find(m => m.payload.id === 100)).toMatchObject({tag: 1103, topic: wallet.sessionTopic, payload: {result: true}})
+        //mobile deep link to the pending request relies on the announced request id
+        expect(byMethod('wc_sessionRequest').payload.id).toBe(statuses[2].requestId)
         expect(byMethod('wc_sessionRequest')).toMatchObject({
             tag: 1108,
             prompt: true,
@@ -357,6 +360,9 @@ describe('signXdr', () => {
     test('restores the connection when the page becomes visible again', async () => {
         const wallet = new FakeWallet({
             onRequest: (req, w) => {
+                //dApp resends the request after reconnecting - simulate suspension only once
+                if (relay.sockets.length > 1)
+                    return
                 //browser tab got suspended while the user was signing in the wallet app
                 relay.sockets[0].close()
                 w.publish(w.sessionTopic, {id: req.id, jsonrpc: '2.0', result: {signedXDR: 'SIGNED_LATER'}}, 1109)
@@ -368,6 +374,23 @@ describe('signXdr', () => {
         expect(relay.sockets).toHaveLength(2)
         //new connection uses fresh auth token
         expect(relay.sockets[1].url).not.toBe(relay.sockets[0].url)
+    })
+
+    test('replaces a stale connection when the page becomes visible again', async () => {
+        const wallet = new FakeWallet({
+            onRequest: (req, w) => {
+                if (relay.sockets.length > 1)
+                    return
+                //relay dropped the suspended client, but the browser still reports the socket as open
+                relay.disconnect(relay.sockets[0])
+                w.publish(w.sessionTopic, {id: req.id, jsonrpc: '2.0', result: {signedXDR: 'SIGNED_AFTER_RESUME'}}, 1109)
+                setTimeout(() => document.dispatchEvent(new Event('visibilitychange')), 10)
+            }
+        })
+        jest.spyOn(document, 'visibilityState', 'get').mockReturnValue('visible')
+        await expect(startSigning({wallet}).promise).resolves.toBe('SIGNED_AFTER_RESUME')
+        expect(relay.sockets).toHaveLength(2)
+        expect(relay.sockets[0].readyState).toBe(3)
     })
 })
 

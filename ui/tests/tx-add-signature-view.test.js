@@ -1,5 +1,9 @@
 jest.mock('../signer/tx-signer', () => ({
-    getAllProviders: jest.fn(() => [{title: 'Albedo', mobileSupported: true}, {title: 'Freighter'}]),
+    getAllProviders: jest.fn(() => [
+        {title: 'Albedo', mobileSupported: true},
+        {title: 'Freighter'},
+        {title: 'WalletConnect', mobileSupported: true}
+    ]),
     getAvailableProviders: jest.fn(),
     delegateTxSigning: jest.fn()
 }))
@@ -89,9 +93,37 @@ test('signs with the selected wallet and stores the signature', async () => {
     fireEvent.click(desktop().getByText('Sign'))
     fireEvent.click(within(dropdownOptions()[0]).getByText('Albedo'))
 
-    expect(delegateTxSigning).toHaveBeenCalledWith('Albedo', txInfo.xdr, txInfo.network)
+    expect(delegateTxSigning).toHaveBeenCalledWith('Albedo', txInfo.xdr, txInfo.network, {wallet: undefined})
     await waitFor(() => expect(onUpdate).toHaveBeenCalledWith(updated))
     expect(apiSubmitTx).toHaveBeenCalledWith({...txInfo, xdr: 'SIGNED_XDR'})
+})
+
+test('mobile block lists WalletConnect wallet apps between Albedo and WalletConnect', async () => {
+    await renderView()
+    const buttons = [...document.querySelectorAll('.mobile-only .button')].map(b => b.textContent.trim())
+    expect(buttons).toEqual(['Albedo', 'LOBSTR', 'Freighter', 'HOT Wallet', 'WalletConnect', 'Import'])
+})
+
+test('wallet app buttons request signature via WalletConnect with the chosen wallet', async () => {
+    const {txInfo, onUpdate} = await renderView()
+    delegateTxSigning.mockResolvedValue('SIGNED_XDR')
+    apiSubmitTx.mockResolvedValue(txInfo)
+
+    fireEvent.click(mobile().getByText('LOBSTR'))
+
+    expect(delegateTxSigning).toHaveBeenCalledWith('WalletConnect', txInfo.xdr, txInfo.network, {wallet: 'LOBSTR'})
+    await waitFor(() => expect(onUpdate).toHaveBeenCalled())
+})
+
+test('generic WalletConnect button does not preselect a wallet app', async () => {
+    const {txInfo} = await renderView()
+    delegateTxSigning.mockResolvedValue('SIGNED_XDR')
+    apiSubmitTx.mockResolvedValue(txInfo)
+
+    fireEvent.click(mobile().getByText('WalletConnect'))
+
+    expect(delegateTxSigning).toHaveBeenCalledWith('WalletConnect', txInfo.xdr, txInfo.network, {wallet: undefined})
+    await waitFor(() => expect(apiSubmitTx).toHaveBeenCalled())
 })
 
 test('mobile wallet buttons request signature from the corresponding provider', async () => {
@@ -101,7 +133,7 @@ test('mobile wallet buttons request signature from the corresponding provider', 
 
     fireEvent.click(mobile().getByText('Albedo'))
 
-    expect(delegateTxSigning).toHaveBeenCalledWith('Albedo', txInfo.xdr, txInfo.network)
+    expect(delegateTxSigning).toHaveBeenCalledWith('Albedo', txInfo.xdr, txInfo.network, {wallet: undefined})
     await waitFor(() => expect(onUpdate).toHaveBeenCalled())
 })
 

@@ -53,12 +53,21 @@ export async function getAvailableProviders() {
     return available.filter(Boolean)
 }
 
-export async function delegateTxSigning(providerName, xdr, network) {
+/**
+ * Request transaction signature from a wallet
+ * @param {string} providerName - Signer provider title
+ * @param {string} xdr - Transaction envelope XDR
+ * @param {string} network - Network name or passphrase
+ * @param {Object} [options] - Provider-specific options
+ * @param {string} [options.wallet] - Mobile wallet app to open via WalletConnect deep link
+ * @return {Promise<string>} - Signed transaction envelope XDR
+ */
+export async function delegateTxSigning(providerName, xdr, network, options) {
     const provider = signerProviders[providerName]
     //resolve network
     if (config.networks[network]) {
         network = config.networks[network].passphrase
     }
     //request signature
-    return await provider.signTx({xdr, network})
+    return await provider.signTx({xdr, network, ...options})
 }
