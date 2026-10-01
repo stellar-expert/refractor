@@ -285,6 +285,19 @@ describe('signXdr', () => {
         await expect(startSigning({wallet}).promise).resolves.toBe('PLAIN_SIGNED')
     })
 
+    test('accepts the SEP-43 signedTxXdr signing result', async () => {
+        const wallet = new FakeWallet({
+            onRequest: req => ({id: req.id, jsonrpc: '2.0', result: {signedTxXdr: 'SEP43_SIGNED', signerAddress: 'GSIGNER'}})
+        })
+        await expect(startSigning({wallet}).promise).resolves.toBe('SEP43_SIGNED')
+    })
+
+    test('fails when the wallet returns an unknown result shape', async () => {
+        jest.spyOn(console, 'error').mockImplementation(() => {})
+        const wallet = new FakeWallet({onRequest: req => ({id: req.id, jsonrpc: '2.0', result: {whatever: 'X'}})})
+        await expect(startSigning({wallet}).promise).rejects.toThrow('Wallet returned no signed transaction')
+    })
+
     test('fails when the wallet rejects the connection', async () => {
         const wallet = new FakeWallet({
             onProposal: proposal => ({id: proposal.id, jsonrpc: '2.0', error: {code: 5000, message: 'User rejected.'}})
