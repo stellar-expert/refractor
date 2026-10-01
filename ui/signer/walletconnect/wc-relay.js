@@ -227,16 +227,19 @@ export class RelayClient {
      * @private
      */
     onVisibilityChange() {
-        if (document.visibilityState !== 'visible' || this.closed)
+        if (document.visibilityState !== 'visible' || this.closed || this.isConnected)
             return
-        //a suspended socket may still report OPEN state while the relay has already dropped it - always start over
         const {socket} = this
         if (socket?.readyState === WebSocket.CONNECTING)
             return //reconnection already in progress
+        //a frozen tab can lose the socket without ever running onclose, leaving a closed one behind
         if (socket) {
             this.socket = null
+            socket.onopen = socket.onmessage = socket.onclose = null
             socket.close(1000)
         }
+        clearTimeout(this.reconnectTimer)
+        this.reconnectAttempt = 0
         this.reconnect()
     }
 

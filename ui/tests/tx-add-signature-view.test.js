@@ -110,9 +110,9 @@ test('wallet app buttons request signature via WalletConnect with the chosen wal
     delegateTxSigning.mockResolvedValue('SIGNED_XDR')
     apiSubmitTx.mockResolvedValue(txInfo)
 
-    fireEvent.click(mobile().getByText('LOBSTR'))
+    fireEvent.click(mobile().getByText('Freighter'))
 
-    expect(delegateTxSigning).toHaveBeenCalledWith('WalletConnect', txInfo.xdr, txInfo.network, {wallet: 'LOBSTR'})
+    expect(delegateTxSigning).toHaveBeenCalledWith('WalletConnect', txInfo.xdr, txInfo.network, {wallet: 'Freighter'})
     await waitFor(() => expect(onUpdate).toHaveBeenCalled())
 })
 
