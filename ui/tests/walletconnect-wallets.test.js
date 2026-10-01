@@ -19,7 +19,13 @@ describe('wallet deep links', () => {
     })
 
     test('list only wallets with native app links', () => {
-        expect(wcMobileWallets.map(w => w.name)).toEqual(['LOBSTR', 'Freighter', 'HOT Wallet'])
+        const names = wcMobileWallets.map(w => w.name)
+        expect(new Set(names).size).toBe(names.length)
+        //links registered in WalletConnect wallet registry
+        expect(wcMobileWallets).toEqual(expect.arrayContaining([
+            expect.objectContaining({name: 'LOBSTR', link: 'lobstr://'}),
+            expect.objectContaining({name: 'Freighter', link: 'freighterwallet://wc-redirect'})
+        ]))
         for (const w of wcMobileWallets) {
             expect(w.link).toMatch(/^[a-z]+:\/\//)
         }

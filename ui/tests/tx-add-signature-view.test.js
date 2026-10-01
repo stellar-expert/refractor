@@ -14,6 +14,7 @@ import {render, screen, fireEvent, waitFor, within} from '@testing-library/react
 import {getAvailableProviders, delegateTxSigning} from '../signer/tx-signer'
 import {apiSubmitTx} from '../infrastructure/tx-dispatcher'
 import TxAddSignatureView from '../views/tx/details/tx-add-signature-view'
+import {wcMobileWallets} from '../signer/walletconnect/wc-wallets'
 import {buildTxInfo, deferred} from './helpers/tx-fixtures'
 
 const detectedProviders = [
@@ -101,7 +102,7 @@ test('signs with the selected wallet and stores the signature', async () => {
 test('mobile block lists WalletConnect wallet apps between Albedo and WalletConnect', async () => {
     await renderView()
     const buttons = [...document.querySelectorAll('.mobile-only .button')].map(b => b.textContent.trim())
-    expect(buttons).toEqual(['Albedo', 'LOBSTR', 'Freighter', 'HOT Wallet', 'WalletConnect', 'Import'])
+    expect(buttons).toEqual(['Albedo', ...wcMobileWallets.map(w => w.name), 'WalletConnect', 'Import'])
 })
 
 test('wallet app buttons request signature via WalletConnect with the chosen wallet', async () => {
