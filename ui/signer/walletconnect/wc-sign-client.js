@@ -125,9 +125,11 @@ class SignFlow {
         const res = await signResponse
         if (res.error)
             throw new Error(res.error.message || 'Wallet rejected the request')
-        const signed = typeof res.result === 'string' ? res.result : res.result?.signedXDR
-        if (!signed)
+        const signed = extractSignedXdr(res.result)
+        if (!signed) {
+            console.error('Unexpected WalletConnect signing response', res.result)
             throw new Error('Wallet returned no signed transaction')
+        }
         return signed
     }
 
@@ -256,6 +258,18 @@ class SignFlow {
         const [tag, ttl] = rpcOpts[request.method]
         return this.relay.publish(topic, {id: request.id, jsonrpc: '2.0', result}, {tag: tag + 1, ttl})
     }
+}
+
+/**
+ * Pull the signed envelope out of a wallet response
+ * The Stellar WalletConnect method defines signedXDR, SEP-43 wallets answer with signedTxXdr
+ * @param {string|Object} result
+ * @return {string|undefined}
+ */
+function extractSignedXdr(result) {
+    if (typeof result === 'string')
+        return result
+    return result?.signedXDR || result?.signedTxXdr
 }
 
 function findAccount(namespaces, chainId) {
