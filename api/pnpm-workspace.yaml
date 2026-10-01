@@ -2,3 +2,6 @@ allowBuilds:
   '@parcel/watcher': false
   protobufjs: false
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - '@stellar-expert/tx-signers-inspector@3.0.0'
+  - '@stellar/stellar-sdk@17.2.1'

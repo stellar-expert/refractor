@@ -1,7 +1,7 @@
 {
   "name": "@stellar-expert/refractor-ui",
   "private": true,
-  "version": "0.9.0",
+  "version": "0.10.0",
   "author": "team@stellar.expert",
   "description": "Refractor - pending transactions storage and multisig aggregator for Stellar Network",
   "scripts": {
@@ -17,11 +17,16 @@
     "@albedo-link/intent": "^0.13.0",
     "@creit.tech/xbull-wallet-connect": "0.4.0",
     "@lobstrco/signer-extension-api": "2.0.0",
+    "@noble/ciphers": "2.4.0",
+    "@noble/curves": "2.4.0",
+    "@noble/hashes": "2.4.0",
+    "@stellar-expert/contract-wasm-interface-parser": "6.0.1",
     "@stellar-expert/formatter": "3.2.0",
-    "@stellar-expert/tx-signers-inspector": "2.0.0",
+    "@stellar-expert/tx-meta-effects-parser": "10.1.1",
+    "@stellar-expert/tx-signers-inspector": "3.0.0",
     "@stellar-expert/ui-framework": "3.0.1",
-    "@stellar/freighter-api": "^6.0.1",
-    "@stellar/stellar-sdk": "17.1.0",
+    "@stellar/freighter-api": "6.0.1",
+    "@stellar/stellar-sdk": "17.2.1",
     "classnames": "2.5.1",
     "prop-types": "15.8.1",
     "react": "17.0.2",
@@ -41,7 +46,7 @@
     "jest-environment-jsdom": "^30.5.1"
   },
   "overrides": {
-    "@stellar/stellar-sdk": "17.1.0",
+    "@stellar/stellar-sdk": "17.2.1",
     "jest": "30.5.1"
   }
 }

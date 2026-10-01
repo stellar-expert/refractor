@@ -5,3 +5,6 @@ allowBuilds:
   core-js: true
   node-sass: true
   unrs-resolver: false
+minimumReleaseAgeExclude:
+  - '@stellar-expert/tx-signers-inspector@3.0.0'
+  - '@stellar/stellar-sdk@17.2.1'

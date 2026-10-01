@@ -10,11 +10,13 @@ import OneKeyProvider from './onekey-provider'
 import BitgetProvider from './bitget-provider'
 import CactusLinkProvider from './cactuslink-provider'
 import FordefiProvider from './fordefi-provider'
+import WalletConnectProvider from './walletconnect-provider'
 
 const signerProviders = {}
 //create instances for all available providers
 for (let providerClass of [AlbedoProvider, FreighterProvider, LobstrProvider, XBullProvider, RabetProvider,
-    HanaProvider, KleverProvider, OneKeyProvider, BitgetProvider, CactusLinkProvider, FordefiProvider]) {
+    HanaProvider, KleverProvider, OneKeyProvider, BitgetProvider, CactusLinkProvider, FordefiProvider,
+    WalletConnectProvider]) {
     const provider = new providerClass()
     signerProviders[provider.title] = provider
 }

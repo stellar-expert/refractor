@@ -3,6 +3,7 @@ import {Button, Dropdown, withErrorBoundary} from '@stellar-expert/ui-framework'
 import {apiSubmitTx} from '../../../infrastructure/tx-dispatcher'
 import {delegateTxSigning, getAllProviders, getAvailableProviders} from '../../../signer/tx-signer'
 import AddXdrView from '../add-xdr-view'
+import WalletConnectDialog from './walletconnect-dialog'
 import './add-signatures.scss'
 
 //static list for the mobile block - only wallets that work on mobile devices
@@ -92,6 +93,7 @@ export default withErrorBoundary(function TxAddSignatureView({txInfo, onUpdate})
         </div>
         {!!inProgress && <div className="loader"/>}
         <AddXdrView isOpen={isOpen} changeVisible={toggleImportModal} txInfo={txInfo} onUpdate={onUpdate}/>
+        <WalletConnectDialog/>
     </div>
 })
 

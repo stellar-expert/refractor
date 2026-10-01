@@ -1,5 +1,6 @@
 import config from '../app.config.json'
 import {getAllProviders, getAvailableProviders, delegateTxSigning} from '../signer/tx-signer'
+import {getWcStatus} from '../signer/walletconnect/wc-status'
 
 const providers = getAllProviders()
 
@@ -14,7 +15,8 @@ afterEach(() => {
 describe('provider registry', () => {
     test('registers every supported wallet exactly once', () => {
         const titles = providers.map(p => p.title)
-        expect(titles).toEqual(['Albedo', 'Freighter', 'Lobstr', 'xBull', 'Rabet', 'Hana', 'Klever', 'OneKey', 'Bitget', 'CactusLink', 'Fordefi'])
+        expect(titles).toEqual(['Albedo', 'Freighter', 'Lobstr', 'xBull', 'Rabet', 'Hana', 'Klever', 'OneKey', 'Bitget', 'CactusLink', 'Fordefi',
+            'WalletConnect'])
         expect(new Set(titles).size).toBe(titles.length)
     })
 
@@ -27,7 +29,7 @@ describe('provider registry', () => {
     })
 
     test('only web-based wallets are marked as mobile-supported', () => {
-        expect(providers.filter(p => p.mobileSupported).map(p => p.title)).toEqual(['Albedo'])
+        expect(providers.filter(p => p.mobileSupported).map(p => p.title)).toEqual(['Albedo', 'WalletConnect'])
     })
 
     test('browser-extension wallets report unavailable when their globals are missing', async () => {
@@ -142,5 +144,58 @@ describe('Freighter provider', () => {
         const {freighter} = stubFreighterApi({signedTxXdr: '', signerAddress: '', error: {message: 'User declined access'}})
         await expect(freighter.signTx({xdr: 'TX_XDR', network: 'Test SDF Network ; September 2015'}))
             .rejects.toThrow('User declined access')
+    })
+})
+
+describe('WalletConnect provider', () => {
+    const wc = provider('WalletConnect')
+
+    afterEach(() => {
+        config.walletConnect.projectId = ''
+    })
+
+    function stubSignClient(signXdr) {
+        jest.spyOn(wc, 'init').mockImplementation(async function () {
+            this.provider = {signXdr}
+        })
+    }
+
+    test('is available only when a project id is configured', () => {
+        expect(wc.checkAvailable()).toBe(false)
+        config.walletConnect.projectId = 'test-project'
+        expect(wc.checkAvailable()).toBe(true)
+    })
+
+    test('maps network passphrase to Stellar chain id', async () => {
+        config.walletConnect.projectId = 'test-project'
+        const signXdr = jest.fn().mockResolvedValue('SIGNED_XDR')
+        stubSignClient(signXdr)
+        await expect(wc.signTx({xdr: 'TX_XDR', network: config.networks.testnet.passphrase})).resolves.toBe('SIGNED_XDR')
+        await wc.signTx({xdr: 'TX_XDR', network: config.networks.public.passphrase})
+        expect(signXdr.mock.calls.map(([args]) => args.chainId)).toEqual(['stellar:testnet', 'stellar:pubnet'])
+        expect(signXdr.mock.calls[0][0]).toMatchObject({xdr: 'TX_XDR', projectId: 'test-project', metadata: {name: 'Refractor'}})
+    })
+
+    test('rejects custom networks without loading the client', async () => {
+        const init = jest.spyOn(wc, 'init')
+        await expect(wc.signTx({xdr: 'TX_XDR', network: 'Custom Network ; 2026'}))
+            .rejects.toThrow('WalletConnect supports only Stellar public and testnet networks')
+        expect(init).not.toHaveBeenCalled()
+    })
+
+    test('publishes flow status with a cancel handler', async () => {
+        stubSignClient(({onStatus, signal}) => new Promise((resolve, reject) => {
+            onStatus({stage: 'pairing', uri: 'wc:test'})
+            signal.addEventListener('abort', () => {
+                onStatus(null)
+                reject(new Error('Cancelled'))
+            })
+        }))
+        const pending = wc.signTx({xdr: 'TX_XDR', network: config.networks.testnet.passphrase})
+        await new Promise(resolve => setTimeout(resolve))
+        expect(getWcStatus()).toMatchObject({stage: 'pairing', uri: 'wc:test'})
+        getWcStatus().cancel()
+        await expect(pending).rejects.toThrow('Cancelled')
+        expect(getWcStatus()).toBeNull()
     })
 })

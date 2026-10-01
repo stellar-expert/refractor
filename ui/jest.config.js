@@ -10,7 +10,8 @@ module.exports = {
             module: {type: 'commonjs'}
         }]
     },
-    transformIgnorePatterns: ['node_modules[\\\\/]\\.pnpm[\\\\/](?!@stellar-expert)'],
+    //@noble/* packages are ESM-only
+    transformIgnorePatterns: ['node_modules[\\\\/]\\.pnpm[\\\\/](?!@stellar-expert|@noble)'],
     moduleNameMapper: {
         '\\.(scss|css)$': 'identity-obj-proxy'
     },

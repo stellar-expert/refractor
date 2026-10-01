@@ -10,5 +10,8 @@
       "horizon": "https://horizon-testnet.stellar.org",
       "passphrase": "Test SDF Network ; September 2015"
     }
+  },
+  "walletConnect": {
+    "projectId": "536c727353f5040a740f5bf857a9a503"
   }
 }
