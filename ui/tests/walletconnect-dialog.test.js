@@ -11,8 +11,7 @@ import WalletConnectDialog from '../views/tx/details/walletconnect-dialog'
 
 const uri = 'wc:' + 'a'.repeat(64) + '@2?relay-protocol=irn&symKey=' + 'b'.repeat(64) + '&expiryTimestamp=1'
 const account = 'GBJBA3HJPU6Q2PYFLOHLHQMJD2BQPVSABURMTNSHOMS6UUP4MWUTZHE2'
-const sessionTopic = 'c'.repeat(64)
-const lobstr = wcMobileWallets.find(w => w.name === 'LOBSTR')
+const freighter = wcMobileWallets.find(w => w.name === 'Freighter')
 
 function dialog() {
     return within(document.querySelector('.dialog'))
@@ -52,9 +51,10 @@ test('shows pairing QR code and generic deep link', () => {
 
 test('passes pairing URI via deep link of the chosen wallet app', () => {
     render(<WalletConnectDialog/>)
-    act(() => setWcStatus({stage: 'pairing', uri, mobileWallet: lobstr, cancel: jest.fn()}))
+    act(() => setWcStatus({stage: 'pairing', uri, mobileWallet: freighter, cancel: jest.fn()}))
     expect(dialog().getByTestId('qr')).toHaveAttribute('data-value', uri)
-    expect(dialog().getByText('Open in LOBSTR')).toHaveAttribute('href', 'lobstr://wc?uri=' + encodeURIComponent(uri))
+    expect(dialog().getByText('Open in Freighter'))
+        .toHaveAttribute('href', 'freighterwallet://wc-redirect/wc?uri=' + encodeURIComponent(uri))
 })
 
 test('shows connected wallet while waiting for the signature', () => {
@@ -74,15 +74,14 @@ test('links the chosen wallet app to the pending request', () => {
     render(<WalletConnectDialog/>)
     act(() => setWcStatus({
         stage: 'requesting',
-        wallet: {name: 'LOBSTR Wallet', redirect: {native: 'lobstr://'}},
+        wallet: {name: 'Freighter Wallet'},
         account,
-        requestId: 123,
-        sessionTopic,
-        mobileWallet: lobstr,
+        mobileWallet: freighter,
         cancel: jest.fn()
     }))
-    expect(dialog().getByText('Open LOBSTR Wallet'))
-        .toHaveAttribute('href', `lobstr://wc?requestId=123&sessionTopic=${sessionTopic}`)
+    //the plain native link reopens the app with the pending request
+    expect(dialog().getByText('Open Freighter Wallet'))
+        .toHaveAttribute('href', 'freighterwallet://wc-redirect')
 })
 
 test('omits wallet link when the wallet provides no redirect', () => {
