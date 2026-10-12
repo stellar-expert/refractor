@@ -2,6 +2,7 @@ jest.mock('../signer/tx-signer', () => ({
     getAllProviders: jest.fn(() => [
         {title: 'Albedo', mobileSupported: true},
         {title: 'Freighter'},
+        {title: 'xBull', mobileSupported: true},
         {title: 'WalletConnect', mobileSupported: true}
     ]),
     getAvailableProviders: jest.fn(),
@@ -102,7 +103,7 @@ test('signs with the selected wallet and stores the signature', async () => {
 test('mobile block lists WalletConnect wallet apps between Albedo and WalletConnect', async () => {
     await renderView()
     const buttons = [...document.querySelectorAll('.mobile-only .button')].map(b => b.textContent.trim())
-    expect(buttons).toEqual(['Albedo', ...wcMobileWallets.map(w => w.name), 'WalletConnect', 'Import'])
+    expect(buttons).toEqual(['Albedo', 'xBull', ...wcMobileWallets.map(w => w.name), 'WalletConnect', 'Import'])
 })
 
 test('wallet app buttons request signature via WalletConnect with the chosen wallet', async () => {
@@ -110,9 +111,9 @@ test('wallet app buttons request signature via WalletConnect with the chosen wal
     delegateTxSigning.mockResolvedValue('SIGNED_XDR')
     apiSubmitTx.mockResolvedValue(txInfo)
 
-    fireEvent.click(mobile().getByText('LOBSTR'))
+    fireEvent.click(mobile().getByText('Freighter'))
 
-    expect(delegateTxSigning).toHaveBeenCalledWith('WalletConnect', txInfo.xdr, txInfo.network, {wallet: 'LOBSTR'})
+    expect(delegateTxSigning).toHaveBeenCalledWith('WalletConnect', txInfo.xdr, txInfo.network, {wallet: 'Freighter'})
     await waitFor(() => expect(onUpdate).toHaveBeenCalled())
 })
 

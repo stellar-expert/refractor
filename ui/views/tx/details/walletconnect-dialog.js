@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import {AccountAddress, Button, CopyToClipboard, Dialog, QrCode} from '@stellar-expert/ui-framework'
 import {getWcStatus, subscribeWcStatus} from '../../../signer/walletconnect/wc-status'
-import {formatPairingLink, formatRequestLink} from '../../../signer/walletconnect/wc-wallets'
+import {formatPairingLink} from '../../../signer/walletconnect/wc-wallets'
 
 export default function WalletConnectDialog() {
     const [status, setStatus] = useState(getWcStatus)
@@ -26,7 +26,7 @@ export default function WalletConnectDialog() {
     </Dialog>
 }
 
-function WalletConnectStage({stage, uri, wallet, account, requestId, sessionTopic, mobileWallet}) {
+function WalletConnectStage({stage, uri, wallet, account, mobileWallet}) {
     switch (stage) {
         case 'pairing': {
             //wallets ignore bare "wc:" links on mobile, so use the deep link of the chosen wallet app if any
@@ -46,8 +46,8 @@ function WalletConnectStage({stage, uri, wallet, account, requestId, sessionTopi
         }
         case 'requesting': {
             const walletName = wallet?.name || 'your wallet'
-            const walletLink = mobileWallet ?
-                formatRequestLink(mobileWallet.link, requestId, sessionTopic) :
+            //the plain native link reopens the app with the pending request
+            const walletLink = mobileWallet?.link ||
                 wallet?.redirect?.native || wallet?.redirect?.universal
             return <>
                 <p>Confirm the transaction in {walletName}</p>

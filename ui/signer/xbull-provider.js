@@ -1,6 +1,8 @@
 export default class XBullProvider {
     title = 'xBull'
 
+    mobileSupported = true
+
     checkAvailable() {
         //connects to both the extension and the web wallet, works everywhere
         return true

@@ -29,7 +29,7 @@ describe('provider registry', () => {
     })
 
     test('only web-based wallets are marked as mobile-supported', () => {
-        expect(providers.filter(p => p.mobileSupported).map(p => p.title)).toEqual(['Albedo', 'WalletConnect'])
+        expect(providers.filter(p => p.mobileSupported).map(p => p.title)).toEqual(['Albedo', 'xBull', 'WalletConnect'])
     })
 
     test('browser-extension wallets report unavailable when their globals are missing', async () => {
