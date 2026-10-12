@@ -1,9 +1,9 @@
 let callbackHandler = function (txInfo) {
-    const {tx, network, hash, callbackUrl} = txInfo
+    const {tx, xdr, network, hash, callbackUrl} = txInfo
     return fetch(callbackUrl, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({tx, hash, network})
+        body: JSON.stringify({tx: tx || xdr, hash, network})
     })
 }
 
